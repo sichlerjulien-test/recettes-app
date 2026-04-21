@@ -1,0 +1,27 @@
+# Exemple d'ingrédient — copier-coller comme template
+# Toutes les valeurs ici sont CURÉES MANUELLEMENT et VÉRIFIÉES.
+
+id: farine-ble-t55
+nom: Farine de blé T55
+nom_pluriel: Farines de blé T55
+categorie: epicerie-salee
+
+# Comment on stocke vs comment on achète
+unite_base: g
+unite_achat: kg
+conversion: 1000  # 1 kg = 1000 g
+
+# Allergènes EU14 — STRICTEMENT issus de data/seed-allergenes.ts
+allergenes:
+  - gluten
+
+contient_trace: []  # Pas d'allergènes en trace probable
+
+# Ingrédients de remplacement (par leur id, doivent exister dans la base)
+substituts:
+  - farine-riz
+  - farine-sarrasin
+
+notes: |
+  Farine polyvalente. Pour pâte à pizza préférer T45.
+  Pour pain rustique préférer T80 ou T110.

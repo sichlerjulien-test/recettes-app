@@ -1,0 +1,79 @@
+# Exemple de recette — copier-coller comme template
+#
+# IMPORTANT :
+# - Tous les ingredient_id doivent exister dans data/ingredients/
+# - Le champ allergenes_calcules N'EST PAS saisi ici, il sera ajouté au build
+# - Cette recette doit avoir été cuisinée au moins une fois avant merge
+
+id: pates-pesto-poulet
+nom: Pâtes au pesto et poulet grillé
+description: Plat rapide et nourrissant, parfait après une journée de rando.
+
+portions_base: 4
+
+# Durées en minutes
+duree_minutes: 25      # Total de préparation + cuisson
+duree_active: 15       # Temps où il faut être présent (le reste = pâtes qui cuisent seules)
+
+difficulte: facile
+
+# Équipements requis (intersection avec l'équipement disponible du séjour)
+equipement:
+  - plaque
+
+# Quand cette recette est servable
+type_repas:
+  - midi
+  - soir
+
+type_cuisine: italienne
+
+saison:
+  - toutes
+
+# Métadonnées pour les règles de cohérence du planning
+ingredient_principal: poulet
+feculent_dominant: pates
+
+# Liste structurée des ingrédients
+ingredients:
+  - ingredient_id: penne
+    quantite_base: 400
+    unite: g
+
+  - ingredient_id: poulet-blanc
+    quantite_base: 500
+    unite: g
+
+  - ingredient_id: pesto-vert
+    quantite_base: 180
+    unite: g
+
+  - ingredient_id: parmesan
+    quantite_base: 60
+    unite: g
+    optionnel: true
+
+  - ingredient_id: huile-olive
+    quantite_base: 20
+    unite: ml
+
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+
+# Étapes — markdown léger autorisé (gras, italique, listes simples)
+etapes:
+  - Faire bouillir une grande casserole d'eau salée.
+  - Découper le poulet en lanières et l'assaisonner.
+  - Cuire le poulet à la poêle avec un filet d'huile, environ 8 minutes.
+  - Cuire les pâtes selon les instructions du paquet (généralement 8-10 min).
+  - Hors du feu, mélanger pâtes égouttées + pesto + poulet.
+  - Servir avec du parmesan râpé et un tour de moulin à poivre.
+
+# Tags libres pour la recherche et les préférences utilisateur
+tags_libres:
+  - rapide
+  - convivial
+  - apres-randonnee
+  - une-seule-casserole
