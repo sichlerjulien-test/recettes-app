@@ -234,13 +234,38 @@ export interface ShoppingList {
 // VALIDATION RESULTS
 // ============================================================================
 
-export interface ValidationViolation {
+/** Violation liée à un allergène EU14 déclaré par un participant. */
+export interface AllergenViolation {
+  kind: 'allergen';
   recette_id: string;
   recette_nom: string;
   allergene: Allergen;
-  participant_id?: string;
-  participant_nom?: string;
+  participant_id: string | undefined;
+  participant_nom: string | undefined;
 }
+
+/** Violation liée à un régime alimentaire déclaré par un participant. */
+export interface RegimeViolation {
+  kind: 'regime';
+  recette_id: string;
+  recette_nom: string;
+  regime: DietaryRestriction;
+  participant_id: string | undefined;
+  participant_nom: string | undefined;
+}
+
+/** Violation d'intégrité : l'entrée du planning référence une recette inconnue. */
+export interface RecetteInconnueViolation {
+  kind: 'recette_inconnue';
+  recette_id: string;
+  participant_id: string | undefined;
+  participant_nom: string | undefined;
+}
+
+export type ValidationViolation =
+  | AllergenViolation
+  | RegimeViolation
+  | RecetteInconnueViolation;
 
 export interface ValidationResult {
   valid: boolean;
