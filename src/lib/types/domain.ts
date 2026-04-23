@@ -104,9 +104,9 @@ export interface RecipeIngredient {
   /** Quantité pour portions_base personnes */
   quantite_base: number;
   unite: Unit;
-  optionnel?: boolean;
+  optionnel: boolean;
   /** Regroupement visuel, ex: "pour la sauce", "pour le dressage" */
-  groupe?: string;
+  groupe?: string | undefined;
 }
 
 export interface Recette {
@@ -246,3 +246,25 @@ export interface ValidationResult {
   valid: boolean;
   violations: ValidationViolation[];
 }
+
+// ============================================================================
+// CHECK DE COHÉRENCE COMPILE-TIME
+//
+// Ce bloc garantit que l'interface `Recette` (source de vérité TypeScript)
+// et le type `RecetteEnrichie` (inféré depuis `RecetteSchema` dans schemas.ts)
+// restent structurellement équivalents.
+//
+// NE PAS SUPPRIMER. Si la compilation échoue ici, c'est qu'un champ a été
+// ajouté ou modifié dans l'un des deux sans mettre à jour l'autre.
+// Procédure de mise à jour :
+//   1. Modifier le champ dans `domain.ts` (interface Recette)
+//   2. Modifier le schéma correspondant dans `schemas.ts` (RecetteSchema)
+//   3. Vérifier que ce check repasse avec `npx tsc --noEmit`
+// ============================================================================
+import type { RecetteEnrichie } from '@/lib/types/schemas';
+
+type _AssertRecetteExtendsEnrichie = Recette extends RecetteEnrichie ? true : never;
+type _AssertEnrichieExtendsRecette = RecetteEnrichie extends Recette ? true : never;
+
+// Force l'évaluation des deux types conditionnels au compile-time.
+const _coherenceCheck: [_AssertRecetteExtendsEnrichie, _AssertEnrichieExtendsRecette] = [true, true];
