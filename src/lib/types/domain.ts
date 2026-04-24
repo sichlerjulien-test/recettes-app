@@ -104,9 +104,9 @@ export interface RecipeIngredient {
   /** Quantité pour portions_base personnes */
   quantite_base: number;
   unite: Unit;
-  optionnel?: boolean;
+  optionnel: boolean;
   /** Regroupement visuel, ex: "pour la sauce", "pour le dressage" */
-  groupe?: string;
+  groupe?: string | undefined;
 }
 
 export interface Recette {
@@ -234,15 +234,62 @@ export interface ShoppingList {
 // VALIDATION RESULTS
 // ============================================================================
 
-export interface ValidationViolation {
+/** Violation liée à un allergène EU14 déclaré par un participant. */
+export interface AllergenViolation {
+  kind: 'allergen';
   recette_id: string;
   recette_nom: string;
   allergene: Allergen;
-  participant_id?: string;
-  participant_nom?: string;
+  participant_id: string | undefined;
+  participant_nom: string | undefined;
 }
+
+/** Violation liée à un régime alimentaire déclaré par un participant. */
+export interface RegimeViolation {
+  kind: 'regime';
+  recette_id: string;
+  recette_nom: string;
+  regime: DietaryRestriction;
+  participant_id: string | undefined;
+  participant_nom: string | undefined;
+}
+
+/** Violation d'intégrité : l'entrée du planning référence une recette inconnue. */
+export interface RecetteInconnueViolation {
+  kind: 'recette_inconnue';
+  recette_id: string;
+  participant_id: string | undefined;
+  participant_nom: string | undefined;
+}
+
+export type ValidationViolation =
+  | AllergenViolation
+  | RegimeViolation
+  | RecetteInconnueViolation;
 
 export interface ValidationResult {
   valid: boolean;
   violations: ValidationViolation[];
 }
+
+// ============================================================================
+// CHECK DE COHÉRENCE COMPILE-TIME
+//
+// Ce bloc garantit que l'interface `Recette` (source de vérité TypeScript)
+// et le type `RecetteEnrichie` (inféré depuis `RecetteSchema` dans schemas.ts)
+// restent structurellement équivalents.
+//
+// NE PAS SUPPRIMER. Si la compilation échoue ici, c'est qu'un champ a été
+// ajouté ou modifié dans l'un des deux sans mettre à jour l'autre.
+// Procédure de mise à jour :
+//   1. Modifier le champ dans `domain.ts` (interface Recette)
+//   2. Modifier le schéma correspondant dans `schemas.ts` (RecetteSchema)
+//   3. Vérifier que ce check repasse avec `npx tsc --noEmit`
+// ============================================================================
+import type { RecetteEnrichie } from '@/lib/types/schemas';
+
+type _AssertRecetteExtendsEnrichie = Recette extends RecetteEnrichie ? true : never;
+type _AssertEnrichieExtendsRecette = RecetteEnrichie extends Recette ? true : never;
+
+// Force l'évaluation des deux types conditionnels au compile-time.
+const _coherenceCheck: [_AssertRecetteExtendsEnrichie, _AssertEnrichieExtendsRecette] = [true, true];

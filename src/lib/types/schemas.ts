@@ -129,6 +129,15 @@ export const RecetteSchema = RecetteInputSchema.extend({
   est_vegan: z.boolean(),
 });
 
+/**
+ * Équivalent runtime de l'interface `Recette` définie dans `domain.ts`.
+ * Ce type est inféré de `RecetteSchema` (source de vérité Zod) et doit
+ * rester structurellement identique à `Recette`.
+ * Toute divergence entre les deux est détectée au compile-time par le
+ * check de cohérence en bas de `domain.ts`.
+ */
+export type RecetteEnrichie = z.infer<typeof RecetteSchema>;
+
 // ============================================================================
 // PARTICIPANT & SEJOUR
 // ============================================================================
