@@ -22,6 +22,11 @@ const MAIN_INGREDIENTS_NON_VEGAN = new Set<MainIngredient>(['oeufs', 'fromage'])
  * @returns Les trois champs calculés : allergenes_calcules, est_vegetarien, est_vegan
  * @throws Error si un ingredient_id référencé n'existe pas dans ingredientsMap
  *
+ * IMPORTANT : les ingrédients marqués optionnel: true sont EXCLUS du calcul de
+ * allergenes_calcules. Décision produit : un ingrédient optionnel peut être omis par
+ * l'utilisateur final, il ne doit donc pas déclencher l'exclusion d'une recette pour
+ * un allergique.
+ *
  * @example
  * const meta = computeRecipeMetadata(recette, new Map(ingredients.map(i => [i.id, i])));
  * // meta.allergenes_calcules => ['gluten', 'lait']

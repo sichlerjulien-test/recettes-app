@@ -144,6 +144,19 @@ describe('filterRecipes', () => {
     expect(result).not.toBe(input);
   });
 
+  it('doit exclure les recettes contenant lait ou oeufs pour un groupe allergique aux deux', () => {
+    const result = filterRecipes(allRecettes(), {
+      ...NO_CONSTRAINTS,
+      allergenes_groupe: ['lait', 'oeufs'],
+    });
+    for (const r of result) {
+      expect(r.allergenes_calcules).not.toContain('lait');
+      expect(r.allergenes_calcules).not.toContain('oeufs');
+    }
+    // Le catalogue doit contenir au moins quelques recettes sans lait ni oeufs
+    expect(result.length).toBeGreaterThan(0);
+  });
+
   it("doit respecter l'intersection stricte vegan + coeliaque + sans four + midi", () => {
     const result = filterRecipes(allRecettes(), {
       allergenes_groupe: ['gluten'],

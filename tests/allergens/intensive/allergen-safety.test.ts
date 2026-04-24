@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { FilterConstraints } from '@/lib/allergens/filter';
 import type { Participant, Planning } from '@/lib/types/domain';
+import { EU14_ALLERGENS } from '../../../data/seed-allergenes';
 import { filterRecipes } from '@/lib/allergens/filter';
 import { validatePlanning } from '@/lib/allergens/validator';
 import {
@@ -9,6 +10,7 @@ import {
   participantCoeliaqueVegan,
   participantSansContrainte,
   participantVegan,
+  participantVegetarienAllergique,
 } from '../../fixtures/participants';
 import { allRecettes, recettesMap } from '../../fixtures/recettes';
 
@@ -55,10 +57,14 @@ function runProfile(
 ): void {
   const rng = mulberry32(seed);
   const catalogue = allRecettes();
+  let skippedIterations = 0;
 
   for (let i = 0; i < iterations; i++) {
     const filtered = filterRecipes(catalogue, constraints);
-    if (filtered.length === 0) continue;
+    if (filtered.length === 0) {
+      skippedIterations++;
+      continue;
+    }
 
     const nb = Math.min(Math.floor(rng() * 5) + 1, filtered.length);
     const selected: string[] = [];
@@ -77,9 +83,14 @@ function runProfile(
       );
     }
   }
+
+  expect(
+    skippedIterations,
+    `Profil ${label}: pool filtré vide dans ${skippedIterations}/${iterations} itérations — contraintes trop restrictives ou catalogue insuffisant`,
+  ).toBeLessThan(iterations);
 }
 
-describe('allergen-safety (500 iterations)', () => {
+describe('allergen-safety (600 iterations)', () => {
 
   it('profil coeliaque: 100 plannings filtrés sont tous valides', () => {
     runProfile(
@@ -147,6 +158,34 @@ describe('allergen-safety (500 iterations)', () => {
       0x5E6F7081,
       100,
     );
+  });
+
+  it('profil vegetarien allergique (fruits-coque, sesame): 100 plannings filtrés sont tous valides', () => {
+    runProfile(
+      'vegetarien-allergique',
+      [participantVegetarienAllergique],
+      {
+        allergenes_groupe: participantVegetarienAllergique.allergies,
+        regimes_groupe: participantVegetarienAllergique.regimes,
+        equipement_disponible: ALL_EQUIPMENT,
+      },
+      0x6F708192,
+      100,
+    );
+  });
+
+  it('doit signaler explicitement un pool filtré vide', () => {
+    // Contraintes maximales : tous les allergènes EU14 + vegan + aucun équipement
+    // → aucune recette du catalogue ne peut passer ces trois filtres cumulés.
+    const filtered = filterRecipes(allRecettes(), {
+      allergenes_groupe: [...EU14_ALLERGENS],
+      regimes_groupe: ['vegan'],
+      equipement_disponible: [],
+    });
+    expect(filtered.length).toBe(0);
+    // Contrat documenté : la couche appelante DOIT détecter ce cas (filtered.length === 0)
+    // et remonter une erreur explicite à l'utilisateur. Jamais continuer silencieusement.
+    // La gestion UI sera implémentée dans le module de génération de planning.
   });
 
 });
