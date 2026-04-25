@@ -1,0 +1,67 @@
+id: omelette-herbes
+nom: Omelette aux herbes et salade verte
+description: Plat rapide et léger qui dépanne à toute heure.
+
+portions_base: 4
+duree_minutes: 15
+duree_active: 15
+difficulte: facile
+
+equipement:
+  - plaque
+
+type_repas:
+  - brunch
+  - midi
+  - soir
+
+type_cuisine: francaise
+
+saison:
+  - toutes
+
+ingredient_principal: oeufs
+feculent_dominant: aucun
+
+ingredients:
+  - ingredient_id: oeuf
+    quantite_base: 8
+    unite: piece
+
+  - ingredient_id: parmesan
+    quantite_base: 40
+    unite: g
+    optionnel: true
+
+  - ingredient_id: salade-mesclun
+    quantite_base: 200
+    unite: g
+
+  - ingredient_id: huile-olive
+    quantite_base: 20
+    unite: ml
+
+  - ingredient_id: vinaigre-balsamique
+    quantite_base: 15
+    unite: ml
+
+  - ingredient_id: sel
+    quantite_base: 3
+    unite: g
+
+  - ingredient_id: poivre
+    quantite_base: 1
+    unite: g
+
+etapes:
+  - Battre les œufs en omelette avec sel, poivre, et parmesan râpé si utilisé.
+  - Faire chauffer l'huile dans une grande poêle.
+  - Verser les œufs, laisser cuire 4-5 minutes, replier en deux.
+  - Préparer la vinaigrette dans un saladier.
+  - Mélanger le mesclun avec la vinaigrette.
+  - Servir l'omelette accompagnée de la salade.
+
+tags_libres:
+  - rapide
+  - vegetarien
+  - secours

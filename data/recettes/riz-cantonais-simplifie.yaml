@@ -1,0 +1,66 @@
+id: riz-cantonais-simplifie
+nom: Riz cantonais simplifié
+description: Recette de secours imparable. Recycle un reste de riz et nourrit un groupe en 15 minutes.
+
+portions_base: 4
+duree_minutes: 20
+duree_active: 15
+difficulte: facile
+
+equipement:
+  - plaque
+
+type_repas:
+  - midi
+  - soir
+
+type_cuisine: asiatique
+
+saison:
+  - toutes
+
+ingredient_principal: oeufs
+feculent_dominant: riz
+
+ingredients:
+  - ingredient_id: riz-basmati
+    quantite_base: 320
+    unite: g
+
+  - ingredient_id: oeuf
+    quantite_base: 4
+    unite: piece
+
+  - ingredient_id: petits-pois-surgeles
+    quantite_base: 200
+    unite: g
+
+  - ingredient_id: oignon
+    quantite_base: 1
+    unite: piece
+
+  - ingredient_id: sauce-soja
+    quantite_base: 40
+    unite: ml
+
+  - ingredient_id: huile-olive
+    quantite_base: 20
+    unite: ml
+
+  - ingredient_id: sel
+    quantite_base: 3
+    unite: g
+
+etapes:
+  - Cuire le riz dans 2 fois son volume d'eau salée, 12 minutes à couvert.
+  - Pendant ce temps, émincer l'oignon et le faire revenir à la poêle.
+  - Battre les œufs en omelette dans un bol.
+  - Ajouter les petits pois à l'oignon, puis verser les œufs et brouiller.
+  - Incorporer le riz cuit, mélanger.
+  - Verser la sauce soja, mélanger encore. Servir immédiatement.
+
+tags_libres:
+  - rapide
+  - secours
+  - reste-de-riz
+  - groupe

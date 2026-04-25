@@ -1,0 +1,11 @@
+id: huile-olive
+nom: Huile d'olive
+nom_pluriel: Huiles d'olive
+categorie: condiments-epices
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []
+notes: Préférer vierge extra pour assaisonnement.

@@ -1,0 +1,11 @@
+id: poivre
+nom: Poivre noir moulu
+nom_pluriel: Poivres noirs moulus
+categorie: condiments-epices
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []
+notes: Préférer poivre fraîchement moulu si possible.

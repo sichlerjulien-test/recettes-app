@@ -1,0 +1,14 @@
+id: sauce-soja
+nom: Sauce soja
+nom_pluriel: Sauces soja
+categorie: condiments-epices
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes:
+  - soja
+  - gluten
+contient_trace: []
+substituts:
+  - tamari
+notes: Tamari pour version sans gluten. Privilégier sauce salée naturellement fermentée.

@@ -1,0 +1,13 @@
+id: pesto-vert
+nom: Pesto vert
+nom_pluriel: Pestos verts
+categorie: condiments-epices
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - lait
+  - fruits-coque
+contient_trace: []
+substituts: []
+notes: Vérifier composition pour pignons (fruits-coque). Certaines marques utilisent des noix de cajou.

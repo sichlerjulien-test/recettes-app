@@ -1,0 +1,12 @@
+id: noix
+nom: Cerneaux de noix
+nom_pluriel: Cerneaux de noix
+categorie: epicerie-salee
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - fruits-coque
+contient_trace: []
+substituts: []
+notes: Conservation au frais après ouverture.

@@ -1,0 +1,75 @@
+id: salade-chevre-miel
+nom: Salade composée chèvre miel et noix
+description: Salade complète qui tient dans le ventre, parfaite pour un déjeuner ensoleillé.
+
+portions_base: 4
+duree_minutes: 15
+duree_active: 15
+difficulte: facile
+
+equipement:
+  - plaque
+
+type_repas:
+  - midi
+
+type_cuisine: francaise
+
+saison:
+  - printemps
+  - ete
+  - automne
+
+ingredient_principal: fromage
+feculent_dominant: pain
+
+ingredients:
+  - ingredient_id: salade-mesclun
+    quantite_base: 300
+    unite: g
+
+  - ingredient_id: chevre-buchette
+    quantite_base: 360
+    unite: g
+
+  - ingredient_id: pain-complet
+    quantite_base: 200
+    unite: g
+
+  - ingredient_id: miel
+    quantite_base: 40
+    unite: g
+
+  - ingredient_id: noix
+    quantite_base: 60
+    unite: g
+
+  - ingredient_id: huile-olive
+    quantite_base: 30
+    unite: ml
+
+  - ingredient_id: vinaigre-balsamique
+    quantite_base: 15
+    unite: ml
+
+  - ingredient_id: sel
+    quantite_base: 3
+    unite: g
+
+  - ingredient_id: poivre
+    quantite_base: 1
+    unite: g
+
+etapes:
+  - Couper le pain en tranches, les toaster légèrement.
+  - Découper le chèvre en rondelles, déposer sur le pain.
+  - Passer les tartines 3 minutes sous le grill.
+  - Pendant ce temps, préparer la vinaigrette (huile + vinaigre + sel + poivre).
+  - Mélanger le mesclun avec la vinaigrette dans un saladier.
+  - Disposer les noix concassées sur la salade.
+  - Sortir les tartines, déposer sur la salade, arroser d'un filet de miel.
+
+tags_libres:
+  - estival
+  - vegetarien
+  - convivial

@@ -1,0 +1,12 @@
+id: riz-basmati
+nom: Riz basmati
+nom_pluriel: Riz basmati
+categorie: feculents-pates-riz
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts:
+  - riz-thai
+notes: Riz long, texture aérée.

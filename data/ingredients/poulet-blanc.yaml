@@ -1,0 +1,12 @@
+id: poulet-blanc
+nom: Blanc de poulet
+nom_pluriel: Blancs de poulet
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts:
+  - tofu-ferme
+notes: Préférer label rouge ou bio si possible.

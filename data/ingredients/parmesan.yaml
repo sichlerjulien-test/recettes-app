@@ -1,0 +1,13 @@
+id: parmesan
+nom: Parmesan râpé
+nom_pluriel: Parmesans râpés
+categorie: cremerie-oeufs
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - lait
+contient_trace: []
+substituts:
+  - levure-maltee
+notes: Pour version vegan, utiliser de la levure maltée.

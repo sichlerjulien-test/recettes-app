@@ -1,0 +1,12 @@
+id: chevre-buchette
+nom: Bûchette de chèvre
+nom_pluriel: Bûchettes de chèvre
+categorie: cremerie-oeufs
+unite_base: g
+unite_achat: piece
+conversion: 180
+allergenes:
+  - lait
+contient_trace: []
+substituts: []
+notes: Bûchette standard ≈ 180g.
