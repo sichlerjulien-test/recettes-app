@@ -1,0 +1,13 @@
+id: pain-complet
+nom: Pain complet
+nom_pluriel: Pains complets
+categorie: boulangerie
+unite_base: g
+unite_achat: piece
+conversion: 400
+allergenes:
+  - gluten
+contient_trace: []
+substituts:
+  - pain-sans-gluten
+notes: Pain en tranches ≈ 400g.

@@ -1,0 +1,58 @@
+id: curry-legumes-riz
+nom: Curry de légumes au riz
+description: Curry doux et réconfortant, vegan et sans gluten, qui fait l'unanimité.
+
+portions_base: 4
+duree_minutes: 35
+duree_active: 20
+difficulte: facile
+
+equipement:
+  - plaque
+
+type_repas:
+  - soir
+
+type_cuisine: asiatique
+
+saison:
+  - automne
+  - hiver
+  - toutes
+
+ingredient_principal: legumes
+feculent_dominant: riz
+
+ingredients:
+  - ingredient_id: riz-basmati
+    quantite_base: 320
+    unite: g
+
+  - ingredient_id: oignon
+    quantite_base: 2
+    unite: piece
+
+  - ingredient_id: huile-olive
+    quantite_base: 30
+    unite: ml
+
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+
+  - ingredient_id: poivre
+    quantite_base: 1
+    unite: g
+
+etapes:
+  - Émincer les oignons, les faire revenir dans l'huile avec une pincée de sel.
+  - Lancer le riz dans 2 fois son volume d'eau, 12 minutes à couvert.
+  - Ajouter les légumes coupés en dés (à compléter selon saison).
+  - Saler, poivrer, laisser mijoter 15 minutes à feu doux.
+  - Servir le curry sur le riz.
+
+tags_libres:
+  - vegan
+  - sans-gluten
+  - reconfortant
+  - groupe

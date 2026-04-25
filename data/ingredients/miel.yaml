@@ -1,0 +1,12 @@
+id: miel
+nom: Miel
+nom_pluriel: Miels
+categorie: epicerie-sucree
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts:
+  - sirop-erable
+notes: Pour version vegan, utiliser sirop d'érable.

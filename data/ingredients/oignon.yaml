@@ -1,0 +1,12 @@
+id: oignon
+nom: Oignon
+nom_pluriel: Oignons
+categorie: fruits-legumes
+unite_base: g
+unite_achat: piece
+conversion: 100
+allergenes: []
+contient_trace: []
+substituts:
+  - echalote
+notes: 1 oignon moyen ≈ 100g.

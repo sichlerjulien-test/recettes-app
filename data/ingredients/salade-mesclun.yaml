@@ -1,0 +1,12 @@
+id: salade-mesclun
+nom: Mesclun
+nom_pluriel: Mesclun
+categorie: fruits-legumes
+unite_base: g
+unite_achat: sachet
+conversion: 150
+allergenes: []
+contient_trace: []
+substituts:
+  - salade-roquette
+notes: Sachet standard 150g.

@@ -1,0 +1,12 @@
+id: oeuf
+nom: Œuf
+nom_pluriel: Œufs
+categorie: cremerie-oeufs
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes:
+  - oeufs
+contient_trace: []
+substituts: []
+notes: Calibre moyen (~50g). Préférer plein air ou bio.
