@@ -140,8 +140,8 @@ export const RecetteSchema = RecetteInputSchema.extend({
 });
 
 /**
- * Type inféré de RecetteSchema — source de vérité pour le type Recette.
- * Conservé pour compatibilité avec les imports existants.
+ * Type inféré de RecetteSchema — alias conservé pour les imports existants.
+ * Equivalent à `Recette` dans domain.ts.
  */
 export type RecetteEnrichie = z.infer<typeof RecetteSchema>;
 
