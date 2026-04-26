@@ -1,0 +1,11 @@
+id: chou-fleur
+nom: Chou-fleur
+nom_pluriel: Choux-fleurs
+categorie: fruits-legumes
+unite_base: g
+unite_achat: piece
+conversion: 800
+allergenes: []
+contient_trace: []
+substituts: []
+notes: 1 chou-fleur entier ≈ 800g de bouquets utilisables.

@@ -1,0 +1,11 @@
+id: lait-coco-conserve
+nom: Lait de coco
+nom_pluriel: Laits de coco
+categorie: epicerie-salee
+unite_base: ml
+unite_achat: piece
+conversion: 400
+allergenes: []
+contient_trace: []
+substituts: []
+notes: Boîte standard 400ml. Choisir version sans additifs.
