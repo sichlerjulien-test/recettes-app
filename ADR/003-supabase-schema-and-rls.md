@@ -61,6 +61,10 @@ Justifications :
 - Trade-off : risque de désynchronisation si la base recettes évolue sans
   rebuild → mitigé par un script build-data idempotent et obligatoire
 
+Les paramètres de séjour sont stockés sous forme JSONB pour aligner le
+schéma SQL sur les types Zod (`repartition_repas`, `parametres`).
+Avantage : pas de mapping colonne ↔ champ objet dans les routes API.
+
 ### Row Level Security (RLS)
 
 Au MVP (pas d'authentification) :
@@ -77,17 +81,20 @@ Au MVP (pas d'authentification) :
 
 ### Stratégie de seed et build
 
-Deux scripts distincts :
+Deux artefacts distincts :
 
-- **scripts/seed-db.ts** : crée le schéma initial (tables, contraintes,
-  RLS policies). Idempotent. Utilise les migrations Supabase via
-  l'interface SQL ou la CLI selon la simplicité d'implémentation.
+- **scripts/migrations/001-initial-schema.sql** : crée le schéma initial
+  (tables, contraintes, RLS policies). Idempotent.
+  Au MVP : appliqué manuellement via le SQL Editor de Supabase → Run.
+  Migration via CLI Supabase à envisager au Sprint 1.
 
 - **scripts/build-data.ts** : lit les YAML de data/, calcule les
   champs dérivés via computeRecipeMetadata, et UPSERT dans Supabase.
   Idempotent (peut être relancé sans casser les données existantes).
+  Limite connue : le DELETE + INSERT sur recette_ingredients est non
+  transactionnel. En cas d'échec partiel, relancer le script suffit.
 
-Les deux scripts utilisent SUPABASE_SERVICE_ROLE_KEY (bypass RLS), jamais
+Les deux artefacts utilisent SUPABASE_SERVICE_ROLE_KEY (bypass RLS), jamais
 exécutés côté client.
 
 ## Conséquences
@@ -109,6 +116,23 @@ exécutés côté client.
 - Pas d'ORM (pas de Drizzle, Prisma, Kysely) pour le MVP
   - @supabase/supabase-js suffit pour la simplicité actuelle
   - À reconsidérer si la complexité des requêtes augmente
+
+## Choix de Supabase vs alternatives
+
+Supabase a été retenu plutôt que Neon, Railway, Convex ou Firebase pour :
+- **Postgres standard** : pas de vendor-lock sur le modèle de données
+- **RLS native** : isolation multi-utilisateur sans couche applicative
+- **Gratuit pour le MVP** : free tier suffisant pour 10 recettes + séjours de test
+- **Dashboard inclus** : SQL Editor, Table Editor, Logs sans outillage additionnel
+- **Auth ready** : module Supabase Auth réutilisable au Sprint 1 sans migration
+
+## Pattern de connexion côté app (à venir)
+
+À documenter en Session UI ou Session 7 lors de l'implémentation de la
+première route API. Pistes à explorer :
+- `@supabase/ssr` pour Next.js 16 (cookie-based session management)
+- Client singleton côté serveur (`createServerClient`)
+- Gestion SSR vs CSR : ne jamais exposer SUPABASE_SERVICE_ROLE_KEY au client
 
 ## Alternatives écartées
 

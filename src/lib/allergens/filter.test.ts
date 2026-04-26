@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Recette } from '@/lib/types/domain';
+import type { Recette } from '../types/domain';
 import { allRecettes, getRecette, recettesMap } from '../../../tests/fixtures/recettes';
 import { filterRecipes } from './filter';
 import type { FilterConstraints } from './filter';

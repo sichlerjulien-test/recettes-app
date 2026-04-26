@@ -166,25 +166,46 @@ ALTER TABLE recette_ingredients DISABLE ROW LEVEL SECURITY;
 -- Séjours créés par les utilisateurs. PK = UUID généré par Postgres.
 -- `token` sert d'auth implicite pour le partage URL (MVP sans auth).
 -- RLS activé avec policy permissive MVP.
+--
+-- repartition_repas  : jsonb { midis: int, soirs: int, brunchs: int }
+-- parametres         : jsonb { niveau_cuisine: text, equipement_disponible: text[], temps_disponible: text }
+--
+-- NOTE : DROP TABLE … CASCADE supprime aussi participants et plannings (vides au MVP).
+-- Réexécuter ce fichier depuis le SQL Editor est sans risque tant qu'aucun
+-- utilisateur n'a créé de séjour.
 -- =============================================================================
 
-CREATE TABLE IF NOT EXISTS sejours (
-  id                        uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  token                     text        NOT NULL UNIQUE,  -- partage URL, auth implicite MVP
-  nom                       text        NOT NULL,
-  date_debut                date,                         -- nullable
-  nb_jours                  integer     NOT NULL CHECK (nb_jours >= 1 AND nb_jours <= 7),
-  repartition_midis         integer     NOT NULL DEFAULT 0 CHECK (repartition_midis >= 0),
-  repartition_soirs         integer     NOT NULL DEFAULT 0 CHECK (repartition_soirs >= 0),
-  repartition_brunchs       integer     NOT NULL DEFAULT 0 CHECK (repartition_brunchs >= 0),
-  niveau_cuisine            text        NOT NULL CHECK (niveau_cuisine IN ('facile', 'normal')),
-  equipement_disponible     text[]      NOT NULL CHECK (cardinality(equipement_disponible) > 0),
-  temps_disponible          text        NOT NULL CHECK (temps_disponible IN ('rapide', 'standard')),
-  cree_le                   timestamptz NOT NULL DEFAULT now(),
+DROP TABLE IF EXISTS sejours CASCADE;
 
-  -- Au moins un type de repas doit être planifié sur le séjour
-  CONSTRAINT au_moins_un_repas CHECK (
-    repartition_midis + repartition_soirs + repartition_brunchs > 0
+CREATE TABLE sejours (
+  id                uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  token             text        NOT NULL UNIQUE,  -- partage URL, auth implicite MVP
+  nom               text        NOT NULL,
+  date_debut        date,                         -- nullable
+  nb_jours          integer     NOT NULL CHECK (nb_jours >= 1 AND nb_jours <= 7),
+  repartition_repas jsonb       NOT NULL,
+  parametres        jsonb       NOT NULL,
+  cree_le           timestamptz NOT NULL DEFAULT now(),
+
+  -- repartition_repas : chaque valeur >= 0, et au moins un repas planifié
+  CONSTRAINT repartition_midis_nonneg   CHECK ((repartition_repas->>'midis')::int   >= 0),
+  CONSTRAINT repartition_soirs_nonneg   CHECK ((repartition_repas->>'soirs')::int   >= 0),
+  CONSTRAINT repartition_brunchs_nonneg CHECK ((repartition_repas->>'brunchs')::int >= 0),
+  CONSTRAINT au_moins_un_repas          CHECK (
+    (repartition_repas->>'midis')::int
+    + (repartition_repas->>'soirs')::int
+    + (repartition_repas->>'brunchs')::int > 0
+  ),
+
+  -- parametres : valeurs énumérées + au moins un équipement
+  CONSTRAINT niveau_cuisine_valid CHECK (
+    (parametres->>'niveau_cuisine') IN ('facile', 'normal')
+  ),
+  CONSTRAINT temps_disponible_valid CHECK (
+    (parametres->>'temps_disponible') IN ('rapide', 'standard')
+  ),
+  CONSTRAINT equipement_non_vide CHECK (
+    jsonb_array_length(parametres->'equipement_disponible') > 0
   )
 );
 

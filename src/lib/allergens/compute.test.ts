@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Recette } from '@/lib/types/domain';
+import type { Recette } from '../types/domain';
 import { ingredientsMap } from '../../../tests/fixtures/ingredients';
 import { computeRecipeMetadata } from './compute';
 

@@ -332,6 +332,11 @@ async function main(): Promise<void> {
   }
 
   // 4. Delete + Insert recette_ingredients
+  // Note : DELETE + INSERT non transactionnel. Si l'INSERT échoue après
+  // le DELETE, la recette se retrouve sans ingrédients jusqu'au prochain
+  // build-data. Acceptable au MVP (10 recettes, idempotent à condition
+  // d'aller au bout). Si le bug se manifeste, relancer le script.
+  // À durcir si nécessaire via une RPC Supabase transactionnelle.
   console.log('Mise à jour des recette_ingredients…');
 
   const processedIds = new Set<string>(recetteRows.map((r) => r.id));

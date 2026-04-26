@@ -7,7 +7,7 @@ import type {
   RegimeViolation,
   ValidationResult,
   ValidationViolation,
-} from '@/lib/types/domain';
+} from '../types/domain';
 
 /**
  * Valide un planning généré contre les contraintes réelles du groupe.

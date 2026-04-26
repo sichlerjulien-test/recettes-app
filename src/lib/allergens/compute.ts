@@ -1,5 +1,5 @@
 import type { Allergen } from '../../../data/seed-allergenes';
-import type { Ingredient, MainIngredient, Recette } from '@/lib/types/domain';
+import type { Ingredient, MainIngredient, Recette } from '../types/domain';
 
 type RecetteSansCalculs = Omit<Recette, 'allergenes_calcules' | 'est_vegetarien' | 'est_vegan'>;
 
