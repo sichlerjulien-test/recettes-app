@@ -139,12 +139,6 @@ export const RecetteSchema = RecetteInputSchema.extend({
   est_vegan: z.boolean(),
 });
 
-/**
- * Type inféré de RecetteSchema — alias conservé pour les imports existants.
- * Equivalent à `Recette` dans domain.ts.
- */
-export type RecetteEnrichie = z.infer<typeof RecetteSchema>;
-
 // ============================================================================
 // PARTICIPANT & SEJOUR
 // ============================================================================
