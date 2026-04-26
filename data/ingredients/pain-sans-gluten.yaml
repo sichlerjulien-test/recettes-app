@@ -1,0 +1,11 @@
+id: pain-sans-gluten
+nom: Pain sans gluten
+nom_pluriel: Pains sans gluten
+categorie: boulangerie
+unite_base: g
+unite_achat: piece
+conversion: 400
+allergenes: []
+contient_trace: []
+substituts: []
+notes: Vérifier composition - certaines marques contiennent œufs ou lait.

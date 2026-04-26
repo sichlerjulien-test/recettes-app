@@ -1,0 +1,12 @@
+id: tofu-ferme
+nom: Tofu ferme
+nom_pluriel: Tofus fermes
+categorie: epicerie-salee
+unite_base: g
+unite_achat: piece
+conversion: 200
+allergenes:
+  - soja
+contient_trace: []
+substituts: []
+notes: Bloc standard ≈ 200g. Substitut végé du poulet ou de la viande.
