@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { AllergenViolation, Planning } from '@/lib/types/domain';
+import type { AllergenViolation, Planning } from '../types/domain';
 import { recettesMap } from '../../../tests/fixtures/recettes';
 import {
   participantAllergiesMultiples,

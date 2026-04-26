@@ -7,14 +7,16 @@
     "build": "next build",
     "start": "next start",
     "validate": "tsx scripts/validate.ts",
+    "build-data": "tsx scripts/build-data.ts",
     "test": "vitest run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
     "@ducanh2912/next-pwa": "^10.2.9",
-    "@supabase/supabase-js": "^2.104.0",
+    "@supabase/supabase-js": "^2.104.1",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
+    "dotenv": "^17.4.2",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",

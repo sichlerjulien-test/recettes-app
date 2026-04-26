@@ -1,5 +1,5 @@
 import type { Allergen, DietaryRestriction } from '../../../data/seed-allergenes';
-import type { Equipment, MealType, Recette } from '@/lib/types/domain';
+import type { Equipment, MealType, Recette } from '../types/domain';
 
 /**
  * Contraintes de filtrage issues du groupe de participants et des paramètres
