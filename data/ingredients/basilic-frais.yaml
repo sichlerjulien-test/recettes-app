@@ -1,0 +1,11 @@
+id: basilic-frais
+nom: Basilic frais
+nom_pluriel: Basilics frais
+categorie: fruits-legumes
+unite_base: g
+unite_achat: botte
+conversion: 25
+allergenes: []
+contient_trace: []
+substituts: []
+notes: Botte ≈ 25g de feuilles.

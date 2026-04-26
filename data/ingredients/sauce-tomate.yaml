@@ -1,0 +1,11 @@
+id: sauce-tomate
+nom: Sauce tomate nature
+nom_pluriel: Sauces tomate nature
+categorie: epicerie-salee
+unite_base: g
+unite_achat: piece
+conversion: 400
+allergenes: []
+contient_trace: []
+substituts: []
+notes: Bocal standard 400g. Privilégier sauce nature sans additifs.

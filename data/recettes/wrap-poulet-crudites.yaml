@@ -1,0 +1,72 @@
+id: wrap-poulet-crudites
+nom: Wrap poulet crudités
+description: Idéal en pique-nique ou pour un déjeuner sur le pouce.
+
+portions_base: 4
+duree_minutes: 25
+duree_active: 25
+difficulte: facile
+
+equipement:
+  - plaque
+
+type_repas:
+  - midi
+
+type_cuisine: neutre
+
+saison:
+  - toutes
+
+ingredient_principal: poulet
+feculent_dominant: pain
+
+ingredients:
+  - ingredient_id: wrap-tortilla
+    quantite_base: 4
+    unite: piece
+
+  - ingredient_id: poulet-blanc
+    quantite_base: 400
+    unite: g
+
+  - ingredient_id: salade-mesclun
+    quantite_base: 100
+    unite: g
+
+  - ingredient_id: tomate
+    quantite_base: 2
+    unite: piece
+
+  - ingredient_id: concombre
+    quantite_base: 1
+    unite: piece
+
+  - ingredient_id: mayonnaise
+    quantite_base: 80
+    unite: g
+
+  - ingredient_id: huile-olive
+    quantite_base: 15
+    unite: ml
+
+  - ingredient_id: sel
+    quantite_base: 3
+    unite: g
+
+  - ingredient_id: poivre
+    quantite_base: 1
+    unite: g
+
+etapes:
+  - Découper le poulet en lanières, l'assaisonner sel poivre.
+  - Cuire à la poêle avec l'huile, environ 8 minutes.
+  - Pendant ce temps, laver et émincer tomates et concombre.
+  - Étaler la mayonnaise sur chaque tortilla.
+  - Garnir avec mesclun, légumes, lanières de poulet.
+  - Rouler serré et couper en deux pour servir.
+
+tags_libres:
+  - pique-nique
+  - rapide
+  - portatif

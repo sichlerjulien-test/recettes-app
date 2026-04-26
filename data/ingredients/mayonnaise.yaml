@@ -1,0 +1,13 @@
+id: mayonnaise
+nom: Mayonnaise
+nom_pluriel: Mayonnaises
+categorie: condiments-epices
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - oeufs
+  - moutarde
+contient_trace: []
+substituts: []
+notes: Vérifier composition pour moutarde présente dans la plupart des marques.

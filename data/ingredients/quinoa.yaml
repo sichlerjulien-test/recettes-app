@@ -1,0 +1,11 @@
+id: quinoa
+nom: Quinoa
+nom_pluriel: Quinoa
+categorie: feculents-pates-riz
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []
+notes: Sans gluten, riche en protéines.

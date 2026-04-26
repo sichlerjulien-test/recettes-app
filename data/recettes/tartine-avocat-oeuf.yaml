@@ -1,0 +1,65 @@
+id: tartine-avocat-oeuf
+nom: Tartine avocat œuf poché
+description: Brunch parfait, équilibré et photogénique sans effort.
+
+portions_base: 4
+duree_minutes: 20
+duree_active: 20
+difficulte: facile
+
+equipement:
+  - plaque
+
+type_repas:
+  - brunch
+  - midi
+
+type_cuisine: neutre
+
+saison:
+  - toutes
+
+ingredient_principal: oeufs
+feculent_dominant: pain
+
+ingredients:
+  - ingredient_id: pain-complet
+    quantite_base: 240
+    unite: g
+
+  - ingredient_id: avocat
+    quantite_base: 2
+    unite: piece
+
+  - ingredient_id: oeuf
+    quantite_base: 4
+    unite: piece
+
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+
+  - ingredient_id: huile-olive
+    quantite_base: 15
+    unite: ml
+
+  - ingredient_id: sel
+    quantite_base: 3
+    unite: g
+
+  - ingredient_id: poivre
+    quantite_base: 1
+    unite: g
+
+etapes:
+  - Toaster les tranches de pain.
+  - Écraser la chair des avocats avec le jus du citron, sel, poivre.
+  - Faire bouillir une casserole d'eau avec un trait de vinaigre.
+  - Pocher les œufs un par un, 3 minutes chacun.
+  - Tartiner le pain avec l'avocat écrasé.
+  - Déposer un œuf poché sur chaque tartine, arroser d'huile d'olive.
+
+tags_libres:
+  - brunch
+  - vegetarien
+  - rapide

@@ -1,0 +1,12 @@
+id: citron
+nom: Citron jaune
+nom_pluriel: Citrons jaunes
+categorie: fruits-legumes
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts:
+  - citron-vert
+notes: 1 citron ≈ 60g, 30ml de jus.

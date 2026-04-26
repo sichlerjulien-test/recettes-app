@@ -1,0 +1,69 @@
+id: saumon-four-legumes
+nom: Saumon au four et légumes rôtis
+description: Plat de fête simple, équilibré, qui valorise les bons produits.
+
+portions_base: 4
+duree_minutes: 45
+duree_active: 15
+difficulte: facile
+
+equipement:
+  - four
+
+type_repas:
+  - soir
+
+type_cuisine: francaise
+
+saison:
+  - toutes
+
+ingredient_principal: poisson
+feculent_dominant: aucun
+
+ingredients:
+  - ingredient_id: saumon-frais
+    quantite_base: 600
+    unite: g
+
+  - ingredient_id: courgette
+    quantite_base: 2
+    unite: piece
+
+  - ingredient_id: poivron-rouge
+    quantite_base: 2
+    unite: piece
+
+  - ingredient_id: oignon
+    quantite_base: 1
+    unite: piece
+
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+
+  - ingredient_id: huile-olive
+    quantite_base: 50
+    unite: ml
+
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+
+  - ingredient_id: poivre
+    quantite_base: 2
+    unite: g
+
+etapes:
+  - Préchauffer le four à 200°C.
+  - Couper les légumes en gros morceaux, les disposer sur une plaque.
+  - Arroser d'huile, saler, poivrer, mélanger à la main.
+  - Enfourner 20 minutes.
+  - Sortir la plaque, déposer les pavés de saumon, arroser d'huile et de jus de citron.
+  - Remettre au four 12 minutes.
+  - Servir avec des quartiers de citron.
+
+tags_libres:
+  - festif
+  - sans-gluten
+  - une-plaque
