@@ -1,0 +1,11 @@
+id: farine-sarrasin
+nom: Farine de sarrasin
+nom_pluriel: Farines de sarrasin
+categorie: epicerie-salee
+unite_base: g
+unite_achat: kg
+conversion: 1000
+allergenes: []
+contient_trace: []
+substituts: []
+notes: Sans gluten malgré son nom (le sarrasin n'est pas une céréale).

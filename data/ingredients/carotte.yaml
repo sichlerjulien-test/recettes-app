@@ -1,0 +1,11 @@
+id: carotte
+nom: Carotte
+nom_pluriel: Carottes
+categorie: fruits-legumes
+unite_base: g
+unite_achat: piece
+conversion: 100
+allergenes: []
+contient_trace: []
+substituts: []
+notes: 1 carotte moyenne ≈ 100g.

@@ -1,0 +1,12 @@
+id: tamari
+nom: Tamari
+nom_pluriel: Tamari
+categorie: condiments-epices
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes:
+  - soja
+contient_trace: []
+substituts: []
+notes: Sauce soja japonaise traditionnelle, sans gluten contrairement à la sauce soja chinoise.

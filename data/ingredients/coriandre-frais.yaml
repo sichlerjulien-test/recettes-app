@@ -1,0 +1,11 @@
+id: coriandre-frais
+nom: Coriandre fraîche
+nom_pluriel: Coriandres fraîches
+categorie: fruits-legumes
+unite_base: g
+unite_achat: botte
+conversion: 25
+allergenes: []
+contient_trace: []
+substituts: []
+notes: Botte ≈ 25g de feuilles. Optionnel, à parsemer au service.

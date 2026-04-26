@@ -1,0 +1,12 @@
+id: saumon-frais
+nom: Filet de saumon frais
+nom_pluriel: Filets de saumon frais
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - poissons
+contient_trace: []
+substituts: []
+notes: Préférer pavés sans peau pour cuisson au four.

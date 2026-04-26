@@ -1,0 +1,66 @@
+id: pates-tomate-basilic
+nom: Pâtes sauce tomate et basilic
+description: Le grand classique vegan qui dépanne et qui plaît à tout le monde.
+
+portions_base: 4
+duree_minutes: 20
+duree_active: 10
+difficulte: facile
+
+equipement:
+  - plaque
+
+type_repas:
+  - midi
+  - soir
+
+type_cuisine: italienne
+
+saison:
+  - toutes
+
+ingredient_principal: legumes
+feculent_dominant: pates
+
+ingredients:
+  - ingredient_id: penne
+    quantite_base: 400
+    unite: g
+
+  - ingredient_id: sauce-tomate
+    quantite_base: 400
+    unite: g
+
+  - ingredient_id: oignon
+    quantite_base: 1
+    unite: piece
+
+  - ingredient_id: basilic-frais
+    quantite_base: 25
+    unite: g
+
+  - ingredient_id: huile-olive
+    quantite_base: 30
+    unite: ml
+
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+
+  - ingredient_id: poivre
+    quantite_base: 1
+    unite: g
+
+etapes:
+  - Faire bouillir une grande casserole d'eau salée.
+  - Émincer l'oignon, le faire revenir dans l'huile à feu doux.
+  - Ajouter la sauce tomate à l'oignon, saler poivrer, laisser mijoter 10 minutes.
+  - Cuire les pâtes selon les instructions du paquet.
+  - Mélanger pâtes égouttées et sauce.
+  - Parsemer de basilic ciselé juste avant de servir.
+
+tags_libres:
+  - vegan
+  - rapide
+  - secours
+  - convivial

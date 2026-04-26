@@ -1,0 +1,11 @@
+id: sirop-erable
+nom: Sirop d'érable
+nom_pluriel: Sirops d'érable
+categorie: epicerie-sucree
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []
+notes: Substitut vegan du miel.

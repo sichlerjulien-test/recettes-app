@@ -1,0 +1,12 @@
+id: wrap-tortilla
+nom: Tortilla de blé
+nom_pluriel: Tortillas de blé
+categorie: boulangerie
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes:
+  - gluten
+contient_trace: []
+substituts: []
+notes: Galette souple ~25cm de diamètre.

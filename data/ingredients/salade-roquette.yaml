@@ -1,0 +1,11 @@
+id: salade-roquette
+nom: Roquette
+nom_pluriel: Roquettes
+categorie: fruits-legumes
+unite_base: g
+unite_achat: sachet
+conversion: 100
+allergenes: []
+contient_trace: []
+substituts: []
+notes: Sachet standard 100g. Goût poivré.

@@ -1,0 +1,74 @@
+id: buddha-bowl-quinoa
+nom: Buddha bowl quinoa et pois chiches
+description: Bowl complet, vegan et sans gluten, qui rassasie sans alourdir.
+
+portions_base: 4
+duree_minutes: 25
+duree_active: 20
+difficulte: facile
+
+equipement:
+  - plaque
+
+type_repas:
+  - midi
+
+type_cuisine: neutre
+
+saison:
+  - toutes
+
+ingredient_principal: legumineuses
+feculent_dominant: quinoa
+
+ingredients:
+  - ingredient_id: quinoa
+    quantite_base: 240
+    unite: g
+
+  - ingredient_id: pois-chiches-conserve
+    quantite_base: 480
+    unite: g
+
+  - ingredient_id: avocat
+    quantite_base: 2
+    unite: piece
+
+  - ingredient_id: carotte
+    quantite_base: 2
+    unite: piece
+
+  - ingredient_id: salade-mesclun
+    quantite_base: 200
+    unite: g
+
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+
+  - ingredient_id: sel
+    quantite_base: 4
+    unite: g
+
+  - ingredient_id: poivre
+    quantite_base: 1
+    unite: g
+
+etapes:
+  - Cuire le quinoa dans 2 fois son volume d'eau salée, 12 minutes.
+  - Égoutter et rincer les pois chiches.
+  - Râper les carottes en julienne.
+  - Couper les avocats en lamelles, arroser de jus de citron.
+  - "Préparer la sauce : huile, jus de citron restant, sel, poivre."
+  - "Composer chaque bol : base de quinoa, mesclun, pois chiches, carottes, avocat."
+  - Arroser de sauce avant de servir.
+
+tags_libres:
+  - vegan
+  - sans-gluten
+  - sain
+  - bowl

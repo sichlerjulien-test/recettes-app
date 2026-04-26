@@ -3,8 +3,8 @@ nom: Curry de légumes au riz
 description: Curry doux et réconfortant, vegan et sans gluten, qui fait l'unanimité.
 
 portions_base: 4
-duree_minutes: 35
-duree_active: 20
+duree_minutes: 40
+duree_active: 25
 difficulte: facile
 
 equipement:
@@ -29,8 +29,32 @@ ingredients:
     unite: g
 
   - ingredient_id: oignon
+    quantite_base: 1
+    unite: piece
+
+  - ingredient_id: carotte
     quantite_base: 2
     unite: piece
+
+  - ingredient_id: courgette
+    quantite_base: 1
+    unite: piece
+
+  - ingredient_id: chou-fleur
+    quantite_base: 400
+    unite: g
+
+  - ingredient_id: gingembre-frais
+    quantite_base: 20
+    unite: g
+
+  - ingredient_id: pate-curry-rouge
+    quantite_base: 50
+    unite: g
+
+  - ingredient_id: lait-coco-conserve
+    quantite_base: 400
+    unite: ml
 
   - ingredient_id: huile-olive
     quantite_base: 30
@@ -44,15 +68,29 @@ ingredients:
     quantite_base: 1
     unite: g
 
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+
+  - ingredient_id: coriandre-frais
+    quantite_base: 25
+    unite: g
+    optionnel: true
+
 etapes:
-  - Émincer les oignons, les faire revenir dans l'huile avec une pincée de sel.
-  - Lancer le riz dans 2 fois son volume d'eau, 12 minutes à couvert.
-  - Ajouter les légumes coupés en dés (à compléter selon saison).
-  - Saler, poivrer, laisser mijoter 15 minutes à feu doux.
-  - Servir le curry sur le riz.
+  - Émincer l'oignon, râper le gingembre, couper carottes, courgette et chou-fleur en morceaux.
+  - Faire chauffer l'huile dans une grande sauteuse, faire revenir l'oignon et le gingembre 2 minutes.
+  - Ajouter la pâte de curry, mélanger 1 minute pour la torréfier.
+  - Verser le lait de coco, mélanger pour homogénéiser.
+  - Ajouter les carottes et le chou-fleur, laisser mijoter 15 minutes à feu moyen.
+  - Pendant ce temps, lancer le riz dans 2 fois son volume d'eau salée, 12 minutes à couvert.
+  - Ajouter la courgette au curry pour les 5 dernières minutes (elle cuit vite).
+  - Saler, poivrer, ajuster avec un trait de jus de citron.
+  - Servir le curry sur le riz, parsemer de coriandre si utilisée.
 
 tags_libres:
   - vegan
   - sans-gluten
   - reconfortant
   - groupe
+  - une-seule-cocotte
