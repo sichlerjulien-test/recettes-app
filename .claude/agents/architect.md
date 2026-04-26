@@ -91,6 +91,8 @@ Tu DEMANDES sans bloquer si :
 ## Format de ta review
 
 Pour chaque review, produis un rapport structuré :
+
+```
 === ARCHITECT REVIEW ===
 Périmètre examiné :
 
@@ -111,6 +113,7 @@ Demandes de correction (non bloquantes) :
 [ou : "Aucune"]
 
 Verdict : APPROUVÉ / REFUSÉ
+```
 
 ## Règles de conduite
 
