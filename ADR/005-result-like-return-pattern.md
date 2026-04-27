@@ -33,10 +33,26 @@ trois mois.
 retourne un type discriminé Result-like :
 
 ```ts
-type Result<T, E> =
-  | { ok: true; value: T }
+type Result<TPayload extends Record<string, unknown>, E> =
+  | ({ ok: true } & TPayload)
   | { ok: false; error: E };
 ```
+
+---
+
+**Convention sur le payload de succès** : la branche `ok: true` contient
+les champs métier directement, pas un sous-objet `value`. Cela améliore
+la lisibilité côté caller (`result.entries` plutôt que `result.value.entries`).
+
+Exemples conformes :
+- generatePlanning : `{ ok: true; entries: PlanningEntry[] }`
+- buildShoppingList (futur) : `{ ok: true; items: ShoppingItem[]; categories: Category[] }`
+- createSejour (futur) : `{ ok: true; sejour: Sejour; token: string }`
+
+La branche `ok: false` reste invariante : toujours un seul champ `error`
+typé.
+
+---
 
 Critère "raison métier prévisible" :
 - Cas géré explicitement dans la logique (pool vide, validation échec,
