@@ -245,6 +245,18 @@ export const ShoppingItemSchema = z.object({
   utilise_dans: z.array(z.string()),
 });
 
+/**
+ * Contenu calculé d'une liste de courses, sans métadonnées de persistance.
+ * C'est ce que la fonction pure buildShoppingList retourne.
+ * Les champs sejour_id, planning_id, generee_le sont ajoutés par le caller
+ * (API ou couche de persistance).
+ */
+export const ShoppingListContentSchema = z.object({
+  items_par_categorie: z.record(IngredientCategorySchema, z.array(ShoppingItemSchema)),
+});
+
+export type ShoppingListContent = z.infer<typeof ShoppingListContentSchema>;
+
 export const ShoppingListSchema = z.object({
   sejour_id: z.string(),
   planning_id: z.string(),
@@ -343,3 +355,22 @@ export const LLMErrorSchema = z.discriminatedUnion('kind', [
     cause: z.string(),
   }),
 ]);
+
+// ============================================================================
+// SHOPPING (cf. lib/shopping/)
+// ============================================================================
+
+export const ShoppingErrorSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('recette_inconnue'), recette_id: z.string() }),
+  z.object({
+    kind: z.literal('ingredient_inconnu'),
+    recette_id: z.string(),
+    ingredient_id: z.string(),
+  }),
+  z.object({
+    kind: z.literal('invalid_participants'),
+    nbParticipants: z.number(),
+  }),
+]);
+
+export type ShoppingError = z.infer<typeof ShoppingErrorSchema>;
