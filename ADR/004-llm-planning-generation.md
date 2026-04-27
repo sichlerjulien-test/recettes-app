@@ -19,7 +19,7 @@ format d'I/O, gestion des erreurs, coût attendu, stratégie de tests.
 
 ### Modèle utilisé : Claude Sonnet (dernier)
 
-Le module utilise claude-sonnet-4-5 (ou plus récent à la date de
+Le module utilise claude-sonnet-4-6 (ou plus récent à la date de
 développement). Sonnet est le bon compromis qualité/coût pour cette tâche
 de composition contrainte. Opus serait surdimensionné, Haiku risque
 d'être moins fiable sur le respect des contraintes de cohérence.
