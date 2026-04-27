@@ -36,7 +36,16 @@ Le LLM doit produire un JSON strict listant les `recette_id` choisis. Il ne peut
 Implémenté dans `src/lib/allergens/validator.ts`. Le planning produit par le LLM est re-vérifié contre les allergies déclarées. En cas de violation détectée :
 1. Logger l'incident avec contexte complet (audit)
 2. Retry de la génération (max 2 fois)
-3. Si échec persistant : fallback sur un planning composé de recettes "secours" garanties safe
+3. Si échec persistant après MAX_ATTEMPTS (3 tentatives) : retourner une
+   erreur métier explicite (validation_failed_after_retries) avec les
+   dernières violations détectées. Le caller (UI) affichera un message
+   actionnable proposant de relancer ou de modifier les contraintes.
+   Décision révisée (Session 7) : le fallback "recettes secours" envisagé
+   initialement n'a pas été implémenté. Au MVP, toutes les recettes du
+   catalogue sont par construction des "recettes secours" (10 recettes
+   curées pour servir de socle). Si le pipeline filter+LLM+validator
+   échoue, c'est un signal de bug à investiguer, pas un cas à masquer
+   par un fallback.
 
 ### Étage 4 — Liste de courses 100% déterministe
 Aucun LLM dans `src/lib/shopping/build-list.ts`. La liste est calculée par agrégation directe des ingrédients du planning, ajustée au nombre de portions.

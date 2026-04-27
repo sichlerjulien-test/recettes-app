@@ -305,3 +305,41 @@ export type RecetteInput = z.input<typeof RecetteInputSchema>;
 export type RecetteOutput = z.infer<typeof RecetteInputSchema>;
 export type SejourCreateInput = z.input<typeof SejourCreateSchema>;
 export type LLMPlanningOutput = z.infer<typeof LLMPlanningOutputSchema>;
+
+// ============================================================================
+// LLM PLANNING GENERATION (cf. ADR-004)
+// ============================================================================
+
+export const GeneratePlanningInputSchema = z.object({
+  pool: z.array(RecetteSchema),
+  contexte: z.object({
+    nb_jours: z.number().int().min(1).max(7),
+    repartition_repas: z.object({
+      midis: z.number().int().nonnegative(),
+      soirs: z.number().int().nonnegative(),
+      brunchs: z.number().int().nonnegative(),
+    }),
+    niveau_cuisine: z.enum(['facile', 'normal']),
+    temps_disponible: z.enum(['rapide', 'standard']),
+  }),
+});
+
+export const GeneratePlanningOutputSchema = z.object({
+  entries: z.array(z.object({
+    jour: z.number().int().positive(),
+    repas: MealTypeSchema,
+    recette_id: z.string(),
+  })),
+});
+
+export const LLMErrorSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('pool_empty') }),
+  z.object({
+    kind: z.literal('validation_failed_after_retries'),
+    lastViolations: z.array(ValidationViolationSchema),
+  }),
+  z.object({
+    kind: z.literal('llm_unavailable'),
+    cause: z.string(),
+  }),
+]);
