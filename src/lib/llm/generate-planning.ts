@@ -1,10 +1,11 @@
-import type { Participant, PlanningEntry, Recette } from '../types/domain';
+import type { Participant, PlanningEntry, Recette, ValidationViolation } from '../types/domain';
 import { filterRecipes, type FilterConstraints } from '../allergens/filter';
 import { validatePlanning } from '../allergens/validator';
 import type { LLMClient } from './client';
 import type { GeneratePlanningInput, LLMError } from './types';
 
-const MAX_RETRIES = 3;
+// 3 tentatives totales (initial + 2 retries)
+const MAX_ATTEMPTS = 3;
 
 /**
  * Orchestre la génération de planning : filtre → LLM → validation → retry.
@@ -34,14 +35,10 @@ export async function generatePlanning(
   }
 
   const portions = Math.max(participants.length, 1);
-  let lastViolations = validatePlanning(
-    { id: '', sejour_id: '', entries: [], genere_le: '', contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] } },
-    recettesMap,
-    participants,
-  ).violations;
+  let lastViolations: ValidationViolation[] = [];
 
   try {
-    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       const output = await client.generate({ pool, contexte: sejourContexte });
 
       const planningEntries: PlanningEntry[] = output.entries.map((entry) => ({
@@ -68,8 +65,10 @@ export async function generatePlanning(
       }
 
       lastViolations = result.violations;
+      // MVP : log via console.warn. Logger injectable à introduire au Sprint 1
+      // si besoin d'audit structuré (cf. ADR-001 mention "audit").
       console.warn(
-        `[generatePlanning] tentative ${attempt + 1}/${MAX_RETRIES} — ${result.violations.length} violation(s)`,
+        `[generatePlanning] tentative ${attempt + 1}/${MAX_ATTEMPTS} — ${result.violations.length} violation(s)`,
         result.violations,
       );
     }

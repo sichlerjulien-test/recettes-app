@@ -1,3 +1,17 @@
+/**
+ * Adaptateur API Anthropic.
+ *
+ * NON TESTÉ unitairement par design : ce module est un wrapper fin autour
+ * du SDK officiel @anthropic-ai/sdk. Sa logique métier est minimale
+ * (construction du prompt, parse Zod du tool_use, gestion d'erreur).
+ *
+ * Validation effective via :
+ * - Tests d'intégration appelant l'API réelle (cf. integration.test.ts)
+ * - Tests de generatePlanning() qui mockent ce client via l'interface LLMClient
+ *
+ * Si la complexité de buildSystemPrompt ou buildUserMessage augmente,
+ * extraire ces fonctions dans un module testable séparé.
+ */
 import Anthropic from '@anthropic-ai/sdk';
 import { LLMPlanningOutputSchema } from '../types/schemas';
 import type { GeneratePlanningInput, GeneratePlanningOutput } from './types';

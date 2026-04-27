@@ -285,6 +285,29 @@ describe('generatePlanning', () => {
     expect(mockClient.calls).toHaveLength(1);
   });
 
+  it('should stringify non-Error throws via String(error)', async () => {
+    const mockClient: LLMClient = {
+      async generate() {
+        throw 'network failure as string'; // pas une instance d'Error
+      },
+    };
+
+    const result = await generatePlanning(
+      mockClient,
+      allRecettes(),
+      recettesMap,
+      NO_CONSTRAINTS,
+      [participantSansContrainte],
+      BASE_CONTEXTE,
+    );
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.kind).toBe('llm_unavailable');
+    if (result.error.kind !== 'llm_unavailable') return;
+    expect(result.error.cause).toBe('network failure as string');
+  });
+
   // Cas régression sécurité ─────────────────────────────────────────────────────
 
   it('should return error if mock LLM returns a recipe_id NOT in the pool', async () => {

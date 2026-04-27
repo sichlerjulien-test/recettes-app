@@ -66,9 +66,9 @@ Trois cas explicites :
 2. **Validateur détecte une violation post-LLM**
    - Retry max 2 fois (le LLM peut avoir un comportement non déterministe
      même avec température basse)
-   - Si 3 échecs : fallback sur un planning composé uniquement de recettes
-     "secours" (taggées comme telles)
-   - Si même le fallback échoue : ValidationFailedError
+   - Si 3 échecs consécutifs : retourner ValidationFailedError avec les
+     violations. Pas de fallback automatique au MVP — voir ADR-001 pour
+     la justification.
 
 3. **API Anthropic indisponible ou timeout**
    - Timeout côté client : 15 secondes
