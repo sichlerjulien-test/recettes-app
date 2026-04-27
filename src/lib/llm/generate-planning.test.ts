@@ -190,7 +190,7 @@ describe('generatePlanning', () => {
 
   // Cas validation ──────────────────────────────────────────────────────────────
 
-  it('should retry up to 3 times when validatePlanning detects violations', async () => {
+  it('should make at most 3 total attempts when all fail', async () => {
     const mockClient = createMockClient({
       kind: 'success_after_failures',
       failuresBefore: [INVALID_OUTPUT_UNKNOWN_RECIPE, INVALID_OUTPUT_UNKNOWN_RECIPE, INVALID_OUTPUT_UNKNOWN_RECIPE],

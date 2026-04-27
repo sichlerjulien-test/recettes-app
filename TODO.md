@@ -50,3 +50,18 @@ via les mises à jour de Next.
 - Re-vérifier `npm audit` à chaque session de mise à jour de dépendances
 - Réévaluer si une vraie CVE exploitable apparaît
 - Si un fix non-breaking devient disponible, l'appliquer immédiatement
+
+---
+
+## Dette technique LLM (Sprint 1+)
+
+### Génération du tool input_schema depuis Zod
+
+`COMPOSE_PLANNING_TOOL` dans `src/lib/llm/client.ts` duplique partiellement
+`LLMPlanningOutputSchema`. Risque de divergence si l'un évolue sans l'autre.
+
+Solution future : utiliser une lib type `zod-to-json-schema` pour générer
+`input_schema` depuis `LLMPlanningOutputSchema` au runtime.
+
+Pas urgent au MVP : les deux sont colocalisés dans `client.ts`, le risque
+de divergence est faible.

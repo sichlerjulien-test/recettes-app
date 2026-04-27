@@ -72,7 +72,8 @@ Trois cas explicites :
 
 3. **API Anthropic indisponible ou timeout**
    - Timeout côté client : 15 secondes
-   - Retry 1 fois après 2s
+   - Retry 1 fois géré par le SDK Anthropic (backoff interne, configuré
+     via maxRetries: 1 sur le client)
    - Si échec persistant : LLMUnavailableError avec message actionnable
 
 ### Coût et latence
