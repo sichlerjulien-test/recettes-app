@@ -44,7 +44,7 @@ Structure :
 - src/lib/db/ingredients.ts : getAllIngredients, getIngredientById
 - src/lib/db/recettes.ts : getAllRecettes, getRecetteById
 - src/lib/db/sejours.ts : createSejour, getSejourById, getSejourByToken
-- src/lib/db/plannings.ts : createPlanning, getPlanningBySejourId
+- src/lib/db/plannings.ts : createPlanning
 
 Bénéfices :
 - Couplage faible entre routes et DB

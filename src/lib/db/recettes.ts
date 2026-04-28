@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { getSupabaseClient } from './supabase';
 import { RecetteSchema } from '../types/schemas';
 import type { Recette } from '../types/domain';
-import type { DbError } from './types';
+import type { DbError } from '../types/domain';
 
 type RecettesResult =
   | { ok: true; recettes: Recette[] }

@@ -1,4 +1,4 @@
-import type { DbError } from '@/lib/db/types';
+import type { DbError } from '@/lib/types/domain';
 import { jsonError } from './responses';
 
 export function dbErrorToResponse(error: DbError): Response {

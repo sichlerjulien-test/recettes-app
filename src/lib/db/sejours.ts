@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { getSupabaseClient } from './supabase';
 import { SejourSchema } from '../types/schemas';
 import type { Sejour, Participant, SejourParametres } from '../types/domain';
-import type { DbError } from './types';
+import type { DbError } from '../types/domain';
 
 export type SejourDALInput = {
   nom: string;

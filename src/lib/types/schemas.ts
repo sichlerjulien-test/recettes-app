@@ -5,7 +5,7 @@
  *
  * Utilisation :
  *   - Chargement des YAML : RecetteSchema.parse(yaml)
- *   - Entrées API : SejourCreateSchema.parse(req.body)
+ *   - Entrées API : CreateSejourBodySchema.parse(req.body)
  *   - Sortie LLM : LLMPlanningOutputSchema.parse(llmResponse)
  */
 
@@ -158,20 +158,6 @@ export const SejourParametresSchema = z.object({
   temps_disponible: TimeAvailableSchema,
 });
 
-export const SejourCreateSchema = z.object({
-  nom: z.string().min(1).max(100).optional(),
-  date_debut: z.string().datetime().optional(),
-  nb_jours: z.number().int().min(1).max(7),
-  repartition_repas: z.object({
-    midis: z.number().int().nonnegative(),
-    soirs: z.number().int().nonnegative(),
-    brunchs: z.number().int().nonnegative(),
-  }).refine(
-    (r) => r.midis + r.soirs + r.brunchs > 0,
-    { message: 'Au moins un repas doit être planifié' },
-  ),
-});
-
 /** Entité Sejour complète (post-création, avec id et token). */
 export const SejourSchema = z.object({
   id: z.string(),
@@ -303,7 +289,6 @@ export type IngredientInput = z.input<typeof IngredientSchema>;
 export type IngredientOutput = z.infer<typeof IngredientSchema>;
 export type RecetteInput = z.input<typeof RecetteInputSchema>;
 export type RecetteOutput = z.infer<typeof RecetteInputSchema>;
-export type SejourCreateInput = z.input<typeof SejourCreateSchema>;
 export type LLMPlanningOutput = z.infer<typeof LLMPlanningOutputSchema>;
 
 // ============================================================================
@@ -362,6 +347,18 @@ export const ShoppingErrorSchema = z.discriminatedUnion('kind', [
 ]);
 
 export type ShoppingError = z.infer<typeof ShoppingErrorSchema>;
+
+// ============================================================================
+// INFRASTRUCTURE — DB ERRORS
+// ============================================================================
+
+export const DbErrorSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('connection_failed'), cause: z.string() }),
+  z.object({ kind: z.literal('query_failed'), cause: z.string() }),
+  z.object({ kind: z.literal('row_validation_failed'), cause: z.string() }),
+  z.object({ kind: z.literal('not_found'), entity: z.string(), id: z.string() }),
+  z.object({ kind: z.literal('constraint_violation'), cause: z.string() }),
+]);
 
 // ============================================================================
 // API INPUT SCHEMAS

@@ -2,7 +2,7 @@ import 'server-only';
 import { getSupabaseClient } from './supabase';
 import { PlanningSchema } from '../types/schemas';
 import type { Planning, PlanningEntry } from '../types/domain';
-import type { DbError } from './types';
+import type { DbError } from '../types/domain';
 
 export type CreatePlanningInput = {
   sejour_id: string;

@@ -31,9 +31,6 @@ export async function POST(request: Request): Promise<Response> {
   const result = await createSejour(sejourInput, participants);
 
   if (!result.ok) {
-    if (result.error.kind === 'constraint_violation') {
-      return jsonError(400, 'business_error', result.error.cause);
-    }
     return dbErrorToResponse(result.error);
   }
 
