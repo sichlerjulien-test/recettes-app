@@ -70,6 +70,20 @@ via les sub-agents qa-engineer), mais à faire avant ouverture publique.
 
 ---
 
+## DAL sejours — risque de cohérence (Sprint 2+)
+
+Dans `src/lib/db/sejours.ts`, la fonction `createSejour` effectue deux INSERT
+séquentiels non transactionnels : d'abord le séjour, puis les participants.
+
+Si l'INSERT participants échoue, le séjour reste en base sans participants.
+L'API retourne une erreur, mais la donnée partielle est persistée en DB.
+
+**Plan** : durcir avec une RPC transactionnelle Supabase (ou une fonction SQL
+`CREATE FUNCTION create_sejour_with_participants(...)`) au Sprint 2+.
+Référence : commentaire `TODO(Sprint 2+)` dans `src/lib/db/sejours.ts`.
+
+---
+
 ## Dette technique LLM (Sprint 1+)
 
 ### Génération du tool input_schema depuis Zod
