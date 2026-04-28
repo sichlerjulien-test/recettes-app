@@ -362,3 +362,26 @@ export const ShoppingErrorSchema = z.discriminatedUnion('kind', [
 ]);
 
 export type ShoppingError = z.infer<typeof ShoppingErrorSchema>;
+
+// ============================================================================
+// API INPUT SCHEMAS
+// ============================================================================
+
+export const CreateSejourBodySchema = z.object({
+  nom: z.string().min(1).max(100).optional(),
+  date_debut: z.string().date().optional(),
+  nb_jours: z.number().int().min(1).max(7),
+  repartition_repas: z.object({
+    midis: z.number().int().nonnegative(),
+    soirs: z.number().int().nonnegative(),
+    brunchs: z.number().int().nonnegative(),
+  }),
+  parametres: SejourParametresSchema,
+  participants: z.array(z.object({
+    nom: z.string().min(1).max(50),
+    allergies: z.array(AllergenSchema).default([]),
+    regimes: z.array(DietaryRestrictionSchema).default([]),
+    aime: z.array(z.string()).default([]),
+    n_aime_pas: z.array(z.string()).default([]),
+  })).min(1).max(12),
+});
