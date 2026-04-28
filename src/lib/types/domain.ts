@@ -34,6 +34,7 @@ import type {
   ValidationViolationSchema,
   ValidationResultSchema,
   ShoppingErrorSchema,
+  DbErrorSchema,
 } from './schemas';
 
 // ============================================================================
@@ -116,3 +117,9 @@ export type RecetteInconnueViolation = z.infer<typeof RecetteInconnueViolationSc
 export type ValidationViolation = z.infer<typeof ValidationViolationSchema>;
 
 export type ValidationResult = z.infer<typeof ValidationResultSchema>;
+
+// ============================================================================
+// INFRASTRUCTURE
+// ============================================================================
+
+export type DbError = z.infer<typeof DbErrorSchema>;

@@ -70,6 +70,48 @@ via les sub-agents qa-engineer), mais à faire avant ouverture publique.
 
 ---
 
+## DAL sejours — risque de cohérence (Sprint 2+)
+
+Dans `src/lib/db/sejours.ts`, la fonction `createSejour` effectue deux INSERT
+séquentiels non transactionnels : d'abord le séjour, puis les participants.
+
+Si l'INSERT participants échoue, le séjour reste en base sans participants.
+L'API retourne une erreur, mais la donnée partielle est persistée en DB.
+
+**Plan** : durcir avec une RPC transactionnelle Supabase (ou une fonction SQL
+`CREATE FUNCTION create_sejour_with_participants(...)`) au Sprint 2+.
+Référence : commentaire `TODO(Sprint 2+)` dans `src/lib/db/sejours.ts`.
+
+---
+
+## Dette technique Sprint 1+
+
+### Migration FK manquantes (corrigée en live, à formaliser)
+
+Le SQL `scripts/migrations/001-initial-schema.sql` n'inclut plus les FK
+`participants→sejours` et `plannings→sejours` suite au `DROP TABLE sejours CASCADE`
+de Session 6. Les FK ont été recréées manuellement via `ALTER TABLE` en
+production (Session connexion Supabase).
+
+À faire :
+- Soit régénérer `001-initial-schema.sql` depuis l'état Supabase actuel
+- Soit ajouter une migration `002-restore-foreign-keys.sql` qui recrée
+  explicitement `participants_sejour_id_fkey` et `plannings_sejour_id_fkey`
+
+### Extraction de buildFilterConstraintsFromSejour
+
+La construction de `FilterConstraints` depuis un `sejour` (lignes 46-57 de
+`src/app/api/sejours/[id]/planning/route.ts`) doit migrer dans
+`src/lib/allergens/filter.ts` pour éviter la logique métier inline dans les routes.
+
+### Logger applicatif injectable
+
+Aujourd'hui pas de log structuré applicatif. À introduire au Sprint 2
+si besoin de debug en prod (le pattern peut être inspiré du `LLMClient`
+injectable du module `llm/`).
+
+---
+
 ## Dette technique LLM (Sprint 1+)
 
 ### Génération du tool input_schema depuis Zod

@@ -1,0 +1,108 @@
+import type { NextRequest } from 'next/server';
+import { getSejourById } from '@/lib/db/sejours';
+import { getAllRecettes, getAllRecettesAsMap } from '@/lib/db/recettes';
+import { createPlanning } from '@/lib/db/plannings';
+import { createAnthropicClient } from '@/lib/llm/client';
+import { generatePlanning } from '@/lib/llm/generate-planning';
+import type { FilterConstraints } from '@/lib/allergens/filter';
+import { jsonError, jsonSuccess } from '@/lib/api/responses';
+import { dbErrorToResponse } from '@/lib/api/error-mapping';
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+): Promise<Response> {
+  const { id } = await params;
+
+  const token = request.headers.get('X-Sejour-Token');
+  if (token === null) {
+    return jsonError(401, 'unauthorized', 'Token de séjour requis');
+  }
+
+  const sejourResult = await getSejourById(id);
+  if (!sejourResult.ok) {
+    return dbErrorToResponse(sejourResult.error);
+  }
+
+  const sejour = sejourResult.sejour;
+
+  if (sejour.token !== token) {
+    return jsonError(401, 'unauthorized', 'Token invalide');
+  }
+
+  const [catalogueResult, recettesMapResult] = await Promise.all([
+    getAllRecettes(),
+    getAllRecettesAsMap(),
+  ]);
+
+  if (!catalogueResult.ok) return dbErrorToResponse(catalogueResult.error);
+  if (!recettesMapResult.ok) return dbErrorToResponse(recettesMapResult.error);
+
+  const apiKey = process.env['ANTHROPIC_API_KEY'];
+  if (!apiKey) {
+    return jsonError(503, 'llm_unavailable', 'Configuration LLM manquante');
+  }
+
+  const filterConstraints: FilterConstraints = {
+    allergenes_groupe: [...new Set(sejour.participants.flatMap((p) => p.allergies))],
+    regimes_groupe: [...new Set(sejour.participants.flatMap((p) => p.regimes))],
+    equipement_disponible: sejour.parametres.equipement_disponible,
+  };
+
+  const contexte = {
+    nb_jours: sejour.nb_jours,
+    repartition_repas: sejour.repartition_repas,
+    niveau_cuisine: sejour.parametres.niveau_cuisine,
+    temps_disponible: sejour.parametres.temps_disponible,
+  };
+
+  const client = createAnthropicClient(apiKey);
+
+  const planningResult = await generatePlanning(
+    client,
+    catalogueResult.recettes,
+    recettesMapResult.recettes,
+    filterConstraints,
+    sejour.participants,
+    contexte,
+  );
+
+  if (!planningResult.ok) {
+    switch (planningResult.error.kind) {
+      case 'pool_empty':
+        return jsonError(
+          422,
+          'business_error',
+          'Vos contraintes alimentaires excluent toutes les recettes du catalogue',
+        );
+      case 'validation_failed_after_retries':
+        return jsonError(
+          422,
+          'business_error',
+          'Impossible de composer un planning conforme après plusieurs tentatives',
+        );
+      case 'llm_unavailable':
+        return jsonError(503, 'llm_unavailable', planningResult.error.cause);
+    }
+  }
+
+  const persistResult = await createPlanning({
+    sejour_id: sejour.id,
+    entries: planningResult.entries,
+    contraintes_utilisees: {
+      allergenes: filterConstraints.allergenes_groupe,
+      regimes: filterConstraints.regimes_groupe,
+      equipement: filterConstraints.equipement_disponible,
+    },
+  });
+
+  if (!persistResult.ok) {
+    return dbErrorToResponse(persistResult.error);
+  }
+
+  const { id: planningId, sejour_id, entries, genere_le } = persistResult.planning;
+
+  return jsonSuccess(201, {
+    planning: { id: planningId, sejour_id, entries, genere_le },
+  });
+}
