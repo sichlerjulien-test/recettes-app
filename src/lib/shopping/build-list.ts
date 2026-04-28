@@ -4,7 +4,6 @@ import type {
   Recette,
   Ingredient,
   ShoppingItem,
-  ShoppingListContent,
   IngredientCategory,
   Unit,
   ShoppingError,
@@ -13,7 +12,7 @@ import type {
 export type { ShoppingError };
 
 export type BuildShoppingListResult =
-  | { ok: true; content: ShoppingListContent }
+  | { ok: true; items_par_categorie: Record<IngredientCategory, ShoppingItem[]> }
   | { ok: false; error: ShoppingError };
 
 type AggregItem = {
@@ -42,13 +41,13 @@ const round2 = (n: number): number => Math.round(n * 100) / 100;
  * @param recettes - Index de toutes les recettes disponibles, clé = recette_id
  * @param ingredients - Index de tous les ingrédients disponibles, clé = ingredient_id
  * @param nbParticipants - Nombre de participants effectifs pour le séjour (doit être > 0)
- * @returns `{ ok: true, content }` avec le contenu calculé, ou `{ ok: false, error }` si
- *          une référence est manquante ou si nbParticipants est invalide
+ * @returns `{ ok: true, items_par_categorie }` avec les items groupés par catégorie,
+ *          ou `{ ok: false, error }` si une référence est manquante ou si nbParticipants est invalide
  *
  * @example
  * const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
  * if (!result.ok) { console.error(result.error.kind); return; }
- * const tomates = result.content.items_par_categorie['fruits-legumes']
+ * const tomates = result.items_par_categorie['fruits-legumes']
  *   .find(i => i.ingredient_id === 'tomate');
  * // tomates.quantite_totale => 1.5, tomates.unite_affichee => 'kg'
  */
@@ -85,7 +84,7 @@ export function buildShoppingList(
   const aggr = new Map<string, AggregItem>();
 
   for (const entry of planning.entries) {
-    const recette = recettes.get(entry.recette_id) as Recette;
+    const recette = recettes.get(entry.recette_id)!;
     const facteur = nbParticipants / recette.portions_base;
 
     for (const ri of recette.ingredients) {
@@ -116,7 +115,7 @@ export function buildShoppingList(
   ) as Record<IngredientCategory, ShoppingItem[]>;
 
   for (const aggItem of aggr.values()) {
-    const ingredient = ingredients.get(aggItem.ingredient_id) as Ingredient;
+    const ingredient = ingredients.get(aggItem.ingredient_id)!;
 
     let quantite_totale: number;
     let unite_affichee: Unit;
@@ -145,5 +144,5 @@ export function buildShoppingList(
     items_par_categorie[cat].sort((a, b) => a.nom_affiche.localeCompare(b.nom_affiche));
   }
 
-  return { ok: true, content: { items_par_categorie } };
+  return { ok: true, items_par_categorie };
 }

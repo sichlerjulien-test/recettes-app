@@ -50,9 +50,9 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const cats = Object.keys(result.content.items_par_categorie);
+    const cats = Object.keys(result.items_par_categorie);
     expect(cats).toHaveLength(11);
-    for (const items of Object.values(result.content.items_par_categorie)) {
+    for (const items of Object.values(result.items_par_categorie)) {
       expect(items).toHaveLength(0);
     }
   });
@@ -68,7 +68,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const tomate = result.content.items_par_categorie['fruits-legumes']
+    const tomate = result.items_par_categorie['fruits-legumes']
       .find((i) => i.ingredient_id === 'tomate');
     expect(tomate).toBeDefined();
     expect(tomate?.quantite_totale).toBe(1);
@@ -116,7 +116,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, localRecettes, localIngredients, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const sauceItems = result.content.items_par_categorie['condiments-epices']
+    const sauceItems = result.items_par_categorie['condiments-epices']
       .filter((i) => i.ingredient_id === 'sauce-locale');
     expect(sauceItems).toHaveLength(2);
   });
@@ -130,7 +130,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 6);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const oeufs = result.content.items_par_categorie['cremerie-oeufs']
+    const oeufs = result.items_par_categorie['cremerie-oeufs']
       .find((i) => i.ingredient_id === 'oeuf-entier');
     expect(oeufs?.quantite_totale).toBe(12);
     expect(oeufs?.unite_affichee).toBe('piece');
@@ -145,7 +145,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const oeufs = result.content.items_par_categorie['cremerie-oeufs']
+    const oeufs = result.items_par_categorie['cremerie-oeufs']
       .find((i) => i.ingredient_id === 'oeuf-entier');
     expect(oeufs?.quantite_totale).toBe(3);
   });
@@ -159,7 +159,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const lait = result.content.items_par_categorie['cremerie-oeufs']
+    const lait = result.items_par_categorie['cremerie-oeufs']
       .find((i) => i.ingredient_id === 'lait-entier');
     expect(lait?.quantite_totale).toBe(0.13);
     expect(String(lait?.quantite_totale).replace('.', '').length).toBeLessThanOrEqual(4);
@@ -175,7 +175,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const parmesan = result.content.items_par_categorie['cremerie-oeufs']
+    const parmesan = result.items_par_categorie['cremerie-oeufs']
       .find((i) => i.ingredient_id === 'parmesan');
     expect(parmesan?.optionnel).toBe(true);
   });
@@ -191,7 +191,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const parmesan = result.content.items_par_categorie['cremerie-oeufs']
+    const parmesan = result.items_par_categorie['cremerie-oeufs']
       .find((i) => i.ingredient_id === 'parmesan');
     expect(parmesan?.optionnel).toBe(false);
   });
@@ -204,7 +204,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const cacahuetes = result.content.items_par_categorie['epicerie-salee']
+    const cacahuetes = result.items_par_categorie['epicerie-salee']
       .find((i) => i.ingredient_id === 'cacahuetes');
     expect(cacahuetes).toBeDefined();
     expect(cacahuetes?.optionnel).toBe(true);
@@ -221,7 +221,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const { items_par_categorie } = result.content;
+    const { items_par_categorie } = result;
     expect(items_par_categorie['viandes-poissons'].some((i) => i.ingredient_id === 'crevettes')).toBe(true);
     expect(items_par_categorie['epicerie-salee'].some((i) => i.ingredient_id === 'cacahuetes')).toBe(true);
     expect(items_par_categorie['condiments-epices'].some((i) => i.ingredient_id === 'sauce-soja')).toBe(true);
@@ -236,11 +236,11 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(Object.keys(result.content.items_par_categorie)).toHaveLength(11);
-    expect(result.content.items_par_categorie['viandes-poissons']).toHaveLength(0);
-    expect(result.content.items_par_categorie['surgele']).toHaveLength(0);
-    expect(result.content.items_par_categorie['boissons']).toHaveLength(0);
-    expect(result.content.items_par_categorie['epicerie-sucree']).toHaveLength(0);
+    expect(Object.keys(result.items_par_categorie)).toHaveLength(11);
+    expect(result.items_par_categorie['viandes-poissons']).toHaveLength(0);
+    expect(result.items_par_categorie['surgele']).toHaveLength(0);
+    expect(result.items_par_categorie['boissons']).toHaveLength(0);
+    expect(result.items_par_categorie['epicerie-sucree']).toHaveLength(0);
   });
 
   it('should sort items alphabetically by nom_affiche within each category', () => {
@@ -252,7 +252,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const items = result.content.items_par_categorie['fruits-legumes'];
+    const items = result.items_par_categorie['fruits-legumes'];
     expect(items).toHaveLength(3);
     const [first, second, third] = items;
     expect(first?.nom_affiche).toBe('Carotte');
@@ -271,7 +271,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const tomate = result.content.items_par_categorie['fruits-legumes']
+    const tomate = result.items_par_categorie['fruits-legumes']
       .find((i) => i.ingredient_id === 'tomate');
     expect(tomate?.utilise_dans).toContain('pates-bolognaise');
     expect(tomate?.utilise_dans).toContain('salade-tomate-basilic');
@@ -291,7 +291,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const lait = result.content.items_par_categorie['cremerie-oeufs']
+    const lait = result.items_par_categorie['cremerie-oeufs']
       .find((i) => i.ingredient_id === 'lait-entier');
     expect(lait?.quantite_totale).toBe(0.4);
     expect(lait?.unite_affichee).toBe('l');
@@ -327,7 +327,7 @@ describe('buildShoppingList', () => {
     const result = buildShoppingList(planning, localRecettes, localIngredients, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    const huile = result.content.items_par_categorie['condiments-epices']
+    const huile = result.items_par_categorie['condiments-epices']
       .find((i) => i.ingredient_id === 'huile-locale');
     expect(huile?.quantite_totale).toBe(3);
     expect(huile?.unite_affichee).toBe('cuillere-soupe');

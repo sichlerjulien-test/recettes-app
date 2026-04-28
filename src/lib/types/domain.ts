@@ -27,7 +27,6 @@ import type {
   PlanningEntryFullSchema,
   PlanningSchema,
   ShoppingItemSchema,
-  ShoppingListContentSchema,
   ShoppingListSchema,
   AllergenViolationSchema,
   RegimeViolationSchema,
@@ -96,8 +95,6 @@ export type Planning = z.infer<typeof PlanningSchema>;
 // ============================================================================
 
 export type ShoppingItem = z.infer<typeof ShoppingItemSchema>;
-
-export type ShoppingListContent = z.infer<typeof ShoppingListContentSchema>;
 
 export type ShoppingList = z.infer<typeof ShoppingListSchema>;
 

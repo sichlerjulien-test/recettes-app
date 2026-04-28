@@ -53,6 +53,23 @@ via les mises à jour de Next.
 
 ---
 
+## CI — gap à combler (Sprint 2+)
+
+Le workflow `.github/workflows/validate-data.yml` exécute uniquement
+`npm run validate` sur les modifications de `data/**`.
+Manquant :
+
+- Pas de workflow qui lance `npm run test` à chaque PR
+- Pas de workflow qui lance `npx tsc --noEmit` à chaque PR
+- Les 77 tests unitaires actuels ne sont pas vérifiés en CI
+
+**Action** : créer un workflow `.github/workflows/test-and-typecheck.yml`
+qui se déclenche sur toute PR vers `main` et exécute les deux commandes.
+Pas urgent au MVP (les tests sont lancés manuellement avant chaque PR
+via les sub-agents qa-engineer), mais à faire avant ouverture publique.
+
+---
+
 ## Dette technique LLM (Sprint 1+)
 
 ### Génération du tool input_schema depuis Zod
