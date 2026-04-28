@@ -79,7 +79,7 @@ détaillées dans le champ `error.details`.
 Pattern :
 ```ts
 const body = await request.json();
-const parsed = SejourCreateSchema.safeParse(body);
+const parsed = CreateSejourBodySchema.safeParse(body);
 if (!parsed.success) {
   return Response.json({
     error: { kind: 'validation_failed', message: '...', details: parsed.error.flatten() }
