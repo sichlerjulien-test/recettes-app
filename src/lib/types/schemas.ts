@@ -343,3 +343,22 @@ export const LLMErrorSchema = z.discriminatedUnion('kind', [
     cause: z.string(),
   }),
 ]);
+
+// ============================================================================
+// SHOPPING (cf. lib/shopping/)
+// ============================================================================
+
+export const ShoppingErrorSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('recette_inconnue'), recette_id: z.string() }),
+  z.object({
+    kind: z.literal('ingredient_inconnu'),
+    recette_id: z.string(),
+    ingredient_id: z.string(),
+  }),
+  z.object({
+    kind: z.literal('invalid_participants'),
+    nbParticipants: z.number(),
+  }),
+]);
+
+export type ShoppingError = z.infer<typeof ShoppingErrorSchema>;

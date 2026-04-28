@@ -33,6 +33,7 @@ import type {
   RecetteInconnueViolationSchema,
   ValidationViolationSchema,
   ValidationResultSchema,
+  ShoppingErrorSchema,
 } from './schemas';
 
 // ============================================================================
@@ -96,6 +97,8 @@ export type Planning = z.infer<typeof PlanningSchema>;
 export type ShoppingItem = z.infer<typeof ShoppingItemSchema>;
 
 export type ShoppingList = z.infer<typeof ShoppingListSchema>;
+
+export type ShoppingError = z.infer<typeof ShoppingErrorSchema>;
 
 // ============================================================================
 // VALIDATION RESULTS
