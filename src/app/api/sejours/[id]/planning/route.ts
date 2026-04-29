@@ -127,9 +127,5 @@ export async function POST(
     return dbErrorToResponse(persistResult.error);
   }
 
-  const { id: planningId, sejour_id, entries, genere_le } = persistResult.planning;
-
-  return jsonSuccess(201, {
-    planning: { id: planningId, sejour_id, entries, genere_le },
-  });
+  return jsonSuccess(201, { planning: persistResult.planning });
 }
