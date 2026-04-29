@@ -7,7 +7,7 @@ vi.mock('./supabase', () => ({
 }));
 
 import { getSupabaseClient } from './supabase';
-import { createPlanning } from './plannings';
+import { createPlanning, getPlanningBySejourId } from './plannings';
 import type { CreatePlanningInput } from './plannings';
 
 // ─── Mock Supabase chainable builder ─────────────────────────────────────────
@@ -22,6 +22,8 @@ function makeChain(result: Promise<MockResult>) {
     select: (_cols?: string) => makeChain(result),
     eq: (_col: string, _val: unknown) => makeChain(result),
     insert: (_rows: unknown) => makeChain(result),
+    order: (_col: string, _opts?: unknown) => makeChain(result),
+    limit: (_count: number) => makeChain(result),
     single: () => result,
     maybeSingle: () => result,
   };
@@ -66,6 +68,44 @@ const RAW_PLANNING_ROW = {
 describe('plannings DAL', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+  });
+
+  describe('getPlanningBySejourId', () => {
+    it('should return ok with planning when row exists', async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        createMockSupabase({
+          plannings: [{ data: RAW_PLANNING_ROW, error: null }],
+        }) as unknown as ReturnType<typeof getSupabaseClient>,
+      );
+
+      const result = await getPlanningBySejourId('sejour-uuid');
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.planning.id).toBe('planning-uuid');
+        expect(result.planning.sejour_id).toBe('sejour-uuid');
+        expect(result.planning.entries).toHaveLength(1);
+      }
+    });
+
+    it('should return not_found when no row matches', async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        createMockSupabase({
+          plannings: [{ data: null, error: null }],
+        }) as unknown as ReturnType<typeof getSupabaseClient>,
+      );
+
+      const result = await getPlanningBySejourId('sejour-uuid');
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('not_found');
+        if (result.error.kind === 'not_found') {
+          expect(result.error.entity).toBe('planning');
+          expect(result.error.id).toBe('sejour-uuid');
+        }
+      }
+    });
   });
 
   describe('createPlanning', () => {

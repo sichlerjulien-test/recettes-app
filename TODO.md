@@ -112,6 +112,33 @@ injectable du module `llm/`).
 
 ---
 
+### UI - Erreurs DB silencieuses sur /sejour/[id]
+
+`src/app/sejour/[id]/page.tsx` convertit les erreurs `query_failed` et
+`row_validation_failed` du DAL plannings en `initialPlanning = null`.
+L'utilisateur voit "Aucun planning généré" sans distinction entre
+"pas encore généré" et "erreur de chargement".
+À Sprint 2 : ajouter un état d'erreur UI explicite (toast au mount via
+`useEffect` côté client, ou Suspense + error boundary).
+
+### Tests UI
+
+Aucun test automatisé sur les pages `/nouveau-sejour` et `/sejour/[id]`
+au MVP. Couverture actuelle : tests d'intégration manuels via curl
+(8 cas validés en Session connexion Supabase).
+À Sprint 2 : Playwright pour tests end-to-end ou Vitest + Testing Library
+pour tests unitaires composants.
+
+### Optimisation chargement catalogue recettes
+
+`src/app/sejour/[id]/page.tsx` charge le catalogue COMPLET de recettes
+à chaque vue, alors que seules les recettes du planning sont nécessaires.
+Acceptable à 10 recettes, structurant à 500.
+À Sprint 2+ : faire une jointure SQL ou un fetch ciblé par `recette_id`
+des entries.
+
+---
+
 ## Dette technique LLM (Sprint 1+)
 
 ### Génération du tool input_schema depuis Zod

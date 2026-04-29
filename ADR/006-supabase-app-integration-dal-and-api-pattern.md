@@ -44,7 +44,7 @@ Structure :
 - src/lib/db/ingredients.ts : getAllIngredients, getIngredientById
 - src/lib/db/recettes.ts : getAllRecettes, getRecetteById
 - src/lib/db/sejours.ts : createSejour, getSejourById, getSejourByToken
-- src/lib/db/plannings.ts : createPlanning
+- src/lib/db/plannings.ts : createPlanning, getPlanningBySejourId
 
 Bénéfices :
 - Couplage faible entre routes et DB
@@ -109,22 +109,28 @@ Codes HTTP associés :
 - db_error : 500
 - llm_unavailable : 503
 
+Exception documentée : la route GET /api/health retourne 503
+(Service Unavailable) au lieu de 500 quand Supabase est indisponible.
+503 est sémantiquement plus juste pour un health check (l'infrastructure
+est temporairement indisponible, à réessayer), et c'est l'usage standard
+des outils de monitoring qui interrogent les health endpoints.
+
 Note : le `kind` côté API est distinct du `kind` interne des modules
 métier. La route fait le mapping (ex: LLMError.pool_empty
 → business_error avec message adapté).
 
 ### 6. Routes API au MVP de la Session
 
-3 routes minimales pour valider la chaîne :
+4 routes implémentées au MVP :
 
 - GET /api/health : sanity check connexion Supabase
 - POST /api/sejours : crée un séjour avec participants et paramètres,
   retourne { id, token }
 - POST /api/sejours/:id/planning : génère un planning pour un séjour
   existant (vérification token via header X-Sejour-Token)
-
-Les routes GET (séjour, planning, shopping list) viendront en Session UI
-ou Session 10 quand le besoin sera concret.
+- GET /api/sejours/:id/planning : récupère le dernier planning persisté
+  d'un séjour (vérification token via header X-Sejour-Token, 404 si
+  aucun planning n'a encore été généré)
 
 ### 7. Authentification au MVP : token de séjour
 
