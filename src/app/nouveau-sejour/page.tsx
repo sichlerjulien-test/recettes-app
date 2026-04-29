@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect } from "react"
 import { z } from "zod"
+import { setupZodFr } from "@/lib/zod-config"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Plus, Trash2 } from "lucide-react"
@@ -64,9 +64,11 @@ function safeNumber(value: number): number {
 }
 
 export default function NouveauSejourPage() {
+  setupZodFr()
+
   const form = useForm<NouveauSejourFormData>({
     resolver: zodResolver(NouveauSejourFormSchema),
-    mode: "onChange",
+    mode: "onTouched",
     defaultValues: {
       nom: "",
       nb_jours: 2,
@@ -86,10 +88,6 @@ export default function NouveauSejourPage() {
   })
 
   const participants = form.watch("participants")
-
-  useEffect(() => {
-    form.trigger()
-  }, [form])
 
   function toggleAllergen(index: number, allergen: Allergen) {
     const allParticipants = form.getValues("participants")
