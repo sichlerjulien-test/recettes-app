@@ -1,6 +1,9 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { z } from "zod"
+import { toast } from "sonner"
 import { setupZodFr } from "@/lib/zod-config"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -59,12 +62,41 @@ const EMPTY_PARTICIPANT = {
   n_aime_pas: [] as string[],
 }
 
+const ApiErrorSchema = z.object({
+  error: z.object({
+    kind: z.string(),
+    message: z.string(),
+    details: z.unknown().optional(),
+  }),
+})
+
+const CreatedSejourSchema = z.object({
+  id: z.string().uuid(),
+  token: z.string().uuid(),
+  url_share: z.string().optional(),
+})
+
+function extractErrorMessage(json: unknown): string {
+  const parsed = ApiErrorSchema.safeParse(json)
+  if (parsed.success) return parsed.data.error.message
+  return "Une erreur est survenue lors de la création du séjour"
+}
+
+function parseCreatedSejour(json: unknown): { id: string; token: string } | null {
+  const parsed = CreatedSejourSchema.safeParse(json)
+  if (!parsed.success) return null
+  return { id: parsed.data.id, token: parsed.data.token }
+}
+
 function safeNumber(value: number): number {
   return Number.isNaN(value) ? 0 : value
 }
 
 export default function NouveauSejourPage() {
   setupZodFr()
+
+  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<NouveauSejourFormData>({
     resolver: zodResolver(NouveauSejourFormSchema),
@@ -127,12 +159,39 @@ export default function NouveauSejourPage() {
     )
   }
 
-  function onSubmit(data: NouveauSejourFormData) {
-    const normalized = {
-      ...data,
-      nom: data.nom === "" ? undefined : data.nom,
+  async function onSubmit(data: NouveauSejourFormData) {
+    setIsSubmitting(true)
+    try {
+      const response = await fetch("/api/sejours", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          nom: data.nom === "" ? undefined : data.nom,
+        }),
+      })
+
+      const json: unknown = await response.json()
+
+      if (!response.ok) {
+        toast.error(extractErrorMessage(json))
+        return
+      }
+
+      const created = parseCreatedSejour(json)
+      if (!created) {
+        toast.error("Réponse serveur inattendue")
+        return
+      }
+
+      toast.success("Séjour créé avec succès")
+      router.push(`/sejour/${created.id}?t=${created.token}`)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Erreur réseau"
+      toast.error(`Échec de la création : ${message}`)
+    } finally {
+      setIsSubmitting(false)
     }
-    console.log("Form data:", normalized)
   }
 
   return (
@@ -517,9 +576,9 @@ export default function NouveauSejourPage() {
               type="submit"
               className="w-full"
               size="lg"
-              disabled={!form.formState.isValid}
+              disabled={!form.formState.isValid || isSubmitting}
             >
-              Continuer
+              {isSubmitting ? "Création en cours..." : "Continuer"}
             </Button>
           </form>
         </Form>
