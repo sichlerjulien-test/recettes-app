@@ -2,14 +2,21 @@
 
 import { useEffect } from "react"
 import { z } from "zod"
-import { useForm } from "react-hook-form"
+import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Plus, Trash2 } from "lucide-react"
 
-import { CreateSejourBodySchema, EquipmentSchema } from "@/lib/types/schemas"
+import { CreateSejourBodySchema, EquipmentSchema, AllergenSchema, DietaryRestrictionSchema } from "@/lib/types/schemas"
+import {
+  ALLERGEN_LABELS,
+  REGIME_LABELS,
+  EU14_ALLERGENS,
+  DIETARY_RESTRICTIONS,
+} from "@/lib/ui/labels"
+import type { Allergen, DietaryRestriction } from "@/lib/ui/labels"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -21,10 +28,17 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 
-// Participants omis — sous-tâche ultérieure.
-// nom étendu : empty string valide au niveau du formulaire (optionnel côté UX).
-const NouveauSejourFormSchema = CreateSejourBodySchema.omit({ participants: true }).extend({
+// Réécrit sans .default([]) pour aligner les types input/output Zod
+// (exactOptionalPropertyTypes cause une incompatibilité resolver sinon).
+const NouveauSejourFormSchema = CreateSejourBodySchema.extend({
   nom: z.string().max(100).optional(),
+  participants: z.array(z.object({
+    nom: z.string().min(1).max(50),
+    allergies: z.array(AllergenSchema),
+    regimes: z.array(DietaryRestrictionSchema),
+    aime: z.array(z.string()),
+    n_aime_pas: z.array(z.string()),
+  })).min(1).max(12),
 })
 
 type NouveauSejourFormData = z.infer<typeof NouveauSejourFormSchema>
@@ -36,6 +50,14 @@ const EQUIPEMENTS: { value: z.infer<typeof EquipmentSchema>; label: string }[] =
   { value: "blender", label: "Blender" },
   { value: "robot", label: "Robot culinaire" },
 ]
+
+const EMPTY_PARTICIPANT = {
+  nom: "",
+  allergies: [] as Allergen[],
+  regimes: [] as DietaryRestriction[],
+  aime: [] as string[],
+  n_aime_pas: [] as string[],
+}
 
 function safeNumber(value: number): number {
   return Number.isNaN(value) ? 0 : value
@@ -54,12 +76,58 @@ export default function NouveauSejourPage() {
         equipement_disponible: ["plaque", "four"],
         temps_disponible: "standard",
       },
+      participants: [{ ...EMPTY_PARTICIPANT }],
     },
   })
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "participants",
+  })
+
+  const participants = form.watch("participants")
 
   useEffect(() => {
     form.trigger()
   }, [form])
+
+  function toggleAllergen(index: number, allergen: Allergen) {
+    const allParticipants = form.getValues("participants")
+    const participant = allParticipants[index]
+    if (!participant) return
+    form.setValue(
+      "participants",
+      allParticipants.map((p, i) =>
+        i === index
+          ? {
+              ...p,
+              allergies: p.allergies.includes(allergen)
+                ? p.allergies.filter((a) => a !== allergen)
+                : [...p.allergies, allergen],
+            }
+          : p,
+      ),
+    )
+  }
+
+  function toggleRegime(index: number, regime: DietaryRestriction) {
+    const allParticipants = form.getValues("participants")
+    const participant = allParticipants[index]
+    if (!participant) return
+    form.setValue(
+      "participants",
+      allParticipants.map((p, i) =>
+        i === index
+          ? {
+              ...p,
+              regimes: p.regimes.includes(regime)
+                ? p.regimes.filter((r) => r !== regime)
+                : [...p.regimes, regime],
+            }
+          : p,
+      ),
+    )
+  }
 
   function onSubmit(data: NouveauSejourFormData) {
     const normalized = {
@@ -67,7 +135,6 @@ export default function NouveauSejourPage() {
       nom: data.nom === "" ? undefined : data.nom,
     }
     console.log("Form data:", normalized)
-    // L'appel API viendra dans la sous-tâche suivante.
   }
 
   return (
@@ -229,7 +296,6 @@ export default function NouveauSejourPage() {
               </h2>
               <div className="rounded-xl border border-gray-100 bg-white p-4 space-y-6">
 
-                {/* Niveau de cuisine */}
                 <FormField
                   control={form.control}
                   name="parametres.niveau_cuisine"
@@ -268,7 +334,6 @@ export default function NouveauSejourPage() {
                   )}
                 />
 
-                {/* Temps disponible */}
                 <FormField
                   control={form.control}
                   name="parametres.temps_disponible"
@@ -307,7 +372,6 @@ export default function NouveauSejourPage() {
                   )}
                 />
 
-                {/* Équipement disponible */}
                 <FormField
                   control={form.control}
                   name="parametres.equipement_disponible"
@@ -342,6 +406,112 @@ export default function NouveauSejourPage() {
                   )}
                 />
               </div>
+            </section>
+
+            {/* ── Section 4 : Participants ── */}
+            <section className="space-y-4">
+              <h2 className="text-base font-semibold text-gray-900">
+                Participants
+              </h2>
+
+              <div className="space-y-4">
+                {fields.map((field, index) => {
+                  const participantAllergies = participants[index]?.allergies ?? []
+                  const participantRegimes = participants[index]?.regimes ?? []
+                  return (
+                    <div
+                      key={field.id}
+                      className="rounded-xl border border-gray-100 bg-white p-4 space-y-4"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold text-gray-700">
+                          Participant {index + 1}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          disabled={fields.length === 1}
+                          onClick={() => remove(index)}
+                          className="h-8 w-8 p-0 text-gray-400 hover:text-red-500"
+                          aria-label={`Supprimer le participant ${index + 1}`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name={`participants.${index}.nom`}
+                        render={({ field: nomField }) => (
+                          <FormItem>
+                            <FormLabel>Nom</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Ex : Alice"
+                                maxLength={50}
+                                {...nomField}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-gray-700">Allergies</p>
+                        <div className="flex flex-wrap gap-2">
+                          {EU14_ALLERGENS.map((allergen) => {
+                            const isSelected = participantAllergies.includes(allergen)
+                            return (
+                              <Button
+                                key={allergen}
+                                type="button"
+                                variant={isSelected ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => toggleAllergen(index, allergen)}
+                              >
+                                {ALLERGEN_LABELS[allergen]}
+                              </Button>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-gray-700">Régimes alimentaires</p>
+                        <div className="flex flex-wrap gap-2">
+                          {DIETARY_RESTRICTIONS.map((regime) => {
+                            const isSelected = participantRegimes.includes(regime)
+                            return (
+                              <Button
+                                key={regime}
+                                type="button"
+                                variant={isSelected ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => toggleRegime(index, regime)}
+                              >
+                                {REGIME_LABELS[regime]}
+                              </Button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                disabled={fields.length >= 12}
+                onClick={() => append({ ...EMPTY_PARTICIPANT })}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Ajouter un participant
+              </Button>
             </section>
 
             {/* ── Bouton de soumission ── */}
