@@ -27,10 +27,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+<html
+  lang="fr"
+  className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+  style={{ colorScheme: "light" }}
+>
       <body className="min-h-full flex flex-col">
         {children}
         <Analytics />
