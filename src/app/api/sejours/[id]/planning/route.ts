@@ -1,12 +1,39 @@
 import type { NextRequest } from 'next/server';
 import { getSejourById } from '@/lib/db/sejours';
 import { getAllRecettes, getAllRecettesAsMap } from '@/lib/db/recettes';
-import { createPlanning } from '@/lib/db/plannings';
+import { createPlanning, getPlanningBySejourId } from '@/lib/db/plannings';
 import { createAnthropicClient } from '@/lib/llm/client';
 import { generatePlanning } from '@/lib/llm/generate-planning';
 import type { FilterConstraints } from '@/lib/allergens/filter';
 import { jsonError, jsonSuccess } from '@/lib/api/responses';
 import { dbErrorToResponse } from '@/lib/api/error-mapping';
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+): Promise<Response> {
+  const { id } = await params;
+
+  const token = request.headers.get('X-Sejour-Token');
+  if (!token) {
+    return jsonError(401, 'unauthorized', 'Token de séjour requis');
+  }
+
+  const sejourResult = await getSejourById(id);
+  if (!sejourResult.ok) {
+    return dbErrorToResponse(sejourResult.error);
+  }
+  if (sejourResult.sejour.token !== token) {
+    return jsonError(401, 'unauthorized', 'Token invalide');
+  }
+
+  const planningResult = await getPlanningBySejourId(id);
+  if (!planningResult.ok) {
+    return dbErrorToResponse(planningResult.error);
+  }
+
+  return jsonSuccess(200, { planning: planningResult.planning });
+}
 
 export async function POST(
   request: NextRequest,
