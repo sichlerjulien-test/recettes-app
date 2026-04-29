@@ -121,7 +121,7 @@ métier. La route fait le mapping (ex: LLMError.pool_empty
 
 ### 6. Routes API au MVP de la Session
 
-4 routes implémentées au MVP :
+5 routes implémentées au MVP :
 
 - GET /api/health : sanity check connexion Supabase
 - POST /api/sejours : crée un séjour avec participants et paramètres,
@@ -131,6 +131,9 @@ métier. La route fait le mapping (ex: LLMError.pool_empty
 - GET /api/sejours/:id/planning : récupère le dernier planning persisté
   d'un séjour (vérification token via header X-Sejour-Token, 404 si
   aucun planning n'a encore été généré)
+- POST /api/sejours/:id/shopping-list : calcule la liste de courses à
+  partir du planning courant (vérification token via header
+  X-Sejour-Token, 422 si aucun planning généré)
 
 ### 7. Authentification au MVP : token de séjour
 
