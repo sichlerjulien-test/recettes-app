@@ -3,6 +3,7 @@ import { getPlanningBySejourId } from "@/lib/db/plannings";
 import { getAllRecettesAsMap } from "@/lib/db/recettes";
 import { notFound } from "next/navigation";
 import { PlanningSection } from "./_components/PlanningSection";
+import { ShoppingListSection } from "./_components/ShoppingListSection";
 
 export default async function SejourPage({
   params,
@@ -86,6 +87,12 @@ export default async function SejourPage({
         token={token}
         initialPlanning={initialPlanning}
         recettes={recettesResult.recettes}
+      />
+
+      <ShoppingListSection
+        sejourId={id}
+        token={token}
+        hasPlanning={initialPlanning !== null}
       />
     </main>
   );
