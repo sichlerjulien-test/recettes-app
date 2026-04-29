@@ -41,6 +41,11 @@ export default async function SejourPage({
     );
   }
 
+  // La vérification du token est intentionnellement répétée ici (page SSR)
+  // et dans le Route Handler (POST/GET /api/sejours/:id/planning).
+  // Le Server Component protège le rendu côté serveur ; le Route Handler
+  // protège l'accès aux données via API.
+  // TODO(Sprint 2+) : centraliser via un helper auth quand Supabase Auth sera introduit.
   if (sejourResult.sejour.token !== token) {
     return (
       <main className="container max-w-2xl mx-auto p-6 space-y-4">

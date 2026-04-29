@@ -14,18 +14,6 @@ type PlanningResult =
   | { ok: true; planning: Planning }
   | { ok: false; error: DbError };
 
-function mapPlanningRow(item: unknown): unknown {
-  if (typeof item !== 'object' || item === null) return item;
-  const row = item as Record<string, unknown>;
-  return {
-    id: row['id'],
-    sejour_id: row['sejour_id'],
-    entries: row['entries'],
-    contraintes_utilisees: row['contraintes_utilisees'],
-    genere_le: row['genere_le'],
-  };
-}
-
 export type GetPlanningResult =
   | { ok: true; planning: Planning }
   | { ok: false; error: DbError };
@@ -87,8 +75,7 @@ export async function createPlanning(input: CreatePlanningInput): Promise<Planni
     };
   }
 
-  const mapped = mapPlanningRow(data);
-  const parsed = PlanningSchema.safeParse(mapped);
+  const parsed = PlanningSchema.safeParse(data);
 
   if (!parsed.success) {
     return {

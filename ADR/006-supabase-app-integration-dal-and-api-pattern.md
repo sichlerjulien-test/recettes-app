@@ -109,6 +109,12 @@ Codes HTTP associés :
 - db_error : 500
 - llm_unavailable : 503
 
+Exception documentée : la route GET /api/health retourne 503
+(Service Unavailable) au lieu de 500 quand Supabase est indisponible.
+503 est sémantiquement plus juste pour un health check (l'infrastructure
+est temporairement indisponible, à réessayer), et c'est l'usage standard
+des outils de monitoring qui interrogent les health endpoints.
+
 Note : le `kind` côté API est distinct du `kind` interne des modules
 métier. La route fait le mapping (ex: LLMError.pool_empty
 → business_error avec message adapté).
