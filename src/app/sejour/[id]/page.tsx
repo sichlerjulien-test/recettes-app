@@ -80,8 +80,18 @@ export default async function SejourPage({
           {sejourResult.sejour.nb_jours} jours,{" "}
           {sejourResult.sejour.participants.length} participant(s)
         </p>
-        <ShareLink url={`/sejour/${id}?t=${token}`} />
       </header>
+
+      <section className="space-y-3">
+        <div className="space-y-1">
+          <h2 className="text-lg font-semibold">Lien à partager</h2>
+          <p className="text-sm text-muted-foreground">
+            Envoyez ce lien aux participants pour qu&apos;ils puissent
+            consulter le séjour et la liste de courses.
+          </p>
+        </div>
+        <ShareLink url={`/sejour/${id}?t=${token}`} />
+      </section>
 
       <SejourContent
         sejourId={id}
