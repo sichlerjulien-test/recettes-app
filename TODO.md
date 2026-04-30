@@ -61,7 +61,7 @@ Manquant :
 
 - Pas de workflow qui lance `npm run test` à chaque PR
 - Pas de workflow qui lance `npx tsc --noEmit` à chaque PR
-- Les 77 tests unitaires actuels ne sont pas vérifiés en CI
+- Les 98 tests unitaires actuels ne sont pas vérifiés en CI
 
 **Action** : créer un workflow `.github/workflows/test-and-typecheck.yml`
 qui se déclenche sur toute PR vers `main` et exécute les deux commandes.
@@ -121,6 +121,36 @@ L'utilisateur voit "Aucun planning généré" sans distinction entre
 À Sprint 2 : ajouter un état d'erreur UI explicite (toast au mount via
 `useEffect` côté client, ou Suspense + error boundary).
 
+### Lock light mode (dette consciente Sprint 1)
+
+`src/app/layout.tsx` force `colorScheme: 'light'` via `<meta>` et supprime le bloc dark
+mode dans `globals.css`. Décision prise pour éviter des couleurs illisibles avec la palette
+actuelle (texte sombre sur fond sombre en dark OS).
+
+À Sprint 2 : soit adopter un vrai support dark mode avec des tokens de couleur adaptés,
+soit documenter explicitement que l'app est light-only. La dette actuelle expose l'app
+à des régressions visuelles si un composant tiers introduit des styles dark-aware.
+
+### Clé de déduplication ShoppingList (edge case)
+
+Dans `ShoppingListSection.tsx`, la clé de l'état coché est
+`${ingredient_id}-${unite_affichee}`. Si un même ingrédient apparaît avec deux unités
+différentes dans la même liste de courses (cas théorique : agrégation partielle échouée),
+les deux lignes partageront le même état de case à cocher.
+
+À corriger si `buildShoppingList` évolue vers une agrégation multi-unités volontaire.
+Peu risqué au MVP (la logique actuelle agrège par ingrédient + unité de façon déterministe).
+
+### Map non sérialisable en prop RSC→Client
+
+Dans `src/app/sejour/[id]/page.tsx`, `recettes` est passé comme `Map<string, Recette>`
+à `SejourContent` (Client Component). Les `Map` ne sont pas sérialisables dans le
+boundary RSC de Next.js — une hydratation SSR échouerait silencieusement ou lèverait
+une erreur selon la version.
+
+À vérifier / corriger avant Sprint 2 : remplacer par `Record<string, Recette>` (objet
+plain) ou convertir explicitement au moment du passage de prop.
+
 ### Tests UI
 
 Aucun test automatisé sur les pages `/nouveau-sejour` et `/sejour/[id]`
@@ -168,3 +198,4 @@ cube, gousse), faire Math.ceil(quantite_convertie). Pour les unités continues
 (g, kg, ml, l), garder la conversion fractionnaire.
 
 Priorité : avant ouverture test interne. Très visible côté utilisateur.
+Cible : Sprint 2 — fix dans `src/lib/shopping/build-list.ts`, hors périmètre UI Sprint 1.
