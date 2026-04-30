@@ -3,6 +3,7 @@ import { getPlanningBySejourId } from "@/lib/db/plannings";
 import { getAllRecettesAsMap } from "@/lib/db/recettes";
 import { notFound } from "next/navigation";
 import { SejourContent } from "./_components/SejourContent";
+import { ShareLink } from "./_components/ShareLink";
 
 export default async function SejourPage({
   params,
@@ -70,7 +71,7 @@ export default async function SejourPage({
   const initialPlanning = planningResult.ok ? planningResult.planning : null;
 
   return (
-    <main className="container max-w-2xl mx-auto p-6 space-y-6">
+    <main className="container max-w-2xl mx-auto p-6 space-y-8">
       <header className="space-y-2">
         <h1 className="text-2xl font-bold">
           {sejourResult.sejour.nom ?? "Séjour"}
@@ -87,6 +88,17 @@ export default async function SejourPage({
         initialPlanning={initialPlanning}
         recettes={recettesResult.recettes}
       />
+
+      <section className="space-y-3 pt-4 border-t">
+        <div className="space-y-1">
+          <h2 className="text-base font-semibold">Lien à partager</h2>
+          <p className="text-sm text-muted-foreground">
+            Envoyez ce lien aux participants pour qu&apos;ils puissent
+            consulter le séjour.
+          </p>
+        </div>
+        <ShareLink sejourId={id} token={token} />
+      </section>
     </main>
   );
 }

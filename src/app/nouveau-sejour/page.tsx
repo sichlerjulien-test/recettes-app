@@ -279,14 +279,37 @@ export default function NouveauSejourPage() {
                 Répartition des repas
               </h2>
               <div className="rounded-xl border border-gray-100 bg-white p-4 space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Combien de repas voulez-vous planifier ? Pour 3 midis sur 3 jours, mettez 3.
+                </p>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+                  <FormField
+                    control={form.control}
+                    name="repartition_repas.brunchs"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Petit-déjeuner</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={0}
+                            {...field}
+                            value={field.value}
+                            onChange={(e) => field.onChange(safeNumber(e.target.valueAsNumber))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                   <FormField
                     control={form.control}
                     name="repartition_repas.midis"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Midis</FormLabel>
+                        <FormLabel>Midi</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -306,27 +329,7 @@ export default function NouveauSejourPage() {
                     name="repartition_repas.soirs"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Soirs</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min={0}
-                            {...field}
-                            value={field.value}
-                            onChange={(e) => field.onChange(safeNumber(e.target.valueAsNumber))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="repartition_repas.brunchs"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Brunchs</FormLabel>
+                        <FormLabel>Soir</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -341,8 +344,6 @@ export default function NouveauSejourPage() {
                     )}
                   />
                 </div>
-
-                <p className="text-xs text-gray-400">Au moins 1 repas au total</p>
               </div>
             </section>
 
