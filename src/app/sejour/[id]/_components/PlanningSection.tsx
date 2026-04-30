@@ -6,16 +6,10 @@ import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { PlanningSchema } from "@/lib/types/schemas";
 import type { Planning, Recette, MealType } from "@/lib/types/domain";
+import { ApiErrorSchema } from "@/lib/api/responses";
 
 const GeneratePlanningResponseSchema = z.object({
   planning: PlanningSchema,
-});
-
-const ApiErrorSchema = z.object({
-  error: z.object({
-    kind: z.string(),
-    message: z.string(),
-  }),
 });
 
 interface Props {

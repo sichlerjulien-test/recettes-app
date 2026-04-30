@@ -8,19 +8,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ShoppingItemSchema, IngredientCategorySchema } from "@/lib/types/schemas";
 import type { ShoppingItem, IngredientCategory } from "@/lib/types/domain";
 import { CATEGORY_LABELS, CATEGORY_ORDER } from "@/lib/ui/labels";
+import { ApiErrorSchema } from "@/lib/api/responses";
 
 const ShoppingListResponseSchema = z.object({
   items_par_categorie: z.record(
     IngredientCategorySchema,
     z.array(ShoppingItemSchema),
   ),
-});
-
-const ApiErrorSchema = z.object({
-  error: z.object({
-    kind: z.string(),
-    message: z.string(),
-  }),
 });
 
 interface Props {
