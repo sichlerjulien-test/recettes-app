@@ -151,3 +151,20 @@ Solution future : utiliser une lib type `zod-to-json-schema` pour générer
 
 Pas urgent au MVP : les deux sont colocalisés dans `client.ts`, le risque
 de divergence est faible.
+
+### Bug d'arrondi des unités d'achat (visible utilisateur)
+
+`buildShoppingList` ne fait pas `Math.ceil` après conversion vers
+`unite_achat`, ce qui produit des affichages absurdes côté UI :
+- "0.3 piece Chou-fleur" (devrait être 1 piece)
+- "0.5 piece Lait de coco" (devrait être 1 piece)
+- "0.5 botte Coriandre fraîche" (devrait être 1 botte)
+
+Cause : pour `chou-fleur`, `unite_base=g, unite_achat=piece, conversion=800`.
+Une recette consomme 240g → conversion 240/800 = 0.3 piece.
+
+Fix attendu : si l'unité finale est discrète (piece, boîte, sachet, botte,
+cube, gousse), faire Math.ceil(quantite_convertie). Pour les unités continues
+(g, kg, ml, l), garder la conversion fractionnaire.
+
+Priorité : avant ouverture test interne. Très visible côté utilisateur.
