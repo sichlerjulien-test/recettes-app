@@ -1,54 +1,55 @@
-const FEATURES = [
-  {
-    title: 'Contraintes alimentaires respectées',
-    detail: "Allergies, régimes — personne n'est oublié.",
-  },
-  {
-    title: 'Planning de repas généré en un tap',
-    detail: 'Midis, soirs, brunchs — tout planifié automatiquement.',
-  },
-  {
-    title: 'Liste de courses prête pour le supermarché',
-    detail: 'Quantités calculées, triées par rayon.',
-  },
-];
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="flex justify-center pt-6 px-4">
-        <span className="text-xs text-gray-400 bg-white border border-gray-100 px-3 py-1 rounded-full">
-          Sprint 0 — en construction
-        </span>
-      </div>
+    <main className="container max-w-2xl mx-auto px-6 py-12 flex-1 flex flex-col gap-12">
+      <section className="space-y-6 text-center sm:text-left">
+        <h1 className="text-3xl sm:text-4xl font-bold leading-tight">
+          Meal Planner
+        </h1>
+        <p className="text-lg text-muted-foreground leading-relaxed">
+          Du week-end au road trip, des repas pour tout le monde sans
+          se prendre la tête.
+        </p>
 
-      <main className="flex-1 flex flex-col items-center justify-start md:justify-center px-4 pt-14 pb-12 w-full">
-        <div className="w-full max-w-sm">
-          <h1 className="text-4xl font-bold text-gray-900 text-center mb-3 tracking-tight">
-            Meal Planner
-          </h1>
-          <p className="text-base text-gray-500 text-center mb-10 leading-relaxed">
-            Planifie tes repas et ta liste de courses en groupe, sans prise de tête.
-          </p>
+        <ul className="space-y-2 text-base">
+          <li className="flex gap-2">
+            <span aria-hidden>→</span>
+            <span>Plats adaptés aux contraintes de chaque participant</span>
+          </li>
+          <li className="flex gap-2">
+            <span aria-hidden>→</span>
+            <span>Liste de courses prête à l&apos;emploi</span>
+          </li>
+          <li className="flex gap-2">
+            <span aria-hidden>→</span>
+            <span>Zéro friction, zéro inscription</span>
+          </li>
+        </ul>
 
-          <div className="flex flex-col gap-3">
-            {FEATURES.map((f) => (
-              <div
-                key={f.title}
-                className="bg-white rounded-xl border border-gray-100 px-5 py-4"
-              >
-                <div className="w-2 h-2 rounded-full bg-teal-400 mb-2" />
-                <p className="text-sm font-medium text-gray-800">{f.title}</p>
-                <p className="text-xs text-gray-400 mt-1">{f.detail}</p>
-              </div>
-            ))}
-          </div>
+        <Button asChild size="lg" className="w-full sm:w-auto">
+          <Link href="/nouveau-sejour">Créer un séjour</Link>
+        </Button>
+      </section>
 
-          <p className="text-xs text-gray-400 mt-10 text-center">
-            Interface bientôt disponible.
-          </p>
-        </div>
-      </main>
-    </div>
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold">Comment ça marche</h2>
+        <ol className="space-y-3 text-base">
+          <li className="flex gap-3">
+            <span className="font-semibold text-muted-foreground shrink-0">1.</span>
+            <span>Décrivez votre séjour et vos amis</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="font-semibold text-muted-foreground shrink-0">2.</span>
+            <span>Notre IA compose un menu adapté</span>
+          </li>
+          <li className="flex gap-3">
+            <span className="font-semibold text-muted-foreground shrink-0">3.</span>
+            <span>La liste de courses suit, prête à imprimer</span>
+          </li>
+        </ol>
+      </section>
+    </main>
   );
 }

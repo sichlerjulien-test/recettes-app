@@ -3,6 +3,7 @@ import { getPlanningBySejourId } from "@/lib/db/plannings";
 import { getAllRecettesAsMap } from "@/lib/db/recettes";
 import { notFound } from "next/navigation";
 import { SejourContent } from "./_components/SejourContent";
+import { ShareLink } from "./_components/ShareLink";
 
 export default async function SejourPage({
   params,
@@ -79,6 +80,7 @@ export default async function SejourPage({
           {sejourResult.sejour.nb_jours} jours,{" "}
           {sejourResult.sejour.participants.length} participant(s)
         </p>
+        <ShareLink url={`/sejour/${id}?t=${token}`} />
       </header>
 
       <SejourContent
