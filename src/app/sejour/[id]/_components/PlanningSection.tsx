@@ -21,17 +21,18 @@ const ApiErrorSchema = z.object({
 interface Props {
   sejourId: string;
   token: string;
-  initialPlanning: Planning | null;
+  planning: Planning | null;
   recettes: Map<string, Recette>;
+  onPlanningGenerated: (planning: Planning) => void;
 }
 
 export function PlanningSection({
   sejourId,
   token,
-  initialPlanning,
+  planning,
   recettes,
+  onPlanningGenerated,
 }: Props) {
-  const [planning, setPlanning] = useState<Planning | null>(initialPlanning);
   const [isGenerating, setIsGenerating] = useState(false);
 
   async function handleGenerate() {
@@ -58,7 +59,7 @@ export function PlanningSection({
         return;
       }
 
-      setPlanning(parsed.data.planning);
+      onPlanningGenerated(parsed.data.planning);
       toast.success("Planning généré");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Erreur réseau";
