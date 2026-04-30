@@ -199,3 +199,14 @@ cube, gousse), faire Math.ceil(quantite_convertie). Pour les unités continues
 
 Priorité : avant ouverture test interne. Très visible côté utilisateur.
 Cible : Sprint 2 — fix dans `src/lib/shopping/build-list.ts`, hors périmètre UI Sprint 1.
+
+
+### Clé de checkbox shopping list (cas théorique)
+
+ShoppingListSection utilise `${ingredient_id}-${unite_affichee}` comme clé
+pour les checkboxes. Si un ingrédient apparaît plusieurs fois dans la même
+liste avec la même unité (impossible avec l'agrégation actuelle, mais
+théoriquement possible si la logique évolue), les checkboxes seraient
+fusionnées.
+
+Sprint cible : non urgent. À ajuster si on rencontre le cas en pratique.
