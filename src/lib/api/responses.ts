@@ -1,3 +1,12 @@
+import { z } from 'zod';
+
+export const ApiErrorSchema = z.object({
+  error: z.object({
+    kind: z.string(),
+    message: z.string(),
+  }),
+});
+
 export type ApiErrorKind =
   | 'validation_failed'
   | 'unauthorized'
