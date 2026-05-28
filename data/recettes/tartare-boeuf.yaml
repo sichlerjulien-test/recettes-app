@@ -1,0 +1,56 @@
+id: tartare-boeuf
+nom: Tartare de bœuf
+description: "Bœuf haché à la main, câpres, cornichons, jaune d'œuf, moutarde. Le plat de brasserie maison."
+portions_base: 4
+duree_minutes: 20
+duree_active: 20
+difficulte: moyen
+equipement: []
+type_repas:
+  - soir
+type_cuisine: francaise
+saison:
+  - printemps
+  - ete
+  - automne
+ingredient_principal: boeuf
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: boeuf-tartare
+    quantite_base: 600
+    unite: g
+  - ingredient_id: oeuf
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: moutarde-dijon
+    quantite_base: 20
+    unite: g
+  - ingredient_id: capres
+    quantite_base: 30
+    unite: g
+  - ingredient_id: cornichon
+    quantite_base: 40
+    unite: g
+  - ingredient_id: echalote
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: persil-plat
+    quantite_base: 15
+    unite: g
+  - ingredient_id: sauce-worcestershire
+    quantite_base: 10
+    unite: ml
+  - ingredient_id: tabasco
+    quantite_base: 3
+    unite: ml
+    optionnel: true
+etapes:
+  - "Hacher le bœuf au couteau ou demander au boucher de le faire."
+  - "Hacher finement câpres, cornichons, échalote, persil."
+  - "Mélanger bœuf, moutarde, sauce worcestershire, tabasco, hachis."
+  - "Former en dôme dans les assiettes, déposer le jaune d'œuf au centre."
+  - "Servir avec frites maison ou pain grillé."
+tags_libres:
+  - brasserie
+  - proteines
+  - sans-cuisson

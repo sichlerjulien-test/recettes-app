@@ -1,0 +1,46 @@
+id: fish-and-chips-maison
+nom: Fish & chips maison
+description: "Cabillaud en pâte à bière, chips maison au four. Festif et généreux."
+portions_base: 4
+duree_minutes: 50
+duree_active: 30
+difficulte: moyen
+equipement:
+  - four
+  - plaque
+type_repas:
+  - soir
+type_cuisine: anglaise
+saison:
+  - toutes
+ingredient_principal: poisson
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: filet-cabillaud
+    quantite_base: 600
+    unite: g
+  - ingredient_id: pomme-de-terre
+    quantite_base: 800
+    unite: g
+  - ingredient_id: farine-blanche
+    quantite_base: 150
+    unite: g
+  - ingredient_id: biere-blonde
+    quantite_base: 200
+    unite: ml
+  - ingredient_id: huile-friture
+    quantite_base: 500
+    unite: ml
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+etapes:
+  - "Préchauffer le four à 200°C. Couper pommes de terre en quartiers, huiler, saler."
+  - "Enfourner les chips 35 min en retournant à mi-cuisson."
+  - "Préparer la pâte à frire : farine + bière froide + sel. Texture yaourt."
+  - "Sécher les filets de cabillaud, tremper dans la pâte."
+  - "Frire en petite huile 3-4 min par face jusqu'à dorure. Servir avec citron."
+tags_libres:
+  - festif
+  - britannique
+  - gourmand

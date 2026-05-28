@@ -20,23 +20,31 @@ const NO_CONSTRAINTS: FilterConstraints = {
 
 const BASE_CONTEXTE: GeneratePlanningInput['contexte'] = {
   nb_jours: 1,
-  repartition_repas: { midis: 1, soirs: 1, brunchs: 0 },
+  repartition_repas: { premier_repas: 'matin', midis: 1, soirs: 1, brunchs: 0 },
   niveau_cuisine: 'facile',
   temps_disponible: 'standard',
 };
 
-/** Deux recettes vegan sans allergènes — toujours présentes dans le pool NO_CONSTRAINTS. */
+/**
+ * Deux recettes sans allergènes, ingredient_principal distincts → aucune violation consécutive.
+ * salade-tomate-basilic: legumes (vegan)
+ * omelette-legumes: oeufs (végétarien) — accepté car participantSansContrainte n'a aucun régime
+ */
 const VALID_OUTPUT: GeneratePlanningOutput = {
   entries: [
     { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
-    { jour: 1, repas: 'soir', recette_id: 'riz-saute-legumes' },
+    { jour: 1, repas: 'soir', recette_id: 'omelette-legumes' },
   ],
 };
 
-/** Le LLM hallucine un ID qui n'existe ni dans recettesMap ni dans le pool. */
+/**
+ * Le LLM retourne 2 entrées avec les bons slots mais des IDs inconnus.
+ * Les deux IDs doivent être différents (sinon recette_dupliquee au lieu de recette_inconnue).
+ */
 const INVALID_OUTPUT_UNKNOWN_RECIPE: GeneratePlanningOutput = {
   entries: [
     { jour: 1, repas: 'midi', recette_id: 'recette-hallucination-xyz' },
+    { jour: 1, repas: 'soir', recette_id: 'recette-hallucination-abc' },
   ],
 };
 
@@ -111,10 +119,10 @@ describe('generatePlanning', () => {
     expect(expectedPool.length).toBeGreaterThan(0);
     const expectedIds = expectedPool.map((r) => r.id).sort();
 
-    const safeId = expectedPool[0]!.id;
+    // VALID_OUTPUT (salade-tomate-basilic + omelette-legumes) est sans gluten → dans le pool filtré
     const mockClient = createMockClient({
       kind: 'success',
-      output: { entries: [{ jour: 1, repas: 'midi', recette_id: safeId }] },
+      output: VALID_OUTPUT,
     });
 
     await generatePlanning(mockClient, catalogue, recettesMap, constraints, [participantSansContrainte], BASE_CONTEXTE);
@@ -314,6 +322,7 @@ describe('generatePlanning', () => {
     const outOfPoolOutput: GeneratePlanningOutput = {
       entries: [
         { jour: 1, repas: 'midi', recette_id: 'recette-hallucination-xyz' },
+        { jour: 1, repas: 'soir', recette_id: 'recette-hallucination-abc' },
       ],
     };
     const mockClient = createMockClient({

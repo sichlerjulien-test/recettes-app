@@ -1,0 +1,11 @@
+id: beurre-cacahuete
+nom: Beurre de cacahuète
+nom_pluriel: Beurre de cacahuète
+categorie: epicerie-sucree
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - arachides
+contient_trace: []
+substituts: []

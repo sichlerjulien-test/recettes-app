@@ -1,0 +1,42 @@
+id: porridge-avoine-banane
+nom: Porridge avoine banane et cannelle
+description: "Porridge chaud crémeux à l'avoine, banane écrasée et cannelle. Réconfortant en toutes saisons."
+portions_base: 4
+duree_minutes: 15
+duree_active: 10
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - petit-dejeuner
+type_cuisine: neutre
+saison:
+  - automne
+  - hiver
+ingredient_principal: fruits
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: flocons-avoine
+    quantite_base: 280
+    unite: g
+  - ingredient_id: lait-entier
+    quantite_base: 800
+    unite: ml
+  - ingredient_id: banane
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: cannelle
+    quantite_base: 4
+    unite: g
+  - ingredient_id: miel
+    quantite_base: 40
+    unite: ml
+    optionnel: true
+etapes:
+  - "Porter le lait à frémissement dans une casserole."
+  - "Ajouter les flocons d'avoine, cuire 5 min en remuant."
+  - "Écraser la banane à la fourchette, incorporer avec la cannelle."
+  - "Servir avec un filet de miel."
+tags_libres:
+  - reconfortant
+  - hiver

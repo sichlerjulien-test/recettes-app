@@ -1,0 +1,11 @@
+id: flocons-avoine
+nom: Flocon d'avoine
+nom_pluriel: Flocons d'avoine
+categorie: feculents-pates-riz
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - gluten
+contient_trace: []
+substituts: []

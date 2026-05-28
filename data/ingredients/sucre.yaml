@@ -1,0 +1,10 @@
+id: sucre
+nom: Sucre en poudre
+nom_pluriel: Sucre en poudre
+categorie: epicerie-sucree
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

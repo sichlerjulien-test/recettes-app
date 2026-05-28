@@ -1,0 +1,10 @@
+id: coulis-tomate
+nom: Coulis de tomate
+nom_pluriel: Coulis de tomate
+categorie: epicerie-salee
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

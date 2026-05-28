@@ -1,0 +1,11 @@
+id: pecorino-ou-parmesan-rape
+nom: Pecorino râpé (ou parmesan)
+nom_pluriel: Pecorino râpé
+categorie: cremerie-oeufs
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - lait
+contient_trace: []
+substituts: []

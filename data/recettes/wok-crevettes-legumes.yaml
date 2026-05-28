@@ -1,0 +1,54 @@
+id: wok-crevettes-legumes
+nom: Wok de crevettes et légumes
+description: "Crevettes sautées, légumes croquants, sauce soja-gingembre. Rapide et savoureux."
+portions_base: 4
+duree_minutes: 20
+duree_active: 20
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: asiatique
+saison:
+  - toutes
+ingredient_principal: poisson
+feculent_dominant: riz
+ingredients:
+  - ingredient_id: crevettes-crues-decortiquees
+    quantite_base: 500
+    unite: g
+  - ingredient_id: poivron-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: courgette
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: carotte
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: sauce-soja
+    quantite_base: 60
+    unite: ml
+  - ingredient_id: gingembre-frais
+    quantite_base: 20
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: huile-sesame
+    quantite_base: 15
+    unite: ml
+  - ingredient_id: riz-basmati
+    quantite_base: 320
+    unite: g
+etapes:
+  - "Cuire le riz. Couper les légumes en julienne."
+  - "Chauffer le wok à feu très vif avec l'huile de sésame."
+  - "Sauter les légumes 3 min. Ajouter crevettes, ail et gingembre."
+  - "Verser la sauce soja, sauter encore 2 min."
+  - "Servir immédiatement sur le riz."
+tags_libres:
+  - rapide
+  - asiatique
+  - fruits-de-mer

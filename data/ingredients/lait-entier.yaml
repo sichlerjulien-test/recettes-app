@@ -1,0 +1,11 @@
+id: lait-entier
+nom: Lait entier
+nom_pluriel: Lait entier
+categorie: cremerie-oeufs
+unite_base: ml
+unite_achat: l
+conversion: 1000
+allergenes:
+  - lait
+contient_trace: []
+substituts: []

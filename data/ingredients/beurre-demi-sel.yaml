@@ -1,0 +1,11 @@
+id: beurre-demi-sel
+nom: Beurre demi-sel
+nom_pluriel: Beurre demi-sel
+categorie: cremerie-oeufs
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - lait
+contient_trace: []
+substituts: []

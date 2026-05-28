@@ -1,0 +1,10 @@
+id: sucre-vanille
+nom: Sucre vanillé
+nom_pluriel: Sucres vanillés
+categorie: epicerie-sucree
+unite_base: piece
+unite_achat: sachet
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

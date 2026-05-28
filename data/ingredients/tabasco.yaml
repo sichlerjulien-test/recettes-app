@@ -1,0 +1,10 @@
+id: tabasco
+nom: Tabasco
+nom_pluriel: Tabasco
+categorie: epicerie-salee
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

@@ -1,0 +1,37 @@
+id: muesli-lait-froid
+nom: Muesli au lait et fruits secs
+description: "Muesli croustillant au lait froid, fruits secs et miel. Pas de cuisson, prêt en 2 minutes."
+portions_base: 4
+duree_minutes: 5
+duree_active: 5
+difficulte: facile
+equipement: []
+type_repas:
+  - petit-dejeuner
+type_cuisine: neutre
+saison:
+  - toutes
+ingredient_principal: fruits
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: muesli
+    quantite_base: 240
+    unite: g
+  - ingredient_id: lait-entier
+    quantite_base: 600
+    unite: ml
+  - ingredient_id: raisins-secs
+    quantite_base: 60
+    unite: g
+  - ingredient_id: miel
+    quantite_base: 40
+    unite: ml
+    optionnel: true
+etapes:
+  - "Verser le muesli dans les bols."
+  - "Ajouter les raisins secs et le miel."
+  - "Verser le lait froid. Servir immédiatement."
+tags_libres:
+  - sans-cuisson
+  - rapide
+  - leger

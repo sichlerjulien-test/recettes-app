@@ -1,0 +1,12 @@
+id: granola
+nom: Granola
+nom_pluriel: Granola
+categorie: epicerie-sucree
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - gluten
+  - fruits-coque
+contient_trace: []
+substituts: []

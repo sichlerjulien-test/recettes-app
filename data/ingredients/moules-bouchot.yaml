@@ -1,0 +1,11 @@
+id: moules-bouchot
+nom: Moule de bouchot
+nom_pluriel: Moules de bouchot
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - mollusques
+contient_trace: []
+substituts: []

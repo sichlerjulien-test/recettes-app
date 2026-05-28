@@ -1,0 +1,10 @@
+id: capres
+nom: Câpre
+nom_pluriel: Câpres
+categorie: epicerie-salee
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

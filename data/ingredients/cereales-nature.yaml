@@ -1,0 +1,11 @@
+id: cereales-nature
+nom: Céréales nature
+nom_pluriel: Céréales nature
+categorie: epicerie-sucree
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - gluten
+contient_trace: []
+substituts: []

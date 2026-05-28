@@ -1,0 +1,10 @@
+id: pomme-de-terre
+nom: Pomme de terre
+nom_pluriel: Pommes de terre
+categorie: fruits-legumes
+unite_base: g
+unite_achat: kg
+conversion: 1000
+allergenes: []
+contient_trace: []
+substituts: []

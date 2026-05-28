@@ -33,7 +33,7 @@ const hasApiKey = (): boolean => Boolean(process.env.ANTHROPIC_API_KEY);
 
 const SEJOUR_3_JOURS: GeneratePlanningInput['contexte'] = {
   nb_jours: 3,
-  repartition_repas: { midis: 3, soirs: 3, brunchs: 0 },
+  repartition_repas: { premier_repas: 'matin', midis: 3, soirs: 3, brunchs: 0 },
   niveau_cuisine: 'facile',
   temps_disponible: 'standard',
 };

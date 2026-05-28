@@ -1,0 +1,10 @@
+id: levure-boulangere
+nom: Levure boulangère
+nom_pluriel: Levure boulangère
+categorie: feculents-pates-riz
+unite_base: g
+unite_achat: sachet
+conversion: 7
+allergenes: []
+contient_trace: []
+substituts: []

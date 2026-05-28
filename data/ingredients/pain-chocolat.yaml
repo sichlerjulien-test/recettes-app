@@ -1,0 +1,14 @@
+id: pain-chocolat
+nom: Pain au chocolat
+nom_pluriel: Pains au chocolat
+categorie: boulangerie
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes:
+  - gluten
+  - lait
+  - oeufs
+contient_trace:
+  - soja
+substituts: []

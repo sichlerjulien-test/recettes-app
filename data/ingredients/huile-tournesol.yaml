@@ -1,0 +1,10 @@
+id: huile-tournesol
+nom: Huile de tournesol
+nom_pluriel: Huile de tournesol
+categorie: epicerie-salee
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

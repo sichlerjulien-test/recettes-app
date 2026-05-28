@@ -1,0 +1,55 @@
+id: ratatouille-four
+nom: Ratatouille au four
+description: "Courgettes, aubergines, poivrons, tomates confites au four. Végétarienne, colorée, généreuse."
+portions_base: 4
+duree_minutes: 60
+duree_active: 20
+difficulte: facile
+equipement:
+  - four
+type_repas:
+  - soir
+type_cuisine: francaise
+saison:
+  - ete
+ingredient_principal: legumes
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: courgette
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: aubergine
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: poivron-rouge
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: tomate
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: oignon
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: ail
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 60
+    unite: ml
+  - ingredient_id: herbes-de-provence
+    quantite_base: 5
+    unite: g
+  - ingredient_id: thym-frais
+    quantite_base: 3
+    unite: g
+etapes:
+  - "Préchauffer le four à 180°C."
+  - "Couper tous les légumes en rondelles ou dés. Mélanger huile, ail haché, herbes."
+  - "Disposer les légumes dans un grand plat, verser la marinade huile-herbes."
+  - "Enfourner 40 min en retournant à mi-cuisson."
+  - "Servir chaud ou tiède, avec pain ou riz."
+tags_libres:
+  - vegan
+  - sans-gluten
+  - ete
+  - vegetarien

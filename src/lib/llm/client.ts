@@ -34,7 +34,7 @@ const COMPOSE_PLANNING_TOOL = {
           type: 'object',
           properties: {
             jour: { type: 'integer', minimum: 1 },
-            repas: { type: 'string', enum: ['midi', 'soir', 'brunch', 'petit-dejeuner'] },
+            repas: { type: 'string', enum: ['midi', 'soir', 'petit-dejeuner'] },
             recette_id: { type: 'string' },
           },
           required: ['jour', 'repas', 'recette_id'],

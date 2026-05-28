@@ -54,6 +54,12 @@ const EQUIPEMENTS: { value: z.infer<typeof EquipmentSchema>; label: string }[] =
   { value: "robot", label: "Robot culinaire" },
 ]
 
+const PREMIER_REPAS_OPTIONS: { value: 'matin' | 'midi' | 'soir'; label: string }[] = [
+  { value: "matin", label: "Matin (petit-déjeuner)" },
+  { value: "midi", label: "Midi" },
+  { value: "soir", label: "Soir" },
+]
+
 const EMPTY_PARTICIPANT = {
   nom: "",
   allergies: [] as Allergen[],
@@ -92,6 +98,35 @@ function safeNumber(value: number): number {
   return Number.isNaN(value) ? 0 : value
 }
 
+type RepasValidation =
+  | { type: 'error'; message: string }
+  | { type: 'warning'; message: string }
+  | null
+
+function computeRepasValidation(
+  nbJours: number,
+  midis: number,
+  soirs: number,
+  brunchs: number,
+): RepasValidation {
+  const total = midis + soirs + brunchs
+  const max = nbJours * 3
+  const min = 3 * (nbJours - 1)
+  if (total > max) {
+    return {
+      type: 'error',
+      message: "Le nombre de repas dépasse la capacité du séjour (3 repas par jour maximum).",
+    }
+  }
+  if (total < min) {
+    return {
+      type: 'warning',
+      message: "Certains créneaux ne seront pas couverts — est-ce intentionnel ?",
+    }
+  }
+  return null
+}
+
 export default function NouveauSejourPage() {
   setupZodFr()
 
@@ -104,7 +139,7 @@ export default function NouveauSejourPage() {
     defaultValues: {
       nom: "",
       nb_jours: 2,
-      repartition_repas: { midis: 2, soirs: 2, brunchs: 0 },
+      repartition_repas: { premier_repas: "matin", midis: 2, soirs: 2, brunchs: 0 },
       parametres: {
         niveau_cuisine: "facile",
         equipement_disponible: ["plaque", "four"],
@@ -120,6 +155,17 @@ export default function NouveauSejourPage() {
   })
 
   const participants = form.watch("participants")
+  const nbJours = form.watch("nb_jours") ?? 0
+  const midis = form.watch("repartition_repas.midis") ?? 0
+  const soirs = form.watch("repartition_repas.soirs") ?? 0
+  const brunchs = form.watch("repartition_repas.brunchs") ?? 0
+
+  const repasValidation = computeRepasValidation(
+    safeNumber(nbJours),
+    safeNumber(midis),
+    safeNumber(soirs),
+    safeNumber(brunchs),
+  )
 
   function toggleAllergen(index: number, allergen: Allergen) {
     const allParticipants = form.getValues("participants")
@@ -282,6 +328,45 @@ export default function NouveauSejourPage() {
                 <p className="text-sm text-muted-foreground">
                   Combien de repas voulez-vous planifier ? Pour 3 midis sur 3 jours, mettez 3.
                 </p>
+
+                <FormField
+                  control={form.control}
+                  name="repartition_repas.premier_repas"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Premier repas du séjour</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          className="grid grid-cols-3 gap-2"
+                        >
+                          {PREMIER_REPAS_OPTIONS.map(({ value, label }) => (
+                            <Label
+                              key={value}
+                              htmlFor={`premier-repas-${value}`}
+                              className={[
+                                "flex cursor-pointer items-center justify-center rounded-lg border px-3 py-3 text-sm font-medium transition-colors text-center",
+                                field.value === value
+                                  ? "border-primary bg-primary/5 text-primary"
+                                  : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50",
+                              ].join(" ")}
+                            >
+                              <RadioGroupItem
+                                id={`premier-repas-${value}`}
+                                value={value}
+                                className="sr-only"
+                              />
+                              {label}
+                            </Label>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
 
                   <FormField
@@ -347,6 +432,20 @@ export default function NouveauSejourPage() {
                     )}
                   />
                 </div>
+
+                {repasValidation !== null && (
+                  <p
+                    className={[
+                      "text-sm rounded-lg px-3 py-2",
+                      repasValidation.type === 'error'
+                        ? "bg-red-50 text-red-700 border border-red-200"
+                        : "bg-amber-50 text-amber-700 border border-amber-200",
+                    ].join(" ")}
+                    role={repasValidation.type === 'error' ? "alert" : "status"}
+                  >
+                    {repasValidation.message}
+                  </p>
+                )}
               </div>
             </section>
 
@@ -580,7 +679,7 @@ export default function NouveauSejourPage() {
               type="submit"
               className="w-full"
               size="lg"
-              disabled={!form.formState.isValid || isSubmitting}
+              disabled={!form.formState.isValid || isSubmitting || repasValidation?.type === 'error'}
             >
               {isSubmitting ? "Création en cours..." : "Continuer"}
             </Button>

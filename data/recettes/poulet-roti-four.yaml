@@ -1,0 +1,49 @@
+id: poulet-roti-four
+nom: Poulet rôti au four
+description: "Poulet entier rôti, croustillant dehors, fondant dedans. Herbes, ail, beurre. L'indémodable."
+portions_base: 4
+duree_minutes: 90
+duree_active: 15
+difficulte: facile
+equipement:
+  - four
+type_repas:
+  - soir
+type_cuisine: francaise
+saison:
+  - toutes
+ingredient_principal: poulet
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: poulet-entier
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: beurre
+    quantite_base: 60
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: thym-frais
+    quantite_base: 5
+    unite: g
+  - ingredient_id: romarin-frais
+    quantite_base: 5
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 30
+    unite: ml
+etapes:
+  - "Préchauffer le four à 200°C."
+  - "Mélanger beurre mou, ail haché, thym et romarin. Glisser sous la peau du poulet."
+  - "Masser l'extérieur d'huile d'olive, saler, poivrer."
+  - "Mettre le citron coupé en deux et les gousses d'ail à l'intérieur."
+  - "Rôtir 1h15 en arrosant régulièrement. Laisser reposer 10 min avant de découper."
+tags_libres:
+  - classique
+  - sans-gluten
+  - groupe
+  - dimanche

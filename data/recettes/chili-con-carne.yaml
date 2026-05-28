@@ -1,0 +1,60 @@
+id: chili-con-carne
+nom: Chili con carne
+description: "Bœuf haché, haricots rouges, piment, cumin. Généreux, qui se réchauffe encore mieux."
+portions_base: 6
+duree_minutes: 60
+duree_active: 20
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: americaine
+saison:
+  - automne
+  - hiver
+ingredient_principal: boeuf
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: boeuf-hache
+    quantite_base: 600
+    unite: g
+  - ingredient_id: haricots-rouges-boite
+    quantite_base: 400
+    unite: g
+  - ingredient_id: tomate-concassee-boite
+    quantite_base: 400
+    unite: g
+  - ingredient_id: oignon
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: ail
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: cumin-moulu
+    quantite_base: 5
+    unite: g
+  - ingredient_id: paprika
+    quantite_base: 3
+    unite: g
+  - ingredient_id: piment-espelette
+    quantite_base: 2
+    unite: g
+    optionnel: true
+  - ingredient_id: huile-olive
+    quantite_base: 30
+    unite: ml
+  - ingredient_id: bouillon-boeuf
+    quantite_base: 200
+    unite: ml
+etapes:
+  - "Faire revenir l'oignon et l'ail émincés dans l'huile d'olive."
+  - "Ajouter le bœuf haché, faire dorer en l'émiettant à la spatule."
+  - "Incorporer cumin, paprika et piment. Mélanger 1 min."
+  - "Ajouter tomates concassées, haricots rouges égouttés et bouillon."
+  - "Mijoter 30 min à feu doux. Rectifier l'assaisonnement."
+tags_libres:
+  - sans-gluten
+  - mijote
+  - reconfortant
+  - amerique

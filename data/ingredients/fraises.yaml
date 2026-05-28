@@ -1,0 +1,10 @@
+id: fraises
+nom: Fraise
+nom_pluriel: Fraises
+categorie: fruits-legumes
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

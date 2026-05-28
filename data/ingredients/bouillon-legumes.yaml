@@ -1,0 +1,11 @@
+id: bouillon-legumes
+nom: Bouillon de légumes
+nom_pluriel: Bouillon de légumes
+categorie: epicerie-salee
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes: []
+contient_trace:
+  - celeri
+substituts: []

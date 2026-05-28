@@ -1,0 +1,33 @@
+id: yaourt-miel-noix
+nom: Yaourt miel et noix
+description: "Yaourt grec épais, filet de miel, cerneaux de noix. Simple, honnête, rassasiant."
+portions_base: 4
+duree_minutes: 5
+duree_active: 5
+difficulte: facile
+equipement: []
+type_repas:
+  - petit-dejeuner
+type_cuisine: neutre
+saison:
+  - toutes
+ingredient_principal: fromage
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: yaourt-grec
+    quantite_base: 600
+    unite: g
+  - ingredient_id: miel
+    quantite_base: 60
+    unite: ml
+  - ingredient_id: noix-cerneaux
+    quantite_base: 60
+    unite: g
+etapes:
+  - "Répartir le yaourt grec dans les bols."
+  - "Verser un filet de miel."
+  - "Parsemer de noix. Servir."
+tags_libres:
+  - sans-cuisson
+  - rapide
+  - proteines

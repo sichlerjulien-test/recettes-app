@@ -1,0 +1,10 @@
+id: tomate-concassee-boite
+nom: Tomates concassées en boîte
+nom_pluriel: Tomates concassées en boîte
+categorie: epicerie-salee
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

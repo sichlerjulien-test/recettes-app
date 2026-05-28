@@ -1,0 +1,58 @@
+id: boeuf-bourguignon
+nom: Bœuf bourguignon
+description: "Le grand classique mijoté. Bœuf, lardons, champignons, vin rouge. Se prépare la veille."
+portions_base: 6
+duree_minutes: 180
+duree_active: 40
+difficulte: moyen
+equipement:
+  - plaque
+  - four
+type_repas:
+  - soir
+type_cuisine: francaise
+saison:
+  - automne
+  - hiver
+ingredient_principal: boeuf
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: boeuf-bourguignon
+    quantite_base: 1200
+    unite: g
+  - ingredient_id: lardon-fume
+    quantite_base: 200
+    unite: g
+  - ingredient_id: champignon-de-paris
+    quantite_base: 300
+    unite: g
+  - ingredient_id: oignon
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: carotte
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: vin-rouge-cuisine
+    quantite_base: 500
+    unite: ml
+  - ingredient_id: bouillon-boeuf
+    quantite_base: 300
+    unite: ml
+  - ingredient_id: concentre-tomate
+    quantite_base: 30
+    unite: g
+  - ingredient_id: farine-blanche
+    quantite_base: 30
+    unite: g
+etapes:
+  - "Fariner les morceaux de bœuf, faire dorer en cocotte avec les lardons."
+  - "Ajouter oignons et carottes, faire revenir."
+  - "Déglacer au vin rouge, ajouter bouillon et concentré de tomate."
+  - "Mijoter à couvert 2h à feu doux (ou four 160°C)."
+  - "Ajouter les champignons 30 min avant la fin."
+tags_libres:
+  - mijote
+  - hiver
+  - reconfortant
+  - veille
+  - groupe

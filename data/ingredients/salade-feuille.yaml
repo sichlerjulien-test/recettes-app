@@ -1,0 +1,10 @@
+id: salade-feuille
+nom: Feuille de salade
+nom_pluriel: Feuilles de salade
+categorie: fruits-legumes
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

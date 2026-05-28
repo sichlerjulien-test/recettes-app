@@ -1,0 +1,11 @@
+id: noix-cerneaux
+nom: Cerneau de noix
+nom_pluriel: Cerneaux de noix
+categorie: epicerie-sucree
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - fruits-coque
+contient_trace: []
+substituts: []

@@ -11,7 +11,7 @@ equipement:
   - plaque
 
 type_repas:
-  - brunch
+  - petit-dejeuner
   - midi
 
 type_cuisine: neutre

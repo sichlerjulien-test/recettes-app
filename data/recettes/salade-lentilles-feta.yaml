@@ -1,0 +1,48 @@
+id: salade-lentilles-feta
+nom: Salade de lentilles feta et herbes
+description: "Lentilles tièdes, feta émiettée, tomates cerises, herbes fraîches. Nourrissant et frais."
+portions_base: 4
+duree_minutes: 30
+duree_active: 15
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - midi
+type_cuisine: orientale
+saison:
+  - toutes
+ingredient_principal: legumineuses
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: lentilles-vertes
+    quantite_base: 300
+    unite: g
+  - ingredient_id: feta
+    quantite_base: 200
+    unite: g
+  - ingredient_id: tomate-cerise
+    quantite_base: 250
+    unite: g
+  - ingredient_id: persil-plat
+    quantite_base: 30
+    unite: g
+  - ingredient_id: menthe-fraiche
+    quantite_base: 15
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+etapes:
+  - "Cuire les lentilles 20 min dans l'eau bouillante salée. Égoutter."
+  - "Couper tomates cerises en deux. Hacher herbes."
+  - "Mélanger lentilles tièdes, tomates, herbes."
+  - "Émietter la feta dessus. Assaisonner citron-huile d'olive."
+tags_libres:
+  - vegetarien
+  - sans-gluten
+  - proteines
+  - leger

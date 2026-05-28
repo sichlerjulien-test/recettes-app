@@ -1,0 +1,11 @@
+id: creme-fraiche-epaisse
+nom: Crème fraîche épaisse
+nom_pluriel: Crème fraîche épaisse
+categorie: cremerie-oeufs
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes:
+  - lait
+contient_trace: []
+substituts: []

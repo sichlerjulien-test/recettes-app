@@ -1,0 +1,43 @@
+id: tarte-flambee
+nom: Tarte flambée (flammekueche)
+description: "Fine pâte croustillante, crème fraîche, lardons, oignon. Alsacienne, conviviale, rapide."
+portions_base: 4
+duree_minutes: 30
+duree_active: 15
+difficulte: facile
+equipement:
+  - four
+type_repas:
+  - midi
+type_cuisine: francaise
+saison:
+  - toutes
+ingredient_principal: oeufs
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: pate-fine-tarte-flambee
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: creme-fraiche-epaisse
+    quantite_base: 300
+    unite: ml
+  - ingredient_id: lardon-fume
+    quantite_base: 200
+    unite: g
+  - ingredient_id: oignon
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: fromage-blanc
+    quantite_base: 100
+    unite: g
+etapes:
+  - "Préchauffer le four à 250°C."
+  - "Émincer finement les oignons."
+  - "Mélanger crème fraîche et fromage blanc, étaler sur les pâtes."
+  - "Répartir lardons et oignons émincés."
+  - "Cuire 10-12 min jusqu'à bords dorés et croustillants."
+tags_libres:
+  - convivial
+  - rapide
+  - alsacien
+  - groupe

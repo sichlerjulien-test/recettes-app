@@ -1,0 +1,11 @@
+id: farine-blanche
+nom: Farine blanche (T55)
+nom_pluriel: Farine blanche
+categorie: feculents-pates-riz
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - gluten
+contient_trace: []
+substituts: []

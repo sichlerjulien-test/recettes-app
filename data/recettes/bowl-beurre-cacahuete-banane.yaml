@@ -1,0 +1,40 @@
+id: bowl-beurre-cacahuete-banane
+nom: Bowl beurre de cacahuète banane et granola
+description: "Yaourt, beurre de cacahuète, banane tranchée, granola croustillant. Gourmand et protéiné."
+portions_base: 4
+duree_minutes: 10
+duree_active: 10
+difficulte: facile
+equipement: []
+type_repas:
+  - petit-dejeuner
+type_cuisine: americaine
+saison:
+  - toutes
+ingredient_principal: fruits
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: yaourt-grec
+    quantite_base: 500
+    unite: g
+  - ingredient_id: beurre-cacahuete
+    quantite_base: 80
+    unite: g
+  - ingredient_id: banane
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: granola
+    quantite_base: 80
+    unite: g
+  - ingredient_id: miel
+    quantite_base: 30
+    unite: ml
+    optionnel: true
+etapes:
+  - "Répartir le yaourt dans les bols."
+  - "Déposer une cuillère de beurre de cacahuète."
+  - "Trancher la banane, ajouter le granola et le miel."
+tags_libres:
+  - proteines
+  - gourmand
+  - sans-cuisson

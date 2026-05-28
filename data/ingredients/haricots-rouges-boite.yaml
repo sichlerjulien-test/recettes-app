@@ -1,0 +1,10 @@
+id: haricots-rouges-boite
+nom: Haricots rouges en boîte
+nom_pluriel: Haricots rouges en boîte
+categorie: epicerie-salee
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

@@ -9,7 +9,7 @@ export type SejourDALInput = {
   nom: string;
   date_debut?: string;
   nb_jours: number;
-  repartition_repas: { midis: number; soirs: number; brunchs: number };
+  repartition_repas: { premier_repas: 'matin' | 'midi' | 'soir'; midis: number; soirs: number; brunchs: number };
   parametres: SejourParametres;
 };
 

@@ -1,0 +1,10 @@
+id: concentre-tomate
+nom: Concentré de tomate
+nom_pluriel: Concentré de tomate
+categorie: epicerie-salee
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

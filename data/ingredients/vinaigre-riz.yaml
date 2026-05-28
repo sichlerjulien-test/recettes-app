@@ -1,0 +1,10 @@
+id: vinaigre-riz
+nom: Vinaigre de riz
+nom_pluriel: Vinaigre de riz
+categorie: epicerie-salee
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

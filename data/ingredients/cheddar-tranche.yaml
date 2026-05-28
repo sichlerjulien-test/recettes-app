@@ -1,0 +1,11 @@
+id: cheddar-tranche
+nom: Cheddar en tranche
+nom_pluriel: Cheddars en tranches
+categorie: cremerie-oeufs
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes:
+  - lait
+contient_trace: []
+substituts: []

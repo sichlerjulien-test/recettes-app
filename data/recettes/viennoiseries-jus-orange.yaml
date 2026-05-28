@@ -1,0 +1,37 @@
+id: viennoiseries-jus-orange
+nom: Viennoiseries et jus d'orange pressé
+description: "Croissants et pains au chocolat du boulanger, jus d'orange pressé maison. Le dimanche matin parfait."
+portions_base: 4
+duree_minutes: 15
+duree_active: 15
+difficulte: facile
+equipement: []
+type_repas:
+  - petit-dejeuner
+type_cuisine: francaise
+saison:
+  - toutes
+ingredient_principal: pain
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: croissant
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: pain-chocolat
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: orange
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: beurre-demi-sel
+    quantite_base: 40
+    unite: g
+    optionnel: true
+etapes:
+  - "Passer les viennoiseries 3 min au four à 150°C si achetées la veille."
+  - "Presser les oranges."
+  - "Servir avec du beurre demi-sel si souhaité."
+tags_libres:
+  - convivial
+  - classique
+  - dimanche

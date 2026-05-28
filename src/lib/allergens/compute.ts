@@ -4,7 +4,7 @@ import type { Ingredient, MainIngredient, Recette } from '../types/domain';
 type RecetteSansCalculs = Omit<Recette, 'allergenes_calcules' | 'est_vegetarien' | 'est_vegan'>;
 
 const MAIN_INGREDIENTS_NON_VEGETARIEN = new Set<MainIngredient>([
-  'poulet', 'boeuf', 'porc', 'agneau', 'poisson', 'fruits-de-mer',
+  'poulet', 'boeuf', 'porc', 'poisson',
 ]);
 
 const CATEGORIES_NON_VEGAN = new Set(['viandes-poissons', 'cremerie-oeufs'] as const);

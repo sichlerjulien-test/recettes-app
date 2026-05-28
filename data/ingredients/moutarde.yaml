@@ -1,0 +1,11 @@
+id: moutarde
+nom: Moutarde
+nom_pluriel: Moutarde
+categorie: epicerie-salee
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - moutarde
+contient_trace: []
+substituts: []

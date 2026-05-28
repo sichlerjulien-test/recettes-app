@@ -1,0 +1,50 @@
+id: gratin-dauphinois
+nom: Gratin dauphinois
+description: "Pommes de terre fondantes dans la crème et le lait, ail, noix de muscade. L'accompagnement ultime."
+portions_base: 6
+duree_minutes: 90
+duree_active: 20
+difficulte: facile
+equipement:
+  - four
+type_repas:
+  - soir
+type_cuisine: francaise
+saison:
+  - automne
+  - hiver
+ingredient_principal: legumes
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: pomme-de-terre
+    quantite_base: 1200
+    unite: g
+  - ingredient_id: creme-fraiche-liquide
+    quantite_base: 300
+    unite: ml
+  - ingredient_id: lait-entier
+    quantite_base: 300
+    unite: ml
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: gruyere-rape
+    quantite_base: 100
+    unite: g
+  - ingredient_id: beurre
+    quantite_base: 20
+    unite: g
+  - ingredient_id: muscade
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Préchauffer le four à 160°C. Frotter le plat avec l'ail."
+  - "Éplucher et trancher les pommes de terre en rondelles fines."
+  - "Mélanger lait et crème, assaisonner sel, poivre, muscade."
+  - "Alterner couches de pommes de terre et liquide crémeux. Terminer par gruyère."
+  - "Cuire 75 min jusqu'à dorure. Planter un couteau : ça doit glisser."
+tags_libres:
+  - sans-gluten
+  - classique
+  - reconfortant
+  - hiver

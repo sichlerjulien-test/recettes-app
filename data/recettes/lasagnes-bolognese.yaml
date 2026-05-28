@@ -1,0 +1,57 @@
+id: lasagnes-bolognese
+nom: Lasagnes bolognaise
+description: "La grande lasagne qui nourrit une tablée. Bolognaise mijotée, béchamel maison, fromage fondu."
+portions_base: 6
+duree_minutes: 90
+duree_active: 40
+difficulte: moyen
+equipement:
+  - plaque
+  - four
+type_repas:
+  - soir
+type_cuisine: italienne
+saison:
+  - automne
+  - hiver
+ingredient_principal: boeuf
+feculent_dominant: pates
+ingredients:
+  - ingredient_id: feuilles-lasagne
+    quantite_base: 250
+    unite: g
+  - ingredient_id: boeuf-hache
+    quantite_base: 600
+    unite: g
+  - ingredient_id: tomate-concassee-boite
+    quantite_base: 800
+    unite: g
+  - ingredient_id: oignon
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: ail
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: lait-entier
+    quantite_base: 500
+    unite: ml
+  - ingredient_id: farine-blanche
+    quantite_base: 40
+    unite: g
+  - ingredient_id: beurre
+    quantite_base: 40
+    unite: g
+  - ingredient_id: parmesan-rape
+    quantite_base: 80
+    unite: g
+etapes:
+  - "Faire revenir oignon et ail, ajouter le bœuf haché, dorer."
+  - "Ajouter tomates concassées, sel, poivre, origan. Mijoter 30 min."
+  - "Préparer béchamel : beurre + farine + lait."
+  - "Alterner couches : bolognaise, feuilles, béchamel. Terminer par béchamel + parmesan."
+  - "Cuire au four 35 min à 180°C."
+tags_libres:
+  - groupe
+  - reconfortant
+  - hiver
+  - convivial

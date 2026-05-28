@@ -1,0 +1,10 @@
+id: oignon-rouge
+nom: Oignon rouge
+nom_pluriel: Oignons rouges
+categorie: fruits-legumes
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

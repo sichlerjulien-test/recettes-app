@@ -1,0 +1,11 @@
+id: ketchup
+nom: Ketchup
+nom_pluriel: Ketchup
+categorie: epicerie-salee
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes: []
+contient_trace:
+  - celeri
+substituts: []

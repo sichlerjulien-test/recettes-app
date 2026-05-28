@@ -1,0 +1,11 @@
+id: bouillon-boeuf
+nom: Bouillon de bœuf
+nom_pluriel: Bouillon de bœuf
+categorie: epicerie-salee
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes: []
+contient_trace:
+  - celeri
+substituts: []

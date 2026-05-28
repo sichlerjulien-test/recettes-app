@@ -1,0 +1,47 @@
+id: moules-mariniere
+nom: Moules marinière
+description: "Moules de bouchot, vin blanc, échalotes, persil. Simple, festif, convivial."
+portions_base: 4
+duree_minutes: 20
+duree_active: 20
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: francaise
+saison:
+  - automne
+  - hiver
+ingredient_principal: poisson
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: moules-bouchot
+    quantite_base: 2400
+    unite: g
+  - ingredient_id: echalote
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: vin-blanc-sec
+    quantite_base: 200
+    unite: ml
+  - ingredient_id: beurre
+    quantite_base: 40
+    unite: g
+  - ingredient_id: persil-plat
+    quantite_base: 20
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+etapes:
+  - "Gratter et laver les moules, éliminer celles ouvertes."
+  - "Faire revenir échalotes et ail dans le beurre."
+  - "Ajouter les moules et le vin blanc. Couvrir, cuire 5 min à feu vif."
+  - "Remuer à mi-cuisson. Éliminer les moules fermées."
+  - "Parsemer de persil. Servir avec frites ou pain."
+tags_libres:
+  - festif
+  - fruits-de-mer
+  - rapide
+  - convivial

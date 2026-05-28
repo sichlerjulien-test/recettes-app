@@ -1,0 +1,11 @@
+id: cornichon
+nom: Cornichon
+nom_pluriel: Cornichons
+categorie: epicerie-salee
+unite_base: piece
+unite_achat: g
+conversion: 10
+allergenes: []
+contient_trace:
+  - moutarde
+substituts: []

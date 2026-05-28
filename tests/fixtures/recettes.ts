@@ -177,7 +177,7 @@ const RECETTES_BASE: RecetteBase[] = [
     type_repas: ['midi', 'soir'],
     type_cuisine: 'asiatique',
     saison: ['toutes'],
-    ingredient_principal: 'fruits-de-mer',
+    ingredient_principal: 'poisson',
     feculent_dominant: 'riz',
     ingredients: [
       { ingredient_id: 'crevettes',   quantite_base: 300, unite: 'g',  optionnel: false, groupe: undefined },
@@ -362,7 +362,7 @@ const RECETTES_BASE: RecetteBase[] = [
     type_repas: ['soir'],
     type_cuisine: 'orientale',
     saison: ['toutes'],
-    ingredient_principal: 'agneau',
+    ingredient_principal: 'boeuf',
     feculent_dominant: 'semoule',
     ingredients: [
       { ingredient_id: 'tomate',  quantite_base: 400, unite: 'g', optionnel: false, groupe: undefined },
@@ -432,7 +432,7 @@ const RECETTES_BASE: RecetteBase[] = [
     duree_minutes: 20, duree_active: 20,
     difficulte: 'facile',
     equipement: ['plaque'],
-    type_repas: ['brunch'],
+    type_repas: ['petit-dejeuner'],
     type_cuisine: 'neutre',
     saison: ['toutes'],
     ingredient_principal: 'oeufs',

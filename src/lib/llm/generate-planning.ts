@@ -1,6 +1,7 @@
 import type { Participant, PlanningEntry, Recette, ValidationViolation } from '../types/domain';
 import { filterRecipes, type FilterConstraints } from '../allergens/filter';
 import { validatePlanning } from '../allergens/validator';
+import { buildSequence } from '../planning/build-sequence';
 import type { LLMClient } from './client';
 import type { GeneratePlanningInput, LLMError } from './types';
 
@@ -34,6 +35,7 @@ export async function generatePlanning(
     return { ok: false, error: { kind: 'pool_empty' } };
   }
 
+  const expectedSlots = buildSequence(sejourContexte.repartition_repas);
   const portions = Math.max(participants.length, 1);
   let lastViolations: ValidationViolation[] = [];
 
@@ -58,7 +60,12 @@ export async function generatePlanning(
         },
       };
 
-      const result = validatePlanning(planningForValidation, recettesMap, participants);
+      const result = validatePlanning(
+        planningForValidation,
+        recettesMap,
+        participants,
+        expectedSlots,
+      );
 
       if (result.valid) {
         return { ok: true, entries: planningEntries };

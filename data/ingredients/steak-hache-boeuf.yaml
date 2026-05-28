@@ -1,0 +1,10 @@
+id: steak-hache-boeuf
+nom: Steak haché de bœuf
+nom_pluriel: Steaks hachés de bœuf
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

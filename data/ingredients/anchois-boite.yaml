@@ -1,0 +1,11 @@
+id: anchois-boite
+nom: Anchois en boîte (à l'huile)
+nom_pluriel: Anchois en boîte
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - poissons
+contient_trace: []
+substituts: []

@@ -1,0 +1,10 @@
+id: orange
+nom: Orange
+nom_pluriel: Oranges
+categorie: fruits-legumes
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

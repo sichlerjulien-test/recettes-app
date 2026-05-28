@@ -1,0 +1,13 @@
+id: sauce-worcestershire
+nom: Sauce Worcestershire
+nom_pluriel: Sauce Worcestershire
+categorie: epicerie-salee
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes:
+  - poissons
+  - sulfites
+contient_trace:
+  - soja
+substituts: []

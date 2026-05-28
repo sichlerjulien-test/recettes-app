@@ -1,0 +1,10 @@
+id: thym-frais
+nom: Thym frais
+nom_pluriel: Thym frais
+categorie: condiments-epices
+unite_base: g
+unite_achat: botte
+conversion: 15
+allergenes: []
+contient_trace: []
+substituts: []

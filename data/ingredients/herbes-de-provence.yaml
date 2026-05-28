@@ -1,0 +1,10 @@
+id: herbes-de-provence
+nom: Herbes de Provence
+nom_pluriel: Herbes de Provence
+categorie: condiments-epices
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

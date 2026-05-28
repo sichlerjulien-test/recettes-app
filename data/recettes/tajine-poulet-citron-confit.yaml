@@ -1,0 +1,60 @@
+id: tajine-poulet-citron-confit
+nom: Tajine poulet citron confit et olives
+description: "Poulet mijoté aux épices, citron confit, olives vertes. Dépaysant et parfumé."
+portions_base: 4
+duree_minutes: 60
+duree_active: 20
+difficulte: moyen
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: orientale
+saison:
+  - automne
+  - hiver
+  - printemps
+ingredient_principal: poulet
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: cuisse-poulet
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: citron-confit
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: olives-vertes
+    quantite_base: 100
+    unite: g
+  - ingredient_id: oignon
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: ail
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: cumin-moulu
+    quantite_base: 5
+    unite: g
+  - ingredient_id: curcuma
+    quantite_base: 3
+    unite: g
+  - ingredient_id: paprika
+    quantite_base: 3
+    unite: g
+  - ingredient_id: bouillon-poulet
+    quantite_base: 300
+    unite: ml
+  - ingredient_id: coriandre-frais
+    quantite_base: 20
+    unite: g
+etapes:
+  - "Faire dorer les cuisses de poulet dans l'huile. Réserver."
+  - "Faire revenir oignons et ail. Ajouter les épices, cuire 1 min."
+  - "Remettre le poulet, ajouter le bouillon, citrons confits et olives."
+  - "Mijoter 40 min à couvert à feu doux."
+  - "Parsemer de coriandre. Servir avec semoule ou pain."
+tags_libres:
+  - sans-gluten
+  - orientale
+  - mijote
+  - parfume

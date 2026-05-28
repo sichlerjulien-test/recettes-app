@@ -1,0 +1,10 @@
+id: raisins-secs
+nom: Raisin sec
+nom_pluriel: Raisins secs
+categorie: epicerie-sucree
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

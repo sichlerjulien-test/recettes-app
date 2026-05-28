@@ -42,7 +42,7 @@ function createMockSupabase(tableQueues: Record<string, MockResult[]>) {
 const SEJOUR_INPUT: SejourDALInput = {
   nom: 'Séjour test',
   nb_jours: 3,
-  repartition_repas: { midis: 2, soirs: 2, brunchs: 0 },
+  repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0 },
   parametres: {
     niveau_cuisine: 'facile',
     equipement_disponible: ['four'],
@@ -64,7 +64,7 @@ const SEJOUR_DB_ROW = {
   nom: 'Séjour test',
   date_debut: null,
   nb_jours: 3,
-  repartition_repas: { midis: 2, soirs: 2, brunchs: 0 },
+  repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0 },
   participants: [],
   parametres: {
     niveau_cuisine: 'facile',

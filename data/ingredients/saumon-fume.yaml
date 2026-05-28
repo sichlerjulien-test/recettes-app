@@ -1,0 +1,11 @@
+id: saumon-fume
+nom: Saumon fumé
+nom_pluriel: Saumon fumé
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - poissons
+contient_trace: []
+substituts: []

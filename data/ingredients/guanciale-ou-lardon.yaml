@@ -1,0 +1,10 @@
+id: guanciale-ou-lardon
+nom: Guanciale (ou lardon épais)
+nom_pluriel: Guanciale
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

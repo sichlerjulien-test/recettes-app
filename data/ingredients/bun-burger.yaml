@@ -1,0 +1,14 @@
+id: bun-burger
+nom: Bun burger
+nom_pluriel: Buns burger
+categorie: boulangerie
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes:
+  - gluten
+  - lait
+  - oeufs
+contient_trace:
+  - sesame
+substituts: []

@@ -1,0 +1,11 @@
+id: amandes-effilees
+nom: Amande effilée
+nom_pluriel: Amandes effilées
+categorie: epicerie-sucree
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - fruits-coque
+contient_trace: []
+substituts: []

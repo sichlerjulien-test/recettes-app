@@ -1,0 +1,38 @@
+id: tartine-fromage-blanc-fruits
+nom: Tartines fromage blanc et fruits rouges
+description: "Pain grillé, fromage blanc épais, fruits rouges et miel. Frais et léger."
+portions_base: 4
+duree_minutes: 10
+duree_active: 10
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - petit-dejeuner
+type_cuisine: francaise
+saison:
+  - printemps
+  - ete
+ingredient_principal: fromage
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: pain-campagne
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: fromage-blanc
+    quantite_base: 400
+    unite: g
+  - ingredient_id: fruits-rouges-surgeles
+    quantite_base: 200
+    unite: g
+  - ingredient_id: miel
+    quantite_base: 40
+    unite: ml
+etapes:
+  - "Toaster le pain."
+  - "Étaler le fromage blanc."
+  - "Déposer les fruits rouges (décongelés ou frais), filet de miel."
+tags_libres:
+  - frais
+  - leger
+  - ete

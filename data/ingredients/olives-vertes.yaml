@@ -1,0 +1,11 @@
+id: olives-vertes
+nom: Olive verte
+nom_pluriel: Olives vertes
+categorie: epicerie-salee
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace:
+  - sulfites
+substituts: []

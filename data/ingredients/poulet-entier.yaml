@@ -1,0 +1,10 @@
+id: poulet-entier
+nom: Poulet entier
+nom_pluriel: Poulets entiers
+categorie: viandes-poissons
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

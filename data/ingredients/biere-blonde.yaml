@@ -1,0 +1,12 @@
+id: biere-blonde
+nom: Bière blonde
+nom_pluriel: Bière blonde
+categorie: epicerie-salee
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes:
+  - gluten
+  - sulfites
+contient_trace: []
+substituts: []

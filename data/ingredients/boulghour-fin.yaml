@@ -1,0 +1,11 @@
+id: boulghour-fin
+nom: Boulgour fin
+nom_pluriel: Boulgour fin
+categorie: feculents-pates-riz
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - gluten
+contient_trace: []
+substituts: []

@@ -1,0 +1,13 @@
+id: pain-de-mie
+nom: Pain de mie (tranche)
+nom_pluriel: Tranches de pain de mie
+categorie: boulangerie
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes:
+  - gluten
+  - lait
+contient_trace:
+  - oeufs
+substituts: []

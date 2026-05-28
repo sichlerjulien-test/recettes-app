@@ -1,0 +1,10 @@
+id: persil-plat
+nom: Persil plat
+nom_pluriel: Persil plat
+categorie: fruits-legumes
+unite_base: g
+unite_achat: botte
+conversion: 30
+allergenes: []
+contient_trace: []
+substituts: []

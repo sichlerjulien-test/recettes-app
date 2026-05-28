@@ -1,0 +1,11 @@
+id: lardon-fume
+nom: Lardon fumé
+nom_pluriel: Lardons fumés
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace:
+  - sulfites
+substituts: []

@@ -1,0 +1,10 @@
+id: ciboulette
+nom: Ciboulette
+nom_pluriel: Ciboulette
+categorie: fruits-legumes
+unite_base: g
+unite_achat: botte
+conversion: 20
+allergenes: []
+contient_trace: []
+substituts: []

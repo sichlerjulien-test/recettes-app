@@ -1,0 +1,10 @@
+id: champignon-de-paris
+nom: Champignon de Paris
+nom_pluriel: Champignons de Paris
+categorie: fruits-legumes
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

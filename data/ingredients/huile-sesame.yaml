@@ -1,0 +1,11 @@
+id: huile-sesame
+nom: Huile de sésame
+nom_pluriel: Huile de sésame
+categorie: epicerie-salee
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes:
+  - sesame
+contient_trace: []
+substituts: []

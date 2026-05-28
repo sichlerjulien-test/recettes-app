@@ -1,0 +1,53 @@
+id: soupe-minestrone
+nom: Soupe minestrone
+description: "Soupe italienne généreuse aux légumes de saison et petites pâtes. Réconfortante et complète."
+portions_base: 4
+duree_minutes: 40
+duree_active: 20
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - midi
+type_cuisine: italienne
+saison:
+  - automne
+  - hiver
+ingredient_principal: legumes
+feculent_dominant: pates
+ingredients:
+  - ingredient_id: tomate-concassee-boite
+    quantite_base: 400
+    unite: g
+  - ingredient_id: courgette
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: carotte
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: celeri-branche
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: haricots-blancs-boite
+    quantite_base: 400
+    unite: g
+  - ingredient_id: penne
+    quantite_base: 120
+    unite: g
+  - ingredient_id: bouillon-legumes
+    quantite_base: 1000
+    unite: ml
+  - ingredient_id: huile-olive
+    quantite_base: 30
+    unite: ml
+etapes:
+  - "Faire revenir oignon et ail dans l'huile."
+  - "Ajouter carottes et céleri coupés, cuire 5 min."
+  - "Ajouter courgettes, tomates concassées, bouillon. Cuire 15 min."
+  - "Ajouter haricots blancs et pâtes, cuire encore 10 min."
+  - "Rectifier assaisonnement. Servir avec parmesan."
+tags_libres:
+  - vegan
+  - hiver
+  - reconfortant
+  - une-seule-cocotte

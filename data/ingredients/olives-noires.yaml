@@ -1,0 +1,11 @@
+id: olives-noires
+nom: Olive noire
+nom_pluriel: Olives noires
+categorie: epicerie-salee
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace:
+  - sulfites
+substituts: []

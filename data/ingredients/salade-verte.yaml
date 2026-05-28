@@ -1,0 +1,10 @@
+id: salade-verte
+nom: Salade verte
+nom_pluriel: Salade verte
+categorie: fruits-legumes
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

@@ -1,0 +1,46 @@
+id: gratin-courgettes-chevre
+nom: Gratin de courgettes au chèvre
+description: "Courgettes fondantes, chèvre coulant, herbes de Provence. Simple, végétarien, passe-partout."
+portions_base: 4
+duree_minutes: 45
+duree_active: 15
+difficulte: facile
+equipement:
+  - four
+type_repas:
+  - midi
+type_cuisine: francaise
+saison:
+  - ete
+  - printemps
+ingredient_principal: fromage
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: courgette
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: chevre-buchette
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: oeuf
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: creme-fraiche
+    quantite_base: 150
+    unite: ml
+  - ingredient_id: herbes-de-provence
+    quantite_base: 5
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 20
+    unite: ml
+etapes:
+  - "Préchauffer le four à 180°C."
+  - "Couper les courgettes en rondelles, faire revenir 5 min à l'huile d'olive."
+  - "Battre œufs et crème, assaisonner, herbes de Provence."
+  - "Disposer courgettes dans un plat, verser l'appareil, émietter le chèvre."
+  - "Cuire 30 min jusqu'à dorure."
+tags_libres:
+  - vegetarien
+  - ete
+  - leger

@@ -1,0 +1,10 @@
+id: curcuma
+nom: Curcuma
+nom_pluriel: Curcuma
+categorie: condiments-epices
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

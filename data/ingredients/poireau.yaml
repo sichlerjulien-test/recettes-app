@@ -1,0 +1,10 @@
+id: poireau
+nom: Poireau
+nom_pluriel: Poireaux
+categorie: fruits-legumes
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

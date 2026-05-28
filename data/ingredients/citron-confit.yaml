@@ -1,0 +1,10 @@
+id: citron-confit
+nom: Citron confit
+nom_pluriel: Citrons confits
+categorie: condiments-epices
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

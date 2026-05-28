@@ -1,0 +1,52 @@
+id: poke-bowl-saumon
+nom: Poké bowl saumon avocat
+description: "Riz vinaigré, saumon mariné, avocat, edamame, sauce soja-citron. Frais et coloré."
+portions_base: 4
+duree_minutes: 25
+duree_active: 20
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - midi
+type_cuisine: asiatique
+saison:
+  - printemps
+  - ete
+ingredient_principal: poisson
+feculent_dominant: riz
+ingredients:
+  - ingredient_id: riz-rond-sushi
+    quantite_base: 320
+    unite: g
+  - ingredient_id: saumon-frais
+    quantite_base: 400
+    unite: g
+  - ingredient_id: avocat
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: edamame-surgele
+    quantite_base: 200
+    unite: g
+  - ingredient_id: sauce-soja
+    quantite_base: 60
+    unite: ml
+  - ingredient_id: citron-vert
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: sesame-graines
+    quantite_base: 20
+    unite: g
+  - ingredient_id: vinaigre-riz
+    quantite_base: 30
+    unite: ml
+etapes:
+  - "Cuire le riz, assaisonner avec vinaigre de riz et sel."
+  - "Couper le saumon en cubes, mariner dans sauce soja et citron vert."
+  - "Trancher l'avocat. Décongeler les edamames."
+  - "Dresser les bols : riz, saumon, avocat, edamame. Parsemer de sésame."
+tags_libres:
+  - frais
+  - ete
+  - colore
+  - proteines

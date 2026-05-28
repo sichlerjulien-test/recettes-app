@@ -1,0 +1,48 @@
+id: granola-yaourt-fruits
+nom: Granola maison yaourt et fruits frais
+description: "Granola croustillant au miel sur yaourt onctueux, avec fruits de saison."
+portions_base: 4
+duree_minutes: 35
+duree_active: 10
+difficulte: facile
+equipement:
+  - four
+type_repas:
+  - petit-dejeuner
+type_cuisine: neutre
+saison:
+  - toutes
+ingredient_principal: fruits
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: flocons-avoine
+    quantite_base: 200
+    unite: g
+  - ingredient_id: miel
+    quantite_base: 60
+    unite: ml
+  - ingredient_id: huile-tournesol
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: amandes-effilees
+    quantite_base: 50
+    unite: g
+  - ingredient_id: yaourt-nature
+    quantite_base: 500
+    unite: g
+  - ingredient_id: banane
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: fraises
+    quantite_base: 200
+    unite: g
+    optionnel: true
+etapes:
+  - "Préchauffer le four à 170°C."
+  - "Mélanger flocons, miel, huile et amandes. Étaler sur plaque."
+  - "Cuire 20-25 min en remuant à mi-cuisson jusqu'à dorure."
+  - "Laisser refroidir (le granola croustit en refroidissant)."
+  - "Servir avec yaourt et fruits frais coupés."
+tags_libres:
+  - fruits
+  - leger

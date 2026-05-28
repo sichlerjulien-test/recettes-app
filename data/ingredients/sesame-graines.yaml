@@ -1,0 +1,11 @@
+id: sesame-graines
+nom: Graine de sésame
+nom_pluriel: Graines de sésame
+categorie: condiments-epices
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - sesame
+contient_trace: []
+substituts: []

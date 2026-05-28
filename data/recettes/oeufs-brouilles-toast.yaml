@@ -1,0 +1,43 @@
+id: oeufs-brouilles-toast
+nom: Œufs brouillés sur toast
+description: "Œufs brouillés crémeux sur toast grillé. Réconfortant et rassasiant."
+portions_base: 4
+duree_minutes: 15
+duree_active: 15
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - petit-dejeuner
+type_cuisine: neutre
+saison:
+  - toutes
+ingredient_principal: oeufs
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: oeuf
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: beurre
+    quantite_base: 20
+    unite: g
+  - ingredient_id: creme-fraiche
+    quantite_base: 60
+    unite: ml
+  - ingredient_id: pain-campagne
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: ciboulette
+    quantite_base: 10
+    unite: g
+    optionnel: true
+etapes:
+  - "Casser les œufs dans un bol, saler, poivrer, battre légèrement."
+  - "Faire fondre le beurre à feu doux dans une casserole. Ajouter les œufs."
+  - "Remuer constamment à la spatule jusqu'à texture crémeuse."
+  - "Hors du feu, incorporer la crème fraîche. Rectifier l'assaisonnement."
+  - "Servir sur toast grillé, parsemer de ciboulette."
+tags_libres:
+  - rapide
+  - proteines
+  - classique

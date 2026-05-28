@@ -167,9 +167,9 @@ function DayCard({
 }
 
 function mealOrder(meal: MealType): number {
-  return { brunch: 0, midi: 1, soir: 2 }[meal] ?? 99;
+  return { 'petit-dejeuner': 0, midi: 1, soir: 2 }[meal] ?? 99;
 }
 
 function mealLabel(meal: MealType): string {
-  return { brunch: "Brunch", midi: "Midi", soir: "Soir" }[meal] ?? meal;
+  return { 'petit-dejeuner': "Petit-déjeuner", midi: "Midi", soir: "Soir" }[meal] ?? meal;
 }

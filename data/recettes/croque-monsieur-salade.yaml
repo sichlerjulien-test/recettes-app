@@ -1,0 +1,53 @@
+id: croque-monsieur-salade
+nom: Croques monsieur et salade verte
+description: "Le croque qui fait l'unanimité. Jambon, béchamel, emmental fondu. Salade pour équilibrer."
+portions_base: 4
+duree_minutes: 20
+duree_active: 20
+difficulte: facile
+equipement:
+  - four
+  - plaque
+type_repas:
+  - midi
+type_cuisine: francaise
+saison:
+  - toutes
+ingredient_principal: fromage
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: pain-de-mie
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: jambon-blanc
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: emmental-rape
+    quantite_base: 150
+    unite: g
+  - ingredient_id: beurre
+    quantite_base: 30
+    unite: g
+  - ingredient_id: farine-blanche
+    quantite_base: 20
+    unite: g
+  - ingredient_id: lait-entier
+    quantite_base: 250
+    unite: ml
+  - ingredient_id: salade-verte
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: moutarde
+    quantite_base: 20
+    unite: g
+    optionnel: true
+etapes:
+  - "Préparer une béchamel : beurre + farine + lait, cuire 5 min en remuant."
+  - "Tartiner chaque tranche de pain de béchamel."
+  - "Poser jambon et emmental. Refermer. Repasser béchamel dessus."
+  - "Gratiner au four 10 min à 200°C ou passer à la poêle."
+  - "Servir avec salade verte assaisonnée."
+tags_libres:
+  - classique
+  - rapide
+  - convivial

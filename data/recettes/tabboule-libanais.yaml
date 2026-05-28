@@ -1,0 +1,49 @@
+id: tabboule-libanais
+nom: Taboulé libanais
+description: "Persil, tomate, boulgour, citron, menthe. Frais, léger, parfait en été."
+portions_base: 4
+duree_minutes: 20
+duree_active: 20
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+type_cuisine: orientale
+saison:
+  - printemps
+  - ete
+ingredient_principal: legumes
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: boulghour-fin
+    quantite_base: 120
+    unite: g
+  - ingredient_id: persil-plat
+    quantite_base: 100
+    unite: g
+  - ingredient_id: tomate
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: menthe-fraiche
+    quantite_base: 20
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 60
+    unite: ml
+  - ingredient_id: oignon-rouge
+    quantite_base: 1
+    unite: piece
+etapes:
+  - "Tremper le boulgour 15 min dans de l'eau bouillante, égoutter."
+  - "Hacher finement persil et menthe."
+  - "Couper tomates et oignon en petits dés."
+  - "Mélanger tous les ingrédients, jus de citron, huile d'olive, sel."
+  - "Laisser mariner 30 min au frais avant de servir."
+tags_libres:
+  - vegan
+  - frais
+  - ete
+  - sans-four

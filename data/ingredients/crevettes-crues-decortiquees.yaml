@@ -1,0 +1,11 @@
+id: crevettes-crues-decortiquees
+nom: Crevette crue décortiquée
+nom_pluriel: Crevettes crues décortiquées
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - crustaces
+contient_trace: []
+substituts: []

@@ -1,0 +1,11 @@
+id: moutarde-dijon
+nom: Moutarde de Dijon
+nom_pluriel: Moutarde de Dijon
+categorie: epicerie-salee
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - moutarde
+contient_trace: []
+substituts: []

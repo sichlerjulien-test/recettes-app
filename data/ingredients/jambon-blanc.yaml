@@ -1,0 +1,10 @@
+id: jambon-blanc
+nom: Jambon blanc
+nom_pluriel: Jambons blancs
+categorie: frais-traiteur
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

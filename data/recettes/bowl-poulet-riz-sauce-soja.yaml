@@ -1,0 +1,46 @@
+id: bowl-poulet-riz-sauce-soja
+nom: Bowl poulet grillé riz et sauce soja
+description: "Bowl asiatique simple : riz, poulet grillé mariné, crudités, sauce soja-gingembre."
+portions_base: 4
+duree_minutes: 30
+duree_active: 20
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - midi
+type_cuisine: asiatique
+saison:
+  - toutes
+ingredient_principal: poulet
+feculent_dominant: riz
+ingredients:
+  - ingredient_id: riz-basmati
+    quantite_base: 320
+    unite: g
+  - ingredient_id: filet-poulet
+    quantite_base: 600
+    unite: g
+  - ingredient_id: sauce-soja
+    quantite_base: 60
+    unite: ml
+  - ingredient_id: gingembre-frais
+    quantite_base: 20
+    unite: g
+  - ingredient_id: carotte
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: concombre
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-sesame
+    quantite_base: 15
+    unite: ml
+etapes:
+  - "Cuire le riz. Mariner le poulet dans sauce soja, gingembre, huile de sésame."
+  - "Faire griller le poulet à la poêle 5-6 min par face. Trancher."
+  - "Râper les carottes, trancher le concombre."
+  - "Dresser les bols : riz, poulet, crudités. Verser un filet de marinade."
+tags_libres:
+  - proteines
+  - asiatique

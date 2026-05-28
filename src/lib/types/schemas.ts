@@ -42,7 +42,7 @@ export const EquipmentSchema = z.enum([
   'four', 'plaque', 'micro-ondes', 'barbecue', 'blender', 'robot',
 ]);
 
-export const MealTypeSchema = z.enum(['midi', 'soir', 'brunch', 'petit-dejeuner']);
+export const MealTypeSchema = z.enum(['midi', 'soir', 'petit-dejeuner']);
 
 export const SeasonSchema = z.enum(['printemps', 'ete', 'automne', 'hiver', 'toutes']);
 

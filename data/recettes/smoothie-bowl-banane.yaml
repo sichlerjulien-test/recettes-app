@@ -1,0 +1,45 @@
+id: smoothie-bowl-banane
+nom: Smoothie bowl banane et fruits rouges
+description: "Base banane-fruits rouges épaisse, garnie de granola, graines et fruits frais."
+portions_base: 4
+duree_minutes: 15
+duree_active: 15
+difficulte: facile
+equipement: []
+type_repas:
+  - petit-dejeuner
+type_cuisine: neutre
+saison:
+  - printemps
+  - ete
+ingredient_principal: fruits
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: banane
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: fruits-rouges-surgeles
+    quantite_base: 300
+    unite: g
+  - ingredient_id: yaourt-nature
+    quantite_base: 200
+    unite: g
+  - ingredient_id: granola
+    quantite_base: 80
+    unite: g
+  - ingredient_id: graines-chia
+    quantite_base: 20
+    unite: g
+    optionnel: true
+  - ingredient_id: miel
+    quantite_base: 20
+    unite: ml
+    optionnel: true
+etapes:
+  - "Mixer bananes et fruits rouges surgelés avec le yaourt jusqu'à consistance épaisse."
+  - "Répartir dans des bols."
+  - "Garnir de granola, graines de chia et fruits frais."
+tags_libres:
+  - sans-gluten
+  - frais
+  - ete

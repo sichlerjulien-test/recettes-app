@@ -1,0 +1,46 @@
+id: pain-perdu
+nom: Pain perdu
+description: "Du pain de la veille transformé en brioche dorée. Sucré, généreux, parfait en groupe."
+portions_base: 4
+duree_minutes: 20
+duree_active: 20
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - petit-dejeuner
+type_cuisine: francaise
+saison:
+  - toutes
+ingredient_principal: oeufs
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: pain-campagne
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: oeuf
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: lait-entier
+    quantite_base: 200
+    unite: ml
+  - ingredient_id: beurre
+    quantite_base: 30
+    unite: g
+  - ingredient_id: sucre
+    quantite_base: 40
+    unite: g
+  - ingredient_id: cannelle
+    quantite_base: 2
+    unite: g
+    optionnel: true
+etapes:
+  - "Battre les œufs avec le lait, le sucre et la cannelle."
+  - "Tremper les tranches de pain dans la préparation des deux côtés."
+  - "Faire dorer dans le beurre à feu moyen, 2-3 min par face."
+  - "Servir chaud avec sirop d'érable ou confiture."
+tags_libres:
+  - sucre
+  - anti-gaspi
+  - classique
+  - groupe

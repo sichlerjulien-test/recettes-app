@@ -1,0 +1,33 @@
+id: toast-beurre-confiture
+nom: Toasts beurre et confiture
+description: "L'indémodable du petit-déjeuner de gîte. Pain de campagne toasté, beurre demi-sel, confiture maison."
+portions_base: 4
+duree_minutes: 10
+duree_active: 10
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - petit-dejeuner
+type_cuisine: francaise
+saison:
+  - toutes
+ingredient_principal: pain
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: pain-campagne
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: beurre-demi-sel
+    quantite_base: 80
+    unite: g
+  - ingredient_id: confiture-fraises
+    quantite_base: 200
+    unite: g
+etapes:
+  - "Trancher le pain et faire toaster à la poêle ou au grille-pain."
+  - "Servir avec beurre demi-sel et confiture."
+tags_libres:
+  - rapide
+  - sans-effort
+  - classique

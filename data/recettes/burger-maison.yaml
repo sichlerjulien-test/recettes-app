@@ -1,0 +1,50 @@
+id: burger-maison
+nom: Burgers maison
+description: "Steak haché maison, cheddar fondu, salade, tomate, cornichons. Le burger qui fait consensus."
+portions_base: 4
+duree_minutes: 25
+duree_active: 25
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - midi
+type_cuisine: americaine
+saison:
+  - toutes
+ingredient_principal: boeuf
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: steak-hache-boeuf
+    quantite_base: 600
+    unite: g
+  - ingredient_id: bun-burger
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: cheddar-tranche
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: tomate
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: salade-feuille
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: cornichon
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: ketchup
+    quantite_base: 60
+    unite: ml
+  - ingredient_id: mayonnaise
+    quantite_base: 60
+    unite: ml
+etapes:
+  - "Former des steaks de 150g, assaisonner sel et poivre."
+  - "Cuire à la poêle chaude 3 min par face pour saignant, 4 min pour à point."
+  - "Poser le cheddar sur le steak en fin de cuisson, couvrir pour faire fondre."
+  - "Toaster les buns. Garnir avec salade, tomate, cornichons, sauces."
+tags_libres:
+  - convivial
+  - groupe
+  - gourmand

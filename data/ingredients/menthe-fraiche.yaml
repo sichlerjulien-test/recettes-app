@@ -1,0 +1,10 @@
+id: menthe-fraiche
+nom: Menthe fraîche
+nom_pluriel: Menthe fraîche
+categorie: fruits-legumes
+unite_base: g
+unite_achat: botte
+conversion: 25
+allergenes: []
+contient_trace: []
+substituts: []

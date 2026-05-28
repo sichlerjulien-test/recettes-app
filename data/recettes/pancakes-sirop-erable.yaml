@@ -1,0 +1,48 @@
+id: pancakes-sirop-erable
+nom: Pancakes au sirop d'érable
+description: "Pancakes moelleux dorés à la poêle, servis avec sirop d'érable et beurre."
+portions_base: 4
+duree_minutes: 25
+duree_active: 20
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - petit-dejeuner
+type_cuisine: americaine
+saison:
+  - toutes
+ingredient_principal: oeufs
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: farine-blanche
+    quantite_base: 200
+    unite: g
+  - ingredient_id: oeuf
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: lait-entier
+    quantite_base: 250
+    unite: ml
+  - ingredient_id: beurre
+    quantite_base: 30
+    unite: g
+  - ingredient_id: sucre
+    quantite_base: 20
+    unite: g
+  - ingredient_id: levure-chimique
+    quantite_base: 8
+    unite: g
+  - ingredient_id: sirop-erable
+    quantite_base: 80
+    unite: ml
+etapes:
+  - "Mélanger farine, sucre et levure chimique dans un grand bol."
+  - "Creuser un puits, ajouter les œufs battus, le lait et le beurre fondu. Mélanger sans trop travailler la pâte."
+  - "Faire chauffer une poêle antiadhésive à feu moyen avec un peu de beurre."
+  - "Verser une louche de pâte, cuire 2-3 min jusqu'à formation de bulles, retourner et cuire 1 min."
+  - "Servir chaud avec sirop d'érable."
+tags_libres:
+  - sucre
+  - convivial
+  - groupe

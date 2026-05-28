@@ -1,0 +1,46 @@
+id: quiche-lorraine
+nom: Quiche lorraine
+description: "L'incontournable. Lardons, crème, œufs dans une pâte brisée dorée."
+portions_base: 6
+duree_minutes: 55
+duree_active: 20
+difficulte: moyen
+equipement:
+  - four
+type_repas:
+  - midi
+type_cuisine: francaise
+saison:
+  - toutes
+ingredient_principal: oeufs
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: pate-brisee
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: lardon-fume
+    quantite_base: 200
+    unite: g
+  - ingredient_id: oeuf
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: creme-fraiche
+    quantite_base: 200
+    unite: ml
+  - ingredient_id: lait-entier
+    quantite_base: 100
+    unite: ml
+  - ingredient_id: gruyere-rape
+    quantite_base: 80
+    unite: g
+    optionnel: true
+etapes:
+  - "Préchauffer le four à 180°C. Foncer le moule avec la pâte brisée."
+  - "Faire revenir les lardons à la poêle, égoutter."
+  - "Battre œufs, crème et lait. Saler, poivrer, muscade."
+  - "Répartir les lardons dans le fond de tarte, verser l'appareil."
+  - "Ajouter le gruyère râpé si souhaité. Cuire 35-40 min."
+tags_libres:
+  - classique
+  - groupe
+  - convivial

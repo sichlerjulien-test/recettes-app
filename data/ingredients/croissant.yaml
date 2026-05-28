@@ -1,0 +1,13 @@
+id: croissant
+nom: Croissant
+nom_pluriel: Croissants
+categorie: boulangerie
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes:
+  - gluten
+  - lait
+  - oeufs
+contient_trace: []
+substituts: []

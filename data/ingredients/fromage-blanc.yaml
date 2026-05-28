@@ -1,0 +1,11 @@
+id: fromage-blanc
+nom: Fromage blanc
+nom_pluriel: Fromage blanc
+categorie: cremerie-oeufs
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - lait
+contient_trace: []
+substituts: []

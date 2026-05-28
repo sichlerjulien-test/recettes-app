@@ -1,0 +1,36 @@
+id: bowl-cereales-fruits
+nom: Bowl céréales et fruits frais
+description: "Céréales croustillantes, lait froid, fruits de saison coupés. Le basique qui dépanne toujours."
+portions_base: 4
+duree_minutes: 5
+duree_active: 5
+difficulte: facile
+equipement: []
+type_repas:
+  - petit-dejeuner
+type_cuisine: neutre
+saison:
+  - toutes
+ingredient_principal: fruits
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: cereales-nature
+    quantite_base: 200
+    unite: g
+  - ingredient_id: lait-entier
+    quantite_base: 600
+    unite: ml
+  - ingredient_id: banane
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: fraises
+    quantite_base: 150
+    unite: g
+    optionnel: true
+etapes:
+  - "Couper les fruits."
+  - "Verser les céréales dans les bols, ajouter le lait et les fruits."
+tags_libres:
+  - sans-cuisson
+  - rapide
+  - enfants

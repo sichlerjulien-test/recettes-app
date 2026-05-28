@@ -1,0 +1,42 @@
+id: pates-carbonara
+nom: Pâtes carbonara
+description: "La vraie carbonara : guanciale, pecorino, jaune d'œuf. Crémeuse sans crème."
+portions_base: 4
+duree_minutes: 25
+duree_active: 25
+difficulte: moyen
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: italienne
+saison:
+  - toutes
+ingredient_principal: oeufs
+feculent_dominant: pates
+ingredients:
+  - ingredient_id: spaghetti
+    quantite_base: 400
+    unite: g
+  - ingredient_id: guanciale-ou-lardon
+    quantite_base: 200
+    unite: g
+  - ingredient_id: oeuf
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: pecorino-ou-parmesan-rape
+    quantite_base: 100
+    unite: g
+  - ingredient_id: poivre-noir
+    quantite_base: 3
+    unite: g
+etapes:
+  - "Cuire les pâtes al dente, garder 1 verre d'eau de cuisson."
+  - "Faire revenir le guanciale à sec jusqu'à croustillant."
+  - "Battre jaunes d'œufs et pecorino râpé."
+  - "Hors du feu, mélanger pâtes égouttées, guanciale, mélange œuf-fromage."
+  - "Allonger avec l'eau de cuisson pour obtenir une sauce crémeuse. Poivre généreux."
+tags_libres:
+  - classique
+  - italienne
+  - rapide

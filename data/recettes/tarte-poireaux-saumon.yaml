@@ -1,0 +1,48 @@
+id: tarte-poireaux-saumon
+nom: Tarte poireaux saumon
+description: "Fondue de poireaux, saumon fumé, crème, pâte brisée. Élégant sans effort."
+portions_base: 6
+duree_minutes: 55
+duree_active: 20
+difficulte: facile
+equipement:
+  - four
+  - plaque
+type_repas:
+  - soir
+type_cuisine: francaise
+saison:
+  - automne
+  - hiver
+  - printemps
+ingredient_principal: poisson
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: pate-brisee
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: poireau
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: saumon-fume
+    quantite_base: 150
+    unite: g
+  - ingredient_id: oeuf
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: creme-fraiche
+    quantite_base: 200
+    unite: ml
+  - ingredient_id: beurre
+    quantite_base: 20
+    unite: g
+etapes:
+  - "Préchauffer le four à 180°C."
+  - "Émincer et faire fondre les poireaux au beurre 10 min."
+  - "Battre œufs et crème, assaisonner."
+  - "Foncer le moule. Disposer poireaux et saumon fumé coupé."
+  - "Verser l'appareil. Cuire 35 min."
+tags_libres:
+  - elegant
+  - poisson
+  - automne

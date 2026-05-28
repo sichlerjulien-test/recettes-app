@@ -1,0 +1,13 @@
+id: pate-brisee
+nom: Pâte brisée (rouleau)
+nom_pluriel: Pâtes brisées
+categorie: boulangerie
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes:
+  - gluten
+  - lait
+contient_trace:
+  - oeufs
+substituts: []

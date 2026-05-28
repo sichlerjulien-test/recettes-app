@@ -1,0 +1,41 @@
+id: avocado-toast-simple
+nom: Avocado toast
+description: "Avocat écrasé sur pain grillé, citron, piment d'Espelette. Frais et rassasiant."
+portions_base: 4
+duree_minutes: 10
+duree_active: 10
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - petit-dejeuner
+type_cuisine: neutre
+saison:
+  - toutes
+ingredient_principal: legumes
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: avocat
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: pain-campagne
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: piment-espelette
+    quantite_base: 2
+    unite: g
+    optionnel: true
+  - ingredient_id: fleur-de-sel
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Toaster le pain."
+  - "Écraser l'avocat à la fourchette avec le jus de citron, sel et piment."
+  - "Étaler généreusement sur le pain. Servir immédiatement."
+tags_libres:
+  - vegan
+  - rapide
+  - frais

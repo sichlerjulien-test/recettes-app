@@ -1,0 +1,12 @@
+id: feuilles-lasagne
+nom: Feuille de lasagne
+nom_pluriel: Feuilles de lasagne
+categorie: feculents-pates-riz
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - gluten
+  - oeufs
+contient_trace: []
+substituts: []

@@ -1,0 +1,11 @@
+id: emmental-rape
+nom: Emmental râpé
+nom_pluriel: Emmental râpé
+categorie: cremerie-oeufs
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - lait
+contient_trace: []
+substituts: []

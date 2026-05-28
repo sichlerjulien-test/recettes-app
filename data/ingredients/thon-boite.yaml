@@ -1,0 +1,11 @@
+id: thon-boite
+nom: Thon en boîte (au naturel)
+nom_pluriel: Thon en boîte
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - poissons
+contient_trace: []
+substituts: []

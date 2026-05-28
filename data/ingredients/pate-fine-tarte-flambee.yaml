@@ -1,0 +1,11 @@
+id: pate-fine-tarte-flambee
+nom: Pâte fine tarte flambée
+nom_pluriel: Pâtes fines tarte flambée
+categorie: boulangerie
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes:
+  - gluten
+contient_trace: []
+substituts: []

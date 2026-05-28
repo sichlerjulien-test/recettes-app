@@ -1,0 +1,10 @@
+id: graines-chia
+nom: Graine de chia
+nom_pluriel: Graines de chia
+categorie: epicerie-sucree
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

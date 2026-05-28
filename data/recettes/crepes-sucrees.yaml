@@ -1,0 +1,45 @@
+id: crepes-sucrees
+nom: Crêpes sucrées
+description: "Crêpes fines à la française. Beurre, sucre, citron — ou Nutella pour les gourmands."
+portions_base: 4
+duree_minutes: 30
+duree_active: 25
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - petit-dejeuner
+type_cuisine: francaise
+saison:
+  - toutes
+ingredient_principal: oeufs
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: farine-blanche
+    quantite_base: 250
+    unite: g
+  - ingredient_id: oeuf
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: lait-entier
+    quantite_base: 500
+    unite: ml
+  - ingredient_id: beurre
+    quantite_base: 40
+    unite: g
+  - ingredient_id: sucre
+    quantite_base: 20
+    unite: g
+  - ingredient_id: sucre-vanille
+    quantite_base: 1
+    unite: piece
+etapes:
+  - "Mélanger farine et œufs. Ajouter le lait progressivement en fouettant."
+  - "Incorporer beurre fondu, sucre et sucre vanillé. Laisser reposer 30 min si possible."
+  - "Cuire les crêpes dans une poêle beurrée à feu moyen."
+  - "Servir avec sucre, confiture, citron ou pâte à tartiner."
+tags_libres:
+  - convivial
+  - sucre
+  - classique
+  - groupe

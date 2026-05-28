@@ -1,0 +1,10 @@
+id: tomate-cerise
+nom: Tomate cerise
+nom_pluriel: Tomates cerises
+categorie: fruits-legumes
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []
