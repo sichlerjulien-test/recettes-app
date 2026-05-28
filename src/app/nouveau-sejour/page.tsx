@@ -258,12 +258,12 @@ export default function NouveauSejourPage() {
                       <FormLabel>Nombre de jours</FormLabel>
                       <FormControl>
                         <Input
-                          type="number"
-                          min={1}
-                          max={7}
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                           {...field}
                           value={field.value}
-                          onChange={(e) => field.onChange(safeNumber(e.target.valueAsNumber))}
+                          onChange={(e) => field.onChange(safeNumber(parseInt(e.target.value, 10)))}
                         />
                       </FormControl>
                       <FormMessage />
@@ -292,11 +292,12 @@ export default function NouveauSejourPage() {
                         <FormLabel>Petit-déjeuner</FormLabel>
                         <FormControl>
                           <Input
-                            type="number"
-                            min={0}
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             {...field}
                             value={field.value}
-                            onChange={(e) => field.onChange(safeNumber(e.target.valueAsNumber))}
+                            onChange={(e) => field.onChange(safeNumber(parseInt(e.target.value, 10)))}
                           />
                         </FormControl>
                         <FormMessage />
@@ -312,11 +313,12 @@ export default function NouveauSejourPage() {
                         <FormLabel>Midi</FormLabel>
                         <FormControl>
                           <Input
-                            type="number"
-                            min={0}
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             {...field}
                             value={field.value}
-                            onChange={(e) => field.onChange(safeNumber(e.target.valueAsNumber))}
+                            onChange={(e) => field.onChange(safeNumber(parseInt(e.target.value, 10)))}
                           />
                         </FormControl>
                         <FormMessage />
@@ -332,11 +334,12 @@ export default function NouveauSejourPage() {
                         <FormLabel>Soir</FormLabel>
                         <FormControl>
                           <Input
-                            type="number"
-                            min={0}
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             {...field}
                             value={field.value}
-                            onChange={(e) => field.onChange(safeNumber(e.target.valueAsNumber))}
+                            onChange={(e) => field.onChange(safeNumber(parseInt(e.target.value, 10)))}
                           />
                         </FormControl>
                         <FormMessage />
