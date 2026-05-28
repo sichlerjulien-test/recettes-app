@@ -31,6 +31,9 @@ import type {
   AllergenViolationSchema,
   RegimeViolationSchema,
   RecetteInconnueViolationSchema,
+  SlotsMismatchViolationSchema,
+  RecetteDupliqueeViolationSchema,
+  IngredientConsecutifViolationSchema,
   ValidationViolationSchema,
   ValidationResultSchema,
   ShoppingErrorSchema,
@@ -113,6 +116,15 @@ export type RegimeViolation = z.infer<typeof RegimeViolationSchema>;
 
 /** Violation d'intégrité : l'entrée du planning référence une recette inconnue. */
 export type RecetteInconnueViolation = z.infer<typeof RecetteInconnueViolationSchema>;
+
+/** Violation structurelle : les slots du planning ne correspondent pas aux slots attendus. */
+export type SlotsMismatchViolation = z.infer<typeof SlotsMismatchViolationSchema>;
+
+/** Violation structurelle : la même recette apparaît deux fois. */
+export type RecetteDupliqueeViolation = z.infer<typeof RecetteDupliqueeViolationSchema>;
+
+/** Violation structurelle : même ingredient_principal sur deux créneaux du même jour. */
+export type IngredientConsecutifViolation = z.infer<typeof IngredientConsecutifViolationSchema>;
 
 export type ValidationViolation = z.infer<typeof ValidationViolationSchema>;
 

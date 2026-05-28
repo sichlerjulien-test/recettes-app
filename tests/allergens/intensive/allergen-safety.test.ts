@@ -44,8 +44,14 @@ function buildPlanning(recetteIds: string[]): Planning {
   };
 }
 
-function pickRandom<T>(arr: T[], rng: () => number): T {
-  return arr[Math.floor(rng() * arr.length)]!;
+function pickUniqueN<T>(arr: T[], n: number, rng: () => number): T[] {
+  const available = [...arr];
+  const result: T[] = [];
+  for (let i = 0; i < n && available.length > 0; i++) {
+    const idx = Math.floor(rng() * available.length);
+    result.push(available.splice(idx, 1)[0]!);
+  }
+  return result;
 }
 
 function runProfile(
@@ -67,19 +73,23 @@ function runProfile(
     }
 
     const nb = Math.min(Math.floor(rng() * 5) + 1, filtered.length);
-    const selected: string[] = [];
-    for (let j = 0; j < nb; j++) {
-      selected.push(pickRandom(filtered, rng).id);
-    }
+    const selected = pickUniqueN(filtered, nb, rng).map((r) => r.id);
 
     const planning = buildPlanning(selected);
-    const result = validatePlanning(planning, recettesMap, participants);
+    const expectedSlots = planning.entries.map((e) => ({ jour: e.jour, repas: e.repas }));
+    const result = validatePlanning(planning, recettesMap, participants, expectedSlots);
 
-    if (!result.valid) {
+    // Ce test vérifie uniquement la sécurité allergènes/régimes après filtrage.
+    // Les violations structurelles (slots_mismatch, ingredient_consecutif) ne sont
+    // pas pertinentes pour des plannings aléatoires construits hors buildSequence.
+    const safetyViolations = result.violations.filter(
+      (v) => v.kind === 'allergen' || v.kind === 'regime',
+    );
+    if (safetyViolations.length > 0) {
       throw new Error(
         `[${label}] Iteration ${i + 1}: Planning invalide après filtrage.\n` +
         `Recettes sélectionnées : ${selected.join(', ')}\n` +
-        `Violations : ${JSON.stringify(result.violations, null, 2)}`,
+        `Violations : ${JSON.stringify(safetyViolations, null, 2)}`,
       );
     }
   }

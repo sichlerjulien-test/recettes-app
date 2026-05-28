@@ -42,20 +42,20 @@ export const EquipmentSchema = z.enum([
   'four', 'plaque', 'micro-ondes', 'barbecue', 'blender', 'robot',
 ]);
 
-export const MealTypeSchema = z.enum(['midi', 'soir', 'brunch']);
+export const MealTypeSchema = z.enum(['midi', 'soir', 'brunch', 'petit-dejeuner']);
 
 export const SeasonSchema = z.enum(['printemps', 'ete', 'automne', 'hiver', 'toutes']);
 
-export const DifficultySchema = z.enum(['facile', 'normale']);
+export const DifficultySchema = z.enum(['facile', 'normale', 'moyen']);
 
 export const CuisineTypeSchema = z.enum([
   'francaise', 'italienne', 'asiatique', 'mexicaine',
-  'mediterraneenne', 'orientale', 'neutre',
+  'mediterraneenne', 'orientale', 'neutre', 'americaine', 'anglaise',
 ]);
 
 export const MainIngredientSchema = z.enum([
-  'poulet', 'boeuf', 'porc', 'agneau', 'poisson', 'fruits-de-mer',
-  'oeufs', 'legumineuses', 'fromage', 'tofu', 'legumes',
+  'poulet', 'boeuf', 'porc', 'poisson',
+  'oeufs', 'legumineuses', 'fromage', 'legumes', 'fruits', 'pain',
 ]);
 
 export const DominantStarchSchema = z.enum([
@@ -116,7 +116,7 @@ export const RecetteInputSchema = z.object({
   duree_minutes: z.number().int().positive().max(480),
   duree_active: z.number().int().nonnegative().max(480),
   difficulte: DifficultySchema,
-  equipement: z.array(EquipmentSchema).min(1),
+  equipement: z.array(EquipmentSchema),
   type_repas: z.array(MealTypeSchema).min(1),
   type_cuisine: CuisineTypeSchema,
   saison: z.array(SeasonSchema).min(1),
@@ -168,6 +168,7 @@ export const SejourSchema = z.object({
   nb_jours: z.number().int().min(1).max(7),
   /** Répartition des repas par jour */
   repartition_repas: z.object({
+    premier_repas: z.enum(['matin', 'midi', 'soir']),
     midis: z.number().int().nonnegative(),
     soirs: z.number().int().nonnegative(),
     brunchs: z.number().int().nonnegative(),
@@ -270,10 +271,32 @@ export const RecetteInconnueViolationSchema = z.object({
   participant_nom: z.union([z.string(), z.undefined()]),
 });
 
+/** Violation structurelle : les slots du planning ne correspondent pas aux slots attendus. */
+export const SlotsMismatchViolationSchema = z.object({
+  kind: z.literal('slots_mismatch'),
+});
+
+/** Violation structurelle : la même recette apparaît deux fois dans le planning. */
+export const RecetteDupliqueeViolationSchema = z.object({
+  kind: z.literal('recette_dupliquee'),
+  recette_id: z.string(),
+});
+
+/** Violation structurelle : deux créneaux du même jour partagent le même ingredient_principal. */
+export const IngredientConsecutifViolationSchema = z.object({
+  kind: z.literal('ingredient_principal_consecutif'),
+  ingredient_principal: MainIngredientSchema,
+  slot_a: z.object({ jour: z.number(), repas: MealTypeSchema }),
+  slot_b: z.object({ jour: z.number(), repas: MealTypeSchema }),
+});
+
 export const ValidationViolationSchema = z.discriminatedUnion('kind', [
   AllergenViolationSchema,
   RegimeViolationSchema,
   RecetteInconnueViolationSchema,
+  SlotsMismatchViolationSchema,
+  RecetteDupliqueeViolationSchema,
+  IngredientConsecutifViolationSchema,
 ]);
 
 export const ValidationResultSchema = z.object({
@@ -300,6 +323,7 @@ export const GeneratePlanningInputSchema = z.object({
   contexte: z.object({
     nb_jours: z.number().int().min(1).max(7),
     repartition_repas: z.object({
+      premier_repas: z.enum(['matin', 'midi', 'soir']),
       midis: z.number().int().nonnegative(),
       soirs: z.number().int().nonnegative(),
       brunchs: z.number().int().nonnegative(),
@@ -369,6 +393,7 @@ export const CreateSejourBodySchema = z.object({
   date_debut: z.string().date().optional(),
   nb_jours: z.number().int().min(1).max(7),
   repartition_repas: z.object({
+    premier_repas: z.enum(['matin', 'midi', 'soir']),
     midis: z.number().int().nonnegative(),
     soirs: z.number().int().nonnegative(),
     brunchs: z.number().int().nonnegative(),

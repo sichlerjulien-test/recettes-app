@@ -14,6 +14,7 @@
  */
 import Anthropic from '@anthropic-ai/sdk';
 import { LLMPlanningOutputSchema } from '../types/schemas';
+import { buildSequence } from '../planning/build-sequence';
 import type { GeneratePlanningInput, GeneratePlanningOutput } from './types';
 
 /** Abstraction du client LLM — injectable pour les tests. */
@@ -33,7 +34,7 @@ const COMPOSE_PLANNING_TOOL = {
           type: 'object',
           properties: {
             jour: { type: 'integer', minimum: 1 },
-            repas: { type: 'string', enum: ['midi', 'soir', 'brunch'] },
+            repas: { type: 'string', enum: ['midi', 'soir', 'brunch', 'petit-dejeuner'] },
             recette_id: { type: 'string' },
           },
           required: ['jour', 'repas', 'recette_id'],
@@ -53,18 +54,21 @@ function buildSystemPrompt(totalRepas: number): string {
 Règles à respecter impérativement :
 - Choisir UNIQUEMENT des recettes présentes dans le pool fourni, identifiées par leur recette_id exact
 - Ne jamais utiliser la même recette deux fois
-- Varier les protéines principales : éviter deux ingredient_principal identiques sur la même journée (24h)
+- Varier les protéines principales : éviter le même ingredient_principal deux fois dans la même journée
 - Varier les types de cuisine sur l'ensemble du planning
 - Si temps_disponible est "rapide", privilégier les recettes avec une duree_active courte
 - Équilibrer les féculents (feculent_dominant) sur l'ensemble du séjour
 - Adapter les choix au niveau_cuisine (facile ou normal)
 
-Tu dois appeler l'outil compose_planning avec exactement ${totalRepas} entrées couvrant tous les repas du séjour.`;
+Tu dois appeler l'outil compose_planning avec exactement ${totalRepas} entrées couvrant tous les créneaux listés.`;
 }
 
 function buildUserMessage(input: GeneratePlanningInput): string {
   const { pool, contexte } = input;
   const { nb_jours, repartition_repas, niveau_cuisine, temps_disponible } = contexte;
+
+  const slots = buildSequence(repartition_repas);
+  const slotsLines = slots.map((s) => `- Jour ${s.jour}, ${s.repas}`).join('\n');
 
   const poolLines = pool
     .map(
@@ -75,14 +79,15 @@ function buildUserMessage(input: GeneratePlanningInput): string {
 
   return `Contexte du séjour :
 - Durée : ${nb_jours} jours
-- Répartition : ${repartition_repas.midis} midis, ${repartition_repas.soirs} soirs, ${repartition_repas.brunchs} brunchs
+- Créneaux à remplir dans cet ordre :
+${slotsLines}
 - Niveau cuisine : ${niveau_cuisine}
 - Temps disponible : ${temps_disponible}
 
 Pool disponible (${pool.length} recettes) :
 ${poolLines}
 
-Compose le planning complet en appelant l'outil compose_planning.`;
+Compose le planning complet en appelant l'outil compose_planning. Remplis exactement les ${slots.length} créneaux listés ci-dessus, dans le même ordre (même jour et même repas).`;
 }
 
 /**
@@ -99,9 +104,8 @@ export function createAnthropicClient(apiKey: string): LLMClient {
 
   return {
     async generate(input: GeneratePlanningInput): Promise<GeneratePlanningOutput> {
-      const { repartition_repas } = input.contexte;
-      const totalRepas =
-        repartition_repas.midis + repartition_repas.soirs + repartition_repas.brunchs;
+      const slots = buildSequence(input.contexte.repartition_repas);
+      const totalRepas = slots.length;
 
       const response = await anthropic.messages.create(
         {
