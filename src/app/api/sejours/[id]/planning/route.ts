@@ -42,7 +42,7 @@ export async function POST(
   const { id } = await params;
 
   const token = request.headers.get('X-Sejour-Token');
-  if (token === null) {
+  if (!token) {
     return jsonError(401, 'unauthorized', 'Token de séjour requis');
   }
 
