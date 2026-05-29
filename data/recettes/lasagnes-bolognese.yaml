@@ -4,7 +4,7 @@ description: "La grande lasagne qui nourrit une tablée. Bolognaise mijotée, b�
 portions_base: 6
 duree_minutes: 90
 duree_active: 40
-difficulte: moyen
+difficulte: normale
 equipement:
   - plaque
   - four

@@ -4,7 +4,7 @@ description: "Cabillaud en pâte à bière, chips maison au four. Festif et gén
 portions_base: 4
 duree_minutes: 50
 duree_active: 30
-difficulte: moyen
+difficulte: normale
 equipement:
   - four
   - plaque

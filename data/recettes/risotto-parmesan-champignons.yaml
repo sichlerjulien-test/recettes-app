@@ -4,7 +4,7 @@ description: "Risotto crémeux, champignons sautés, parmesan généreux. Le pla
 portions_base: 4
 duree_minutes: 40
 duree_active: 35
-difficulte: moyen
+difficulte: normale
 equipement:
   - plaque
 type_repas:

@@ -4,7 +4,7 @@ description: "Pâte maison, sauce tomate, mozzarella, basilic frais. Activité e
 portions_base: 4
 duree_minutes: 60
 duree_active: 30
-difficulte: moyen
+difficulte: normale
 equipement:
   - four
 type_repas:

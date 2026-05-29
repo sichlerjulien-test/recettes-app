@@ -4,7 +4,7 @@ description: "La vraie carbonara : guanciale, pecorino, jaune d'œuf. Crémeuse 
 portions_base: 4
 duree_minutes: 25
 duree_active: 25
-difficulte: moyen
+difficulte: normale
 equipement:
   - plaque
 type_repas:

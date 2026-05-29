@@ -4,7 +4,7 @@ description: "L'incontournable. Lardons, crème, œufs dans une pâte brisée do
 portions_base: 6
 duree_minutes: 55
 duree_active: 20
-difficulte: moyen
+difficulte: normale
 equipement:
   - four
 type_repas:

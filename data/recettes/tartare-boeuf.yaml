@@ -4,7 +4,7 @@ description: "Bœuf haché à la main, câpres, cornichons, jaune d'œuf, moutar
 portions_base: 4
 duree_minutes: 20
 duree_active: 20
-difficulte: moyen
+difficulte: normale
 equipement: []
 type_repas:
   - soir

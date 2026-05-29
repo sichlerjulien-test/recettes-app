@@ -4,7 +4,7 @@ description: "Le grand classique mijoté. Bœuf, lardons, champignons, vin rouge
 portions_base: 6
 duree_minutes: 180
 duree_active: 40
-difficulte: moyen
+difficulte: normale
 equipement:
   - plaque
   - four
