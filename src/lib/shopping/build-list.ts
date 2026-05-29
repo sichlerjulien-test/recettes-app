@@ -25,6 +25,10 @@ type AggregItem = {
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 
+const DISCRETE_UNITS: ReadonlySet<Unit> = new Set(['piece', 'botte', 'sachet']);
+const finalize = (q: number, u: Unit): number =>
+  DISCRETE_UNITS.has(u) ? Math.ceil(q) : round2(q);
+
 /**
  * Construit le contenu de la liste de courses à partir d'un planning.
  *
@@ -89,11 +93,11 @@ export function buildShoppingList(
 
     for (const ri of recette.ingredients) {
       const key = `${ri.ingredient_id}::${ri.unite}`;
-      const quantite = Math.ceil(ri.quantite_base * facteur);
+      const quantite_brute = ri.quantite_base * facteur;
 
       const existing = aggr.get(key);
       if (existing !== undefined) {
-        existing.quantite_totale += quantite;
+        existing.quantite_totale += quantite_brute;
         // Non-optionnel dans au moins une recette => l'emporte sur optionnel
         if (!ri.optionnel) existing.optionnel = false;
         existing.utilise_dans.add(entry.recette_id);
@@ -101,7 +105,7 @@ export function buildShoppingList(
         aggr.set(key, {
           ingredient_id: ri.ingredient_id,
           unite: ri.unite,
-          quantite_totale: quantite,
+          quantite_totale: quantite_brute,
           optionnel: ri.optionnel,
           utilise_dans: new Set([entry.recette_id]),
         });
@@ -122,11 +126,11 @@ export function buildShoppingList(
 
     // Convertir vers unite_achat uniquement si l'unité de la recette correspond à unite_base
     if (aggItem.unite === ingredient.unite_base) {
-      quantite_totale = round2(aggItem.quantite_totale / ingredient.conversion);
       unite_affichee = ingredient.unite_achat;
+      quantite_totale = finalize(aggItem.quantite_totale / ingredient.conversion, unite_affichee);
     } else {
-      quantite_totale = round2(aggItem.quantite_totale);
       unite_affichee = aggItem.unite;
+      quantite_totale = finalize(aggItem.quantite_totale, unite_affichee);
     }
 
     items_par_categorie[ingredient.categorie].push({

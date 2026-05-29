@@ -333,6 +333,79 @@ describe('buildShoppingList', () => {
     expect(huile?.unite_affichee).toBe('cuillere-soupe');
   });
 
+  it('should ceil discrete unit once after conversion (chou-fleur 240g → 1 piece)', () => {
+    // unite_base=g, unite_achat=piece, conversion=800
+    // 240g / 800 = 0.3 → ceil = 1
+    const ingredient: Ingredient = {
+      id: 'chou-fleur',
+      nom: 'Chou-fleur',
+      nom_pluriel: 'Choux-fleurs',
+      categorie: 'fruits-legumes',
+      unite_base: 'g',
+      unite_achat: 'piece',
+      conversion: 800,
+      allergenes: [],
+      contient_trace: [],
+      substituts: [],
+    };
+    const recette: Recette = {
+      ...BASE_RECETTE,
+      id: 'recette-chou',
+      portions_base: 4,
+      ingredients: [
+        { ingredient_id: 'chou-fleur', quantite_base: 240, unite: 'g', optionnel: false, groupe: undefined },
+      ],
+    };
+    const localRecettes = new Map<string, Recette>([['recette-chou', recette]]);
+    const localIngredients = new Map<string, Ingredient>([['chou-fleur', ingredient]]);
+    const planning = makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-chou' }]);
+    const result = buildShoppingList(planning, localRecettes, localIngredients, 4);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const chou = result.items_par_categorie['fruits-legumes']
+      .find((i) => i.ingredient_id === 'chou-fleur');
+    expect(chou?.quantite_totale).toBe(1);
+    expect(chou?.unite_affichee).toBe('piece');
+  });
+
+  it('should ceil sum of raws, not sum of ceils (anti-bias: 240g+240g → 1 piece, not 2)', () => {
+    // deux entries de 240g → somme brute 480g → 480/800 = 0.6 → ceil = 1
+    // si on arrondissait avant : ceil(240/800)+ceil(240/800) = 1+1 = 2 (faux)
+    const ingredient: Ingredient = {
+      id: 'chou-fleur-b',
+      nom: 'Chou-fleur',
+      nom_pluriel: 'Choux-fleurs',
+      categorie: 'fruits-legumes',
+      unite_base: 'g',
+      unite_achat: 'piece',
+      conversion: 800,
+      allergenes: [],
+      contient_trace: [],
+      substituts: [],
+    };
+    const recette: Recette = {
+      ...BASE_RECETTE,
+      id: 'recette-chou-2',
+      portions_base: 4,
+      ingredients: [
+        { ingredient_id: 'chou-fleur-b', quantite_base: 240, unite: 'g', optionnel: false, groupe: undefined },
+      ],
+    };
+    const localRecettes = new Map<string, Recette>([['recette-chou-2', recette]]);
+    const localIngredients = new Map<string, Ingredient>([['chou-fleur-b', ingredient]]);
+    const planning = makePlanning([
+      { jour: 1, repas: 'midi', recette_id: 'recette-chou-2' },
+      { jour: 1, repas: 'soir', recette_id: 'recette-chou-2' },
+    ]);
+    const result = buildShoppingList(planning, localRecettes, localIngredients, 4);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const chou = result.items_par_categorie['fruits-legumes']
+      .find((i) => i.ingredient_id === 'chou-fleur-b');
+    expect(chou?.quantite_totale).toBe(1);
+    expect(chou?.unite_affichee).toBe('piece');
+  });
+
   // === Cas d'erreur ===
 
   it('should return error invalid_participants when nbParticipants is zero or negative', () => {
