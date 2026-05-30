@@ -4,7 +4,13 @@ import type { LLMClient } from './client';
 import { generatePlanning } from './generate-planning';
 import type { GeneratePlanningInput, GeneratePlanningOutput } from './types';
 import { allRecettes, recettesMap } from '../../../tests/fixtures/recettes';
-import { participantSansContrainte } from '../../../tests/fixtures/participants';
+import {
+  participantSansContrainte,
+  participantCoeliaque,
+  participantVegan,
+  participantAllergiesMultiples,
+} from '../../../tests/fixtures/participants';
+import { EU14_ALLERGENS } from '../../../data/seed-allergenes';
 
 // ─── Constantes de test ───────────────────────────────────────────────────────
 
@@ -350,6 +356,240 @@ describe('generatePlanning', () => {
         expect(unknownViolations.length).toBeGreaterThan(0);
       }
     }
+  });
+
+  // Profils contraints de bout en bout (sécurité) ────────────────────────────────
+
+  describe('profils contraints', () => {
+
+    // Contraintes dérivées directement depuis le profil participant (même logique que la route)
+    const COELIAQUE_CONSTRAINTS: FilterConstraints = {
+      allergenes_groupe: participantCoeliaque.allergies,
+      regimes_groupe: participantCoeliaque.regimes,
+      equipement_disponible: ALL_EQUIPMENT,
+    };
+    const VEGAN_CONSTRAINTS: FilterConstraints = {
+      allergenes_groupe: participantVegan.allergies,
+      regimes_groupe: participantVegan.regimes,
+      equipement_disponible: ALL_EQUIPMENT,
+    };
+    const ALLERGIES_MULTIPLES_CONSTRAINTS: FilterConstraints = {
+      allergenes_groupe: participantAllergiesMultiples.allergies,
+      regimes_groupe: participantAllergiesMultiples.regimes,
+      equipement_disponible: ALL_EQUIPMENT,
+    };
+
+    // Sorties LLM valides pour chaque profil.
+    // Profil coeliaque : salade-tomate-basilic (pas de gluten) + tajine-agneau-soir (pas de gluten,
+    //   ingredient_principal 'boeuf' ≠ 'legumes' → pas de violation consecutif)
+    const VALID_COELIAQUE_OUTPUT: GeneratePlanningOutput = {
+      entries: [
+        { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
+        { jour: 1, repas: 'soir', recette_id: 'tajine-agneau-soir' },
+      ],
+    };
+    // Profil vegan : contexte 1 seul slot (midi) pour éviter ingredient_principal_consecutif
+    // car toutes les recettes vegan du catalogue de fixture ont ingredient_principal 'legumes'.
+    const SINGLE_MIDI_CONTEXTE: GeneratePlanningInput['contexte'] = {
+      nb_jours: 1,
+      repartition_repas: { premier_repas: 'midi', midis: 1, soirs: 0, brunchs: 0 },
+      niveau_cuisine: 'facile',
+      temps_disponible: 'standard',
+    };
+    const VALID_VEGAN_OUTPUT: GeneratePlanningOutput = {
+      entries: [
+        { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
+      ],
+    };
+    // Profil allergies multiples : mêmes recettes sans allergène que coeliaque (salade-tomate-basilic
+    // et tajine-agneau-soir n'ont ni gluten, ni lait, ni fruits-coque, ni arachides)
+    const VALID_ALLERGIES_MULTIPLES_OUTPUT: GeneratePlanningOutput = {
+      entries: [
+        { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
+        { jour: 1, repas: 'soir', recette_id: 'tajine-agneau-soir' },
+      ],
+    };
+
+    it('participantCoeliaque : ok:true avec planning sans gluten', async () => {
+      const mockClient = createMockClient({ kind: 'success', output: VALID_COELIAQUE_OUTPUT });
+
+      const result = await generatePlanning(
+        mockClient,
+        allRecettes(),
+        recettesMap,
+        COELIAQUE_CONSTRAINTS,
+        [participantCoeliaque],
+        BASE_CONTEXTE,
+      );
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        for (const entry of result.entries) {
+          const recette = recettesMap.get(entry.recette_id)!;
+          expect(recette.allergenes_calcules).not.toContain('gluten');
+        }
+      }
+    });
+
+    it('participantVegan : ok:true avec planning 100 % vegan', async () => {
+      const mockClient = createMockClient({ kind: 'success', output: VALID_VEGAN_OUTPUT });
+
+      const result = await generatePlanning(
+        mockClient,
+        allRecettes(),
+        recettesMap,
+        VEGAN_CONSTRAINTS,
+        [participantVegan],
+        SINGLE_MIDI_CONTEXTE,
+      );
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        for (const entry of result.entries) {
+          const recette = recettesMap.get(entry.recette_id)!;
+          expect(recette.est_vegan).toBe(true);
+        }
+      }
+    });
+
+    it('participantAllergiesMultiples : ok:true avec planning sans aucun de ses allergènes', async () => {
+      const mockClient = createMockClient({ kind: 'success', output: VALID_ALLERGIES_MULTIPLES_OUTPUT });
+
+      const result = await generatePlanning(
+        mockClient,
+        allRecettes(),
+        recettesMap,
+        ALLERGIES_MULTIPLES_CONSTRAINTS,
+        [participantAllergiesMultiples],
+        BASE_CONTEXTE,
+      );
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        for (const entry of result.entries) {
+          const recette = recettesMap.get(entry.recette_id)!;
+          for (const allergen of participantAllergiesMultiples.allergies) {
+            expect(recette.allergenes_calcules).not.toContain(allergen);
+          }
+        }
+      }
+    });
+
+    // Discriminant obligatoire : si validatePlanning() est retiré, ce test doit ÉCHOUER ───────────
+
+    it('discriminant : ok:false quand le mock LLM retourne une recette contenant un allergène interdit', async () => {
+      // pates-bolognaise contient 'gluten' dans allergenes_calcules et est dans recettesMap,
+      // mais il aurait dû être filtré du pool. Le validateur post-LLM est le backstop.
+      const violatingOutput: GeneratePlanningOutput = {
+        entries: [
+          { jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' },
+          { jour: 1, repas: 'soir', recette_id: 'tajine-agneau-soir' },
+        ],
+      };
+      const mockClient = createMockClient({
+        kind: 'success_after_failures',
+        failuresBefore: [violatingOutput, violatingOutput, violatingOutput],
+        finalSuccess: VALID_COELIAQUE_OUTPUT,
+      });
+
+      const result = await generatePlanning(
+        mockClient,
+        allRecettes(),
+        recettesMap,
+        COELIAQUE_CONSTRAINTS,
+        [participantCoeliaque],
+        BASE_CONTEXTE,
+      );
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('validation_failed_after_retries');
+        if (result.error.kind === 'validation_failed_after_retries') {
+          const allergenViolations = result.error.lastViolations.filter((v) => v.kind === 'allergen');
+          expect(allergenViolations.length).toBeGreaterThan(0);
+          // La violation porte bien sur 'gluten' pour participantCoeliaque
+          const glutenViolations = allergenViolations.filter(
+            (v) => v.kind === 'allergen' && v.allergene === 'gluten',
+          );
+          expect(glutenViolations.length).toBeGreaterThan(0);
+        }
+      }
+      // 3 tentatives toutes échouées, le LLM a bien été appelé (≠ pool_empty)
+      expect(mockClient.calls).toHaveLength(3);
+    });
+
+    // Le LLM ne reçoit ni allergènes ni participants pour les profils contraints ──────────────────
+
+    it('participantCoeliaque : le LLM ne reçoit jamais les allergènes ni les participants', async () => {
+      const mockClient = createMockClient({ kind: 'success', output: VALID_COELIAQUE_OUTPUT });
+
+      await generatePlanning(
+        mockClient,
+        allRecettes(),
+        recettesMap,
+        COELIAQUE_CONSTRAINTS,
+        [participantCoeliaque],
+        BASE_CONTEXTE,
+      );
+
+      expect(mockClient.calls).toHaveLength(1);
+      const callInput = mockClient.calls[0]!;
+      expect('allergenes' in callInput).toBe(false);
+      expect('allergies' in callInput).toBe(false);
+      expect('participants' in callInput).toBe(false);
+      expect(Object.keys(callInput).sort()).toEqual(['contexte', 'pool']);
+    });
+
+    it('participantAllergiesMultiples : le LLM ne reçoit jamais les allergènes ni les participants', async () => {
+      const mockClient = createMockClient({ kind: 'success', output: VALID_ALLERGIES_MULTIPLES_OUTPUT });
+
+      await generatePlanning(
+        mockClient,
+        allRecettes(),
+        recettesMap,
+        ALLERGIES_MULTIPLES_CONSTRAINTS,
+        [participantAllergiesMultiples],
+        BASE_CONTEXTE,
+      );
+
+      expect(mockClient.calls).toHaveLength(1);
+      const callInput = mockClient.calls[0]!;
+      expect('allergenes' in callInput).toBe(false);
+      expect('allergies' in callInput).toBe(false);
+      expect('participants' in callInput).toBe(false);
+      expect(Object.keys(callInput).sort()).toEqual(['contexte', 'pool']);
+    });
+
+  });
+
+  // Pool saturé → erreur explicite, jamais planning vide (ADR-001) ──────────────
+
+  it('should return pool_empty without calling LLM when constraints saturate the catalogue (ADR-001)', async () => {
+    // EU14 + pas d'équipement : tous les allergènes connus excluent ~13 recettes sur 19 ;
+    // les 6 recettes sans allergène restantes sont toutes exclues par equipement_disponible: []
+    // car toutes requièrent au moins 'plaque' ou 'four'.
+    const saturatingConstraints: FilterConstraints = {
+      allergenes_groupe: [...EU14_ALLERGENS],
+      regimes_groupe: [],
+      equipement_disponible: [],
+    };
+    const mockClient = createMockClient({ kind: 'success', output: VALID_OUTPUT });
+
+    const result = await generatePlanning(
+      mockClient,
+      allRecettes(),
+      recettesMap,
+      saturatingConstraints,
+      [participantSansContrainte],
+      BASE_CONTEXTE,
+    );
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.kind).toBe('pool_empty');
+    }
+    // Garantie ADR-001 : le LLM n'est JAMAIS appelé si le pool est vide
+    expect(mockClient.calls).toHaveLength(0);
   });
 
 });

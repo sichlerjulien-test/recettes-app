@@ -1,83 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { z } from "zod";
-import { PlanningSchema } from "@/lib/types/schemas";
 import type { Planning, Recette, MealType } from "@/lib/types/domain";
-import { ApiErrorSchema } from "@/lib/api/responses";
-
-const GeneratePlanningResponseSchema = z.object({
-  planning: PlanningSchema,
-});
 
 interface Props {
-  sejourId: string;
-  token: string;
   planning: Planning | null;
   recettes: Map<string, Recette>;
-  onPlanningGenerated: (planning: Planning) => void;
 }
 
-export function PlanningSection({
-  sejourId,
-  token,
-  planning,
-  recettes,
-  onPlanningGenerated,
-}: Props) {
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  async function handleGenerate() {
-    setIsGenerating(true);
-    try {
-      const response = await fetch(`/api/sejours/${sejourId}/planning`, {
-        method: "POST",
-        headers: { "X-Sejour-Token": token },
-      });
-      const json: unknown = await response.json();
-
-      if (!response.ok) {
-        const errorParsed = ApiErrorSchema.safeParse(json);
-        const message = errorParsed.success
-          ? errorParsed.data.error.message
-          : "Erreur lors de la génération";
-        toast.error(message);
-        return;
-      }
-
-      const parsed = GeneratePlanningResponseSchema.safeParse(json);
-      if (!parsed.success) {
-        toast.error("Réponse serveur inattendue");
-        return;
-      }
-
-      onPlanningGenerated(parsed.data.planning);
-      toast.success("Planning généré");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Erreur réseau";
-      toast.error(message);
-    } finally {
-      setIsGenerating(false);
-    }
-  }
-
+export function PlanningSection({ planning, recettes }: Props) {
   if (!planning) {
     return (
       <section className="space-y-4">
         <p className="text-muted-foreground">
-          Aucun planning généré pour ce séjour. La génération prend quelques
-          secondes (utilise un modèle IA pour composer un planning conforme
-          aux contraintes de chaque participant).
+          Aucun planning généré pour ce séjour. Utilisez le bouton{" "}
+          <strong>Modifier</strong> pour relancer la génération.
         </p>
-        <Button
-          onClick={handleGenerate}
-          disabled={isGenerating}
-          className="w-full"
-        >
-          {isGenerating ? "Génération en cours..." : "Générer le planning"}
-        </Button>
       </section>
     );
   }
@@ -86,16 +23,7 @@ export function PlanningSection({
 
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Planning</h2>
-        <Button
-          variant="outline"
-          onClick={handleGenerate}
-          disabled={isGenerating}
-        >
-          {isGenerating ? "..." : "Régénérer"}
-        </Button>
-      </div>
+      <h2 className="text-xl font-semibold">Planning</h2>
       <div className="space-y-4">
         {Object.entries(entriesByDay).map(([jour, entries]) => (
           <DayCard

@@ -108,6 +108,36 @@ export async function getSejourByToken(token: string): Promise<SejourResult> {
   return { ok: true, sejour: parsed.data };
 }
 
+export async function updateSejour(
+  id: string,
+  input: SejourDALInput,
+  participants: ParticipantDALInput[],
+): Promise<SejourResult> {
+  const supabase = getSupabaseClient();
+
+  const { error } = await supabase.rpc('update_sejour_with_participants', {
+    p_id: id,
+    p_nom: input.nom,
+    p_date_debut: input.date_debut ?? null,
+    p_nb_jours: input.nb_jours,
+    p_repartition_repas: input.repartition_repas,
+    p_parametres: input.parametres,
+    p_participants: participants.map((p) => ({
+      nom: p.nom,
+      allergies: p.allergies,
+      regimes: p.regimes,
+      aime: p.aime,
+      n_aime_pas: p.n_aime_pas,
+    })),
+  });
+
+  if (error) {
+    return { ok: false, error: { kind: 'query_failed', cause: error.message } };
+  }
+
+  return getSejourById(id);
+}
+
 /**
  * Crée un séjour avec ses participants en base et retourne l'entité complète.
  *

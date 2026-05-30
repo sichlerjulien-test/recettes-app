@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { PlanningSection } from "./PlanningSection";
 import { ShoppingListSection } from "./ShoppingListSection";
 import type { Planning, Recette } from "@/lib/types/domain";
@@ -18,21 +17,16 @@ export function SejourContent({
   initialPlanning,
   recettes,
 }: Props) {
-  const [planning, setPlanning] = useState<Planning | null>(initialPlanning);
-
   return (
     <>
       <PlanningSection
-        sejourId={sejourId}
-        token={token}
-        planning={planning}
+        planning={initialPlanning}
         recettes={recettes}
-        onPlanningGenerated={setPlanning}
       />
       <ShoppingListSection
         sejourId={sejourId}
         token={token}
-        hasPlanning={planning !== null}
+        hasPlanning={initialPlanning !== null}
       />
     </>
   );

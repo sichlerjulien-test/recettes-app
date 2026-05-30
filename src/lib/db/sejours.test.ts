@@ -7,7 +7,7 @@ vi.mock('./supabase', () => ({
 }));
 
 import { getSupabaseClient } from './supabase';
-import { createSejour, getSejourById, getSejourByToken } from './sejours';
+import { createSejour, getSejourById, getSejourByToken, updateSejour } from './sejours';
 import type { SejourDALInput, ParticipantDALInput } from './sejours';
 
 // ─── Mock Supabase chainable builder ─────────────────────────────────────────
@@ -27,13 +27,22 @@ function makeChain(result: Promise<MockResult>) {
   };
 }
 
-function createMockSupabase(tableQueues: Record<string, MockResult[]>) {
+function createMockSupabase(
+  tableQueues: Record<string, MockResult[]>,
+  rpcQueue: MockResult[] = [],
+) {
+  const rpcQueueCopy = [...rpcQueue];
+  const rpcSpy = vi.fn((_name: string, _args?: unknown) =>
+    Promise.resolve(rpcQueueCopy.shift() ?? { data: null, error: null }),
+  );
   return {
     from: (table: string) => {
       const queue = tableQueues[table] ?? [];
       const next = queue.shift() ?? { data: null, error: null };
       return makeChain(Promise.resolve(next));
     },
+    rpc: rpcSpy,
+    _rpcSpy: rpcSpy,
   };
 }
 
@@ -228,6 +237,57 @@ describe('sejours DAL', () => {
       if (result.ok) {
         expect(result.sejour.token).toBe('12345678-1234-4abc-8abc-123456789012');
         expect(result.sejour.nom).toBe('Séjour test');
+      }
+    });
+  });
+
+  describe('updateSejour', () => {
+    it('should call rpc with correct payload and return ok when rpc succeeds', async () => {
+      const mock = createMockSupabase(
+        { sejours: [{ data: SEJOUR_DB_ROW, error: null }] },
+        [{ data: null, error: null }],
+      );
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        mock as unknown as ReturnType<typeof getSupabaseClient>,
+      );
+
+      const result = await updateSejour('sejour-uuid-123', SEJOUR_INPUT, [PARTICIPANT_INPUT]);
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.sejour.nom).toBe('Séjour test');
+        expect(result.sejour.nb_jours).toBe(3);
+      }
+      expect(mock._rpcSpy).toHaveBeenCalledOnce();
+      expect(mock._rpcSpy).toHaveBeenCalledWith(
+        'update_sejour_with_participants',
+        expect.objectContaining({
+          p_id: 'sejour-uuid-123',
+          p_nom: SEJOUR_INPUT.nom,
+          p_nb_jours: SEJOUR_INPUT.nb_jours,
+          p_repartition_repas: SEJOUR_INPUT.repartition_repas,
+          p_parametres: SEJOUR_INPUT.parametres,
+        }),
+      );
+    });
+
+    it('should return query_failed when rpc returns an error — no partial success assumed', async () => {
+      const mock = createMockSupabase(
+        {},
+        [{ data: null, error: { message: 'RPC procedure failed' } }],
+      );
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        mock as unknown as ReturnType<typeof getSupabaseClient>,
+      );
+
+      const result = await updateSejour('sejour-uuid-123', SEJOUR_INPUT, [PARTICIPANT_INPUT]);
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('query_failed');
+        if (result.error.kind === 'query_failed') {
+          expect(result.error.cause).toBe('RPC procedure failed');
+        }
       }
     });
   });

@@ -2,6 +2,7 @@ import { getSejourById } from "@/lib/db/sejours";
 import { getPlanningBySejourId } from "@/lib/db/plannings";
 import { getAllRecettesAsMap } from "@/lib/db/recettes";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { SejourContent } from "./_components/SejourContent";
 import { ShareLink } from "./_components/ShareLink";
 
@@ -73,13 +74,23 @@ export default async function SejourPage({
   return (
     <main className="container max-w-2xl mx-auto p-6 space-y-8">
       <header className="space-y-2">
-        <h1 className="text-2xl font-bold">
-          {sejourResult.sejour.nom ?? "Séjour"}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {sejourResult.sejour.nb_jours} jours,{" "}
-          {sejourResult.sejour.participants.length} participant(s)
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">
+              {sejourResult.sejour.nom ?? "Séjour"}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {sejourResult.sejour.nb_jours} jours,{" "}
+              {sejourResult.sejour.participants.length} participant(s)
+            </p>
+          </div>
+          <Link
+            href={`/sejour/${id}/edit?t=${token}`}
+            className="shrink-0 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:border-gray-300 hover:bg-gray-50"
+          >
+            Modifier
+          </Link>
+        </div>
       </header>
 
       <SejourContent
