@@ -312,7 +312,7 @@ export function SejourForm({
                         <RadioGroup
                           value={field.value}
                           onValueChange={field.onChange}
-                          className="grid grid-cols-3 gap-2"
+                          className="grid grid-cols-1 gap-2 sm:grid-cols-3"
                         >
                           {PREMIER_REPAS_OPTIONS.map(({ value, label }) => (
                             <Label
@@ -325,11 +325,12 @@ export function SejourForm({
                                   : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50",
                               ].join(" ")}
                             >
-                              <RadioGroupItem
-                                id={`premier-repas-${value}`}
-                                value={value}
-                                className="sr-only"
-                              />
+                              <span className="sr-only">
+                                <RadioGroupItem
+                                  id={`premier-repas-${value}`}
+                                  value={value}
+                                />
+                              </span>
                               {label}
                             </Label>
                           ))}
@@ -452,11 +453,12 @@ export function SejourForm({
                                   : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50",
                               ].join(" ")}
                             >
-                              <RadioGroupItem
-                                id={`niveau-${niveau}`}
-                                value={niveau}
-                                className="sr-only"
-                              />
+                              <span className="sr-only">
+                                <RadioGroupItem
+                                  id={`niveau-${niveau}`}
+                                  value={niveau}
+                                />
+                              </span>
                               {niveau === "facile" ? "Facile" : "Normal"}
                             </Label>
                           ))}
@@ -490,11 +492,12 @@ export function SejourForm({
                                   : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50",
                               ].join(" ")}
                             >
-                              <RadioGroupItem
-                                id={`temps-${temps}`}
-                                value={temps}
-                                className="sr-only"
-                              />
+                              <span className="sr-only">
+                                <RadioGroupItem
+                                  id={`temps-${temps}`}
+                                  value={temps}
+                                />
+                              </span>
                               {temps === "rapide" ? "Rapide" : "Standard"}
                             </Label>
                           ))}
