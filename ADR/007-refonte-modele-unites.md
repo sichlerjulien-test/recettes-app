@@ -49,11 +49,50 @@ couches sont mises à jour atomiquement dans le même commit :
 
 ### 3. Pluralisation dans buildShoppingList
 
-`nom_affiche` est maintenant dérivé de `quantite_totale` :
+`nom_affiche` est dérivé de `unite_affichee` (l'unité **après** conversion vers
+`unite_achat`) et de `quantite_totale`. La pluralisation s'applique **uniquement**
+aux unités discrètes :
 
 ```typescript
-nom_affiche: quantite_totale > 1 ? ingredient.nom_pluriel : ingredient.nom_singulier,
+nom_affiche: DISCRETE_UNIT_SET.has(unite_affichee) && quantite_totale > 1
+  ? ingredient.nom_pluriel
+  : ingredient.nom_singulier,
 ```
+
+Pour les unités continues (g, kg, ml, l, cuillere-soupe, cuillere-cafe), le format
+d'affichage est `{quantite}{unite} de {nom_singulier}` — le nom n'est jamais
+pluralisé, quelle que soit la quantité. `nom_pluriel` reste un champ requis dans
+`IngredientSchema` pour tous les ingrédients (y compris continus) car la contrainte
+est une règle d'usage applicatif, pas une contrainte d'intégrité de donnée.
+
+### 5. Arrondi par palier pour g et ml
+
+Les quantités affichées en grammes (`g`) ou millilitres (`ml`) suivent un arrondi
+commercial par palier, vers le haut :
+
+| Plage           | Arrondi au multiple de |
+|-----------------|------------------------|
+| < 50            | 10                      |
+| 50 – 500        | 50                      |
+| > 500           | 100                     |
+
+Exemple : 187,5 g → 200 g (palier 50, `ceil(187,5 / 50) × 50`).
+
+La fonction `roundByScale` vit dans `build-list.ts` et n'est pas exportée.
+Alternative écartée : `round2` uniforme — produit des valeurs non achetables
+("47 g de beurre").
+
+### 6. Arrondi des cuillères
+
+`cuillere-soupe` et `cuillere-cafe` restent dans `CONTINUOUS_UNITS`
+(classification physique inchangée). Dans `build-list.ts`, un `CEIL_UNIT_SET`
+local regroupe `DISCRETE_UNITS ∪ {cuillere-soupe, cuillere-cafe}` et applique
+`Math.ceil` : on ne peut pas mesurer 2,33 cuillères à soupe en courses.
+
+`CEIL_UNIT_SET` porte la règle de présentation ; `DISCRETE_UNITS` dans `schemas.ts`
+continue de porter la sémantique physique. Alternative écartée : reclasser les
+cuillères dans `DISCRETE_UNITS` — changerait leur sémantique dans tous les autres
+contextes du modèle.
 
 ### 4. Suppression de "pièce" dans l'UI
 
@@ -61,7 +100,15 @@ Le composant `ShoppingListSection.tsx` n'affiche plus `unite_affichee`
 quand celle-ci vaut `'piece'`. Le `ShoppingItemSchema` ne change pas :
 `unite_affichee: UnitSchema` reste intact.
 
-## Alternatives écartées
+## Alternatives écartées supplémentaires (complément TK-02)
+
+| Alternative | Motif de rejet |
+|---|---|
+| `nom_pluriel` optionnel pour le continu | Sur-ingénierie — 166 YAML ont le champ, la contrainte vit correctement dans le code |
+| `round2` pour g/ml | Produit des valeurs non achetables en courses |
+| Reclasser cuillères dans `DISCRETE_UNITS` | Change la sémantique physique de l'unité dans tout le modèle |
+
+## Alternatives écartées (initiales)
 
 | Alternative | Motif de rejet |
 |---|---|
@@ -73,8 +120,11 @@ quand celle-ci vaut `'piece'`. Le `ShoppingItemSchema` ne change pas :
 ## Conséquences
 
 - `ContinuousUnit` et `DiscreteUnit` sont exportés depuis `schemas.ts`
-- `build-list.ts` n'a plus de Set hardcodé : importe `DISCRETE_UNITS`
-- La colonne `ingredients.nom` Supabase est renommée en `nom_singulier`
-  via `scripts/migrations/004-rename-ingredient-nom.sql`
+- `build-list.ts` importe `DISCRETE_UNITS` depuis `schemas.ts` et définit
+  localement `CEIL_UNIT_SET` (= `DISCRETE_UNITS` ∪ cuillères) pour `finalize()`
+- `nom_pluriel` est consommé uniquement quand `unite_affichee ∈ DISCRETE_UNITS`
+- La colonne `ingredients.nom` Supabase est renommée en `nom_singulier` **et**
+  la colonne `nom_pluriel` est ajoutée, via la migration consolidée
+  `scripts/migrations/004-rename-ingredient-nom.sql` (idempotente)
 - allergen-guard vérifie le diff des 4 fichiers sensibles avant merge
   (oeuf.yaml, lait-entier.yaml, farine-blanche.yaml, farine-ble-t55.yaml)

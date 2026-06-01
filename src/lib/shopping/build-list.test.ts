@@ -459,10 +459,11 @@ describe('buildShoppingList', () => {
     expect(oeuf?.nom_affiche).toBe('Œuf test');
   });
 
-  it('should use nom_pluriel for nom_affiche when quantite_totale > 1 (continuous kg)', () => {
-    // pates-bolognaise + salade-tomate-basilic : tomate 400g + 600g = 1000g → 1 kg
-    // 1 kg NOT > 1 → nom_singulier ; mais avec 2 recettes on obtient exactement 1 kg
-    // Utilisation de nbParticipants=8 pour doubler : 1000g * 2 / 1000 = 2 kg > 1 → nom_pluriel
+  it('should use nom_singulier for continuous kg regardless of qty (tomate, qty = 2 kg > 1)', () => {
+    // pates-bolognaise: tomate 400g + salade-tomate-basilic: tomate 600g
+    // portions_base=4, nbParticipants=8 → facteur=2
+    // total brut = (400+600)*2 = 2000g → round2(2000/1000) = 2 kg
+    // 2 kg > 1 MAIS unite_affichee='kg' ∉ DISCRETE_UNITS → toujours nom_singulier
     const planning = makePlanning([
       { jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' },
       { jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic' },
@@ -473,7 +474,214 @@ describe('buildShoppingList', () => {
     const tomate = result.items_par_categorie['fruits-legumes']
       .find((i) => i.ingredient_id === 'tomate');
     expect(tomate?.quantite_totale).toBe(2);
-    expect(tomate?.nom_affiche).toBe('Tomates');
+    expect(tomate?.nom_affiche).toBe('Tomate');
+  });
+
+  // === Discriminants pluralisation (échouent si +s naïf) ===
+
+  it('should use nom_pluriel for discrete piece ingredient — composé (chou-fleur → choux-fleurs)', () => {
+    // Discriminant : +s naïf donnerait 'Chou-fleurs' ≠ 'Choux-fleurs' → le test échouerait
+    const ingredient: Ingredient = {
+      id: 'chou-fleur-d',
+      nom_singulier: 'Chou-fleur',
+      nom_pluriel: 'Choux-fleurs',
+      categorie: 'fruits-legumes',
+      unite_base: 'piece',
+      unite_achat: 'piece',
+      conversion: 1,
+      allergenes: [], contient_trace: [], substituts: [],
+    };
+    const recette: Recette = {
+      ...BASE_RECETTE,
+      id: 'recette-chou-d',
+      portions_base: 4,
+      ingredients: [
+        { ingredient_id: 'chou-fleur-d', quantite_base: 2, unite: 'piece', optionnel: false, groupe: undefined },
+      ],
+    };
+    // facteur=1, ceil(2)=2 > 1 → nom_pluriel attendu
+    const result = buildShoppingList(
+      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-chou-d' }]),
+      new Map([['recette-chou-d', recette]]),
+      new Map([['chou-fleur-d', ingredient]]),
+      4,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const chou = result.items_par_categorie['fruits-legumes']
+      .find((i) => i.ingredient_id === 'chou-fleur-d');
+    expect(chou?.quantite_totale).toBe(2);
+    expect(chou?.unite_affichee).toBe('piece');
+    expect(chou?.nom_affiche).toBe('Choux-fleurs');
+  });
+
+  it('should use nom_singulier for continuous ingredient regardless of qty — invariable (riz, qty = 1,2 kg > 1)', () => {
+    // Discriminant #1 : +s naïf donnerait 'Riz basmatis' ≠ 'Riz basmati' → échouerait
+    // Discriminant #2 : utiliser nom_pluriel pour les continus donnerait
+    //   'Riz basmati (pluriel-test)' ≠ 'Riz basmati' → échouerait
+    // unite_affichee='kg' ∉ DISCRETE_UNITS → toujours nom_singulier
+    const ingredient: Ingredient = {
+      id: 'riz-inv',
+      nom_singulier: 'Riz basmati',
+      nom_pluriel: 'Riz basmati (pluriel-test)', // délibérément distinct pour rendre le test discriminant
+      categorie: 'feculents-pates-riz',
+      unite_base: 'g',
+      unite_achat: 'kg',
+      conversion: 1000,
+      allergenes: [], contient_trace: [], substituts: [],
+    };
+    const recette: Recette = {
+      ...BASE_RECETTE,
+      id: 'recette-riz-inv',
+      portions_base: 4,
+      ingredients: [
+        { ingredient_id: 'riz-inv', quantite_base: 600, unite: 'g', optionnel: false, groupe: undefined },
+      ],
+    };
+    // nbParticipants=8 → facteur=2 → 600*2=1200g → round2(1200/1000)=1.2 kg > 1 → nom_singulier
+    const result = buildShoppingList(
+      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-riz-inv' }]),
+      new Map([['recette-riz-inv', recette]]),
+      new Map([['riz-inv', ingredient]]),
+      8,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const riz = result.items_par_categorie['feculents-pates-riz']
+      .find((i) => i.ingredient_id === 'riz-inv');
+    expect(riz?.quantite_totale).toBe(1.2);
+    expect(riz?.nom_affiche).toBe('Riz basmati');
+  });
+
+  // === Arrondi commercial poids (g) — échelle par palier vers le haut ===
+
+  it('should apply scale-based rounding for g display: 187.5g → 200g (palier 50)', () => {
+    // portions_base=4, quantite_base=150g, nbParticipants=5 → facteur=1.25
+    // brut=150*1.25=187.5g → roundByScale: 50≤187.5≤500 → ceil(187.5/50)*50=4*50=200
+    const ingredient: Ingredient = {
+      id: 'epice-g',
+      nom_singulier: 'Épice test', nom_pluriel: 'Épices test',
+      categorie: 'condiments-epices', unite_base: 'g', unite_achat: 'g', conversion: 1,
+      allergenes: [], contient_trace: [], substituts: [],
+    };
+    const recette: Recette = {
+      ...BASE_RECETTE, id: 'recette-epice-g', portions_base: 4,
+      ingredients: [{ ingredient_id: 'epice-g', quantite_base: 150, unite: 'g', optionnel: false, groupe: undefined }],
+    };
+    const result = buildShoppingList(
+      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-epice-g' }]),
+      new Map([['recette-epice-g', recette]]),
+      new Map([['epice-g', ingredient]]),
+      5,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const item = result.items_par_categorie['condiments-epices']
+      .find((i) => i.ingredient_id === 'epice-g');
+    expect(item?.quantite_totale).toBe(200);
+    expect(item?.unite_affichee).toBe('g');
+  });
+
+  it('should apply scale-based rounding for g display: <50g → palier 10 (25g → 30g)', () => {
+    // 25g < 50 → ceil(25/10)*10=3*10=30
+    const ingredient: Ingredient = {
+      id: 'epice-g-s', nom_singulier: 'Épice small', nom_pluriel: 'Épices small',
+      categorie: 'condiments-epices', unite_base: 'g', unite_achat: 'g', conversion: 1,
+      allergenes: [], contient_trace: [], substituts: [],
+    };
+    const recette: Recette = {
+      ...BASE_RECETTE, id: 'recette-epice-g-s', portions_base: 4,
+      ingredients: [{ ingredient_id: 'epice-g-s', quantite_base: 25, unite: 'g', optionnel: false, groupe: undefined }],
+    };
+    const result = buildShoppingList(
+      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-epice-g-s' }]),
+      new Map([['recette-epice-g-s', recette]]),
+      new Map([['epice-g-s', ingredient]]),
+      4,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const item = result.items_par_categorie['condiments-epices']
+      .find((i) => i.ingredient_id === 'epice-g-s');
+    expect(item?.quantite_totale).toBe(30);
+  });
+
+  it('should apply scale-based rounding for g display: >500g → palier 100 (620g → 700g)', () => {
+    // 620g > 500 → ceil(620/100)*100=7*100=700
+    const ingredient: Ingredient = {
+      id: 'epice-g-l', nom_singulier: 'Épice large', nom_pluriel: 'Épices large',
+      categorie: 'condiments-epices', unite_base: 'g', unite_achat: 'g', conversion: 1,
+      allergenes: [], contient_trace: [], substituts: [],
+    };
+    const recette: Recette = {
+      ...BASE_RECETTE, id: 'recette-epice-g-l', portions_base: 4,
+      ingredients: [{ ingredient_id: 'epice-g-l', quantite_base: 620, unite: 'g', optionnel: false, groupe: undefined }],
+    };
+    const result = buildShoppingList(
+      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-epice-g-l' }]),
+      new Map([['recette-epice-g-l', recette]]),
+      new Map([['epice-g-l', ingredient]]),
+      4,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const item = result.items_par_categorie['condiments-epices']
+      .find((i) => i.ingredient_id === 'epice-g-l');
+    expect(item?.quantite_totale).toBe(700);
+  });
+
+  // === Arrondi volume (ml) et cuillères ===
+
+  it('should apply scale-based rounding for ml display: 187.5ml → 200ml (palier 50)', () => {
+    // unite_base='ml', unite_achat='ml', conversion=1
+    // 150ml * facteur=1.25 → 187.5ml → roundByScale → 200ml
+    const ingredient: Ingredient = {
+      id: 'sauce-ml', nom_singulier: 'Sauce test', nom_pluriel: 'Sauces test',
+      categorie: 'condiments-epices', unite_base: 'ml', unite_achat: 'ml', conversion: 1,
+      allergenes: [], contient_trace: [], substituts: [],
+    };
+    const recette: Recette = {
+      ...BASE_RECETTE, id: 'recette-sauce-ml-r', portions_base: 4,
+      ingredients: [{ ingredient_id: 'sauce-ml', quantite_base: 150, unite: 'ml', optionnel: false, groupe: undefined }],
+    };
+    const result = buildShoppingList(
+      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-sauce-ml-r' }]),
+      new Map([['recette-sauce-ml-r', recette]]),
+      new Map([['sauce-ml', ingredient]]),
+      5,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const item = result.items_par_categorie['condiments-epices']
+      .find((i) => i.ingredient_id === 'sauce-ml');
+    expect(item?.quantite_totale).toBe(200);
+    expect(item?.unite_affichee).toBe('ml');
+  });
+
+  it('should ceil cuillere-soupe to avoid fractional spoons (2.67 cuilleres → 3)', () => {
+    // Recette: 4 cuillere-soupe pour 6 portions, nbParticipants=4 → facteur=4/6
+    // brut=4*4/6=2.666... → ceil=3 (pas round2=2.67)
+    const ingredient: Ingredient = {
+      id: 'huile-cuil', nom_singulier: "Huile d'olive", nom_pluriel: "Huiles d'olive",
+      categorie: 'condiments-epices', unite_base: 'ml', unite_achat: 'l', conversion: 1000,
+      allergenes: [], contient_trace: [], substituts: [],
+    };
+    const recette: Recette = {
+      ...BASE_RECETTE, id: 'recette-cuil', portions_base: 6,
+      ingredients: [{ ingredient_id: 'huile-cuil', quantite_base: 4, unite: 'cuillere-soupe', optionnel: false, groupe: undefined }],
+    };
+    const result = buildShoppingList(
+      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-cuil' }]),
+      new Map([['recette-cuil', recette]]),
+      new Map([['huile-cuil', ingredient]]),
+      4,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const item = result.items_par_categorie['condiments-epices']
+      .find((i) => i.ingredient_id === 'huile-cuil');
+    expect(item?.quantite_totale).toBe(3);
+    expect(item?.unite_affichee).toBe('cuillere-soupe');
   });
 
   // === Cas d'erreur ===

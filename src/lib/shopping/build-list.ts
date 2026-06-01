@@ -26,8 +26,21 @@ type AggregItem = {
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 
 const DISCRETE_UNIT_SET = new Set<string>(DISCRETE_UNITS);
-const finalize = (q: number, u: Unit): number =>
-  DISCRETE_UNIT_SET.has(u) ? Math.ceil(q) : round2(q);
+// Unités dont la quantité d'achat est nécessairement entière (cf. ADR-007 §5-6)
+const CEIL_UNIT_SET = new Set<string>([...DISCRETE_UNITS, 'cuillere-soupe', 'cuillere-cafe']);
+
+// Arrondi commercial par palier vers le haut pour g et ml (cf. ADR-007 §5)
+const roundByScale = (q: number): number => {
+  if (q < 50) return Math.ceil(q / 10) * 10;
+  if (q <= 500) return Math.ceil(q / 50) * 50;
+  return Math.ceil(q / 100) * 100;
+};
+
+const finalize = (q: number, u: Unit): number => {
+  if (CEIL_UNIT_SET.has(u)) return Math.ceil(q);
+  if (u === 'g' || u === 'ml') return roundByScale(q);
+  return round2(q);
+};
 
 /**
  * Construit le contenu de la liste de courses à partir d'un planning.
@@ -135,7 +148,9 @@ export function buildShoppingList(
 
     items_par_categorie[ingredient.categorie].push({
       ingredient_id: aggItem.ingredient_id,
-      nom_affiche: quantite_totale > 1 ? ingredient.nom_pluriel : ingredient.nom_singulier,
+      nom_affiche: DISCRETE_UNIT_SET.has(unite_affichee) && quantite_totale > 1
+        ? ingredient.nom_pluriel
+        : ingredient.nom_singulier,
       quantite_totale,
       unite_affichee,
       categorie: ingredient.categorie,
