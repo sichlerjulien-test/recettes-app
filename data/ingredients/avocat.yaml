@@ -1,5 +1,5 @@
 id: avocat
-nom: Avocat
+nom_singulier: Avocat
 nom_pluriel: Avocats
 categorie: fruits-legumes
 unite_base: piece

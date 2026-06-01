@@ -1,5 +1,5 @@
 id: coulis-tomate
-nom: Coulis de tomate
+nom_singulier: Coulis de tomate
 nom_pluriel: Coulis de tomate
 categorie: epicerie-salee
 unite_base: ml

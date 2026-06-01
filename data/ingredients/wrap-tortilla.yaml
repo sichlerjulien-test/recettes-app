@@ -1,5 +1,5 @@
 id: wrap-tortilla
-nom: Tortilla de blé
+nom_singulier: Tortilla de blé
 nom_pluriel: Tortillas de blé
 categorie: boulangerie
 unite_base: piece

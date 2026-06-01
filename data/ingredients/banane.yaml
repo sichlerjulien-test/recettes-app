@@ -1,5 +1,5 @@
 id: banane
-nom: Banane
+nom_singulier: Banane
 nom_pluriel: Bananes
 categorie: fruits-legumes
 unite_base: piece

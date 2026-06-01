@@ -1,5 +1,5 @@
 id: ail
-nom: Gousse d'ail
+nom_singulier: Gousse d'ail
 nom_pluriel: Gousses d'ail
 categorie: fruits-legumes
 unite_base: piece

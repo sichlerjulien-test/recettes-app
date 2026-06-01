@@ -1,5 +1,5 @@
 id: mayonnaise
-nom: Mayonnaise
+nom_singulier: Mayonnaise
 nom_pluriel: Mayonnaises
 categorie: condiments-epices
 unite_base: g

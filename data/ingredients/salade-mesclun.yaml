@@ -1,5 +1,5 @@
 id: salade-mesclun
-nom: Mesclun
+nom_singulier: Mesclun
 nom_pluriel: Mesclun
 categorie: fruits-legumes
 unite_base: g

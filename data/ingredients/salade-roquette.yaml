@@ -1,5 +1,5 @@
 id: salade-roquette
-nom: Roquette
+nom_singulier: Roquette
 nom_pluriel: Roquettes
 categorie: fruits-legumes
 unite_base: g

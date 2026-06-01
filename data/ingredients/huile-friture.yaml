@@ -1,5 +1,5 @@
 id: huile-friture
-nom: Huile de friture
+nom_singulier: Huile de friture
 nom_pluriel: Huile de friture
 categorie: epicerie-salee
 unite_base: ml

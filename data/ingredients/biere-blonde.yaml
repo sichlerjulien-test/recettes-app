@@ -1,5 +1,5 @@
 id: biere-blonde
-nom: Bière blonde
+nom_singulier: Bière blonde
 nom_pluriel: Bière blonde
 categorie: epicerie-salee
 unite_base: ml

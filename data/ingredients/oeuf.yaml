@@ -1,5 +1,5 @@
 id: oeuf
-nom: Œuf
+nom_singulier: Œuf
 nom_pluriel: Œufs
 categorie: cremerie-oeufs
 unite_base: piece

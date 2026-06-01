@@ -150,7 +150,7 @@ export function ShoppingListSection({ sejourId, token, hasPlanning }: Props) {
                     />
                     <div className="flex-1">
                       <span className="font-medium">
-                        {formatQty(item.quantite_totale)} {item.unite_affichee}
+                        {formatQty(item.quantite_totale)}{item.unite_affichee !== 'piece' ? ` ${item.unite_affichee}` : ''}
                       </span>{" "}
                       <span
                         className={

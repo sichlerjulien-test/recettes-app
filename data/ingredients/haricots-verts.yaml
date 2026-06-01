@@ -1,5 +1,5 @@
 id: haricots-verts
-nom: Haricot vert
+nom_singulier: Haricot vert
 nom_pluriel: Haricots verts
 categorie: fruits-legumes
 unite_base: g

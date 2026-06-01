@@ -1,5 +1,5 @@
 id: ketchup
-nom: Ketchup
+nom_singulier: Ketchup
 nom_pluriel: Ketchup
 categorie: epicerie-salee
 unite_base: ml

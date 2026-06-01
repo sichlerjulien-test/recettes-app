@@ -1,5 +1,5 @@
 id: poulet-blanc
-nom: Blanc de poulet
+nom_singulier: Blanc de poulet
 nom_pluriel: Blancs de poulet
 categorie: viandes-poissons
 unite_base: g

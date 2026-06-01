@@ -1,5 +1,5 @@
 id: beurre
-nom: Beurre doux
+nom_singulier: Beurre doux
 nom_pluriel: Beurre doux
 categorie: cremerie-oeufs
 unite_base: g

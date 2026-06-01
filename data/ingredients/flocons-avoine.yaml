@@ -1,5 +1,5 @@
 id: flocons-avoine
-nom: Flocon d'avoine
+nom_singulier: Flocon d'avoine
 nom_pluriel: Flocons d'avoine
 categorie: feculents-pates-riz
 unite_base: g

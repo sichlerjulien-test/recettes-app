@@ -1,5 +1,5 @@
 id: miel
-nom: Miel
+nom_singulier: Miel
 nom_pluriel: Miels
 categorie: epicerie-sucree
 unite_base: g

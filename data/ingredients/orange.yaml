@@ -1,5 +1,5 @@
 id: orange
-nom: Orange
+nom_singulier: Orange
 nom_pluriel: Oranges
 categorie: fruits-legumes
 unite_base: piece

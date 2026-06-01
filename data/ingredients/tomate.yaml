@@ -1,5 +1,5 @@
 id: tomate
-nom: Tomate
+nom_singulier: Tomate
 nom_pluriel: Tomates
 categorie: fruits-legumes
 unite_base: g

@@ -1,5 +1,5 @@
 id: sesame-graines
-nom: Graine de sésame
+nom_singulier: Graine de sésame
 nom_pluriel: Graines de sésame
 categorie: condiments-epices
 unite_base: g

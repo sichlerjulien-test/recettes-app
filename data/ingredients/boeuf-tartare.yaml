@@ -1,5 +1,5 @@
 id: boeuf-tartare
-nom: Bœuf à tartare (rumsteck ou filet)
+nom_singulier: Bœuf à tartare (rumsteck ou filet)
 nom_pluriel: Bœuf à tartare
 categorie: viandes-poissons
 unite_base: g

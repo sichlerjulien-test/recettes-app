@@ -1,5 +1,5 @@
 id: bouillon-boeuf
-nom: Bouillon de bœuf
+nom_singulier: Bouillon de bœuf
 nom_pluriel: Bouillon de bœuf
 categorie: epicerie-salee
 unite_base: ml

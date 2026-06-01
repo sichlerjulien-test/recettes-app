@@ -1,5 +1,5 @@
 id: bouillon-legumes
-nom: Bouillon de légumes
+nom_singulier: Bouillon de légumes
 nom_pluriel: Bouillon de légumes
 categorie: epicerie-salee
 unite_base: ml

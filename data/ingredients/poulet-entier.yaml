@@ -1,5 +1,5 @@
 id: poulet-entier
-nom: Poulet entier
+nom_singulier: Poulet entier
 nom_pluriel: Poulets entiers
 categorie: viandes-poissons
 unite_base: piece

@@ -1,5 +1,5 @@
 id: muesli
-nom: Muesli
+nom_singulier: Muesli
 nom_pluriel: Muesli
 categorie: epicerie-sucree
 unite_base: g

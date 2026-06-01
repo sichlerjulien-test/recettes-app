@@ -1,5 +1,5 @@
 id: pain-chocolat
-nom: Pain au chocolat
+nom_singulier: Pain au chocolat
 nom_pluriel: Pains au chocolat
 categorie: boulangerie
 unite_base: piece

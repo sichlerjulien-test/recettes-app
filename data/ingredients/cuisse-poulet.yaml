@@ -1,5 +1,5 @@
 id: cuisse-poulet
-nom: Cuisse de poulet
+nom_singulier: Cuisse de poulet
 nom_pluriel: Cuisses de poulet
 categorie: viandes-poissons
 unite_base: piece

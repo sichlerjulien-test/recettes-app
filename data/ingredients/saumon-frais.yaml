@@ -1,5 +1,5 @@
 id: saumon-frais
-nom: Filet de saumon frais
+nom_singulier: Filet de saumon frais
 nom_pluriel: Filets de saumon frais
 categorie: viandes-poissons
 unite_base: g

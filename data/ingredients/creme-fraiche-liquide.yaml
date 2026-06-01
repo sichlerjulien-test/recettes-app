@@ -1,5 +1,5 @@
 id: creme-fraiche-liquide
-nom: Crème fraîche liquide
+nom_singulier: Crème fraîche liquide
 nom_pluriel: Crème fraîche liquide
 categorie: cremerie-oeufs
 unite_base: ml

@@ -44,7 +44,7 @@ const SUPABASE_SERVICE_ROLE_KEY = requireEnv('SUPABASE_SERVICE_ROLE_KEY');
 
 type IngredientRow = {
   id: string;
-  nom: string;
+  nom_singulier: string;
   nom_pluriel: string;
   categorie: string;
   unite_base: string;
@@ -255,7 +255,7 @@ async function main(): Promise<void> {
   for (const ingredient of ingredients.values()) {
     ingredientRows.push({
       id: ingredient.id,
-      nom: ingredient.nom,
+      nom_singulier: ingredient.nom_singulier,
       nom_pluriel: ingredient.nom_pluriel,
       categorie: ingredient.categorie,
       unite_base: ingredient.unite_base,

@@ -33,10 +33,12 @@ export const IngredientCategorySchema = z.enum([
   'frais-traiteur',
 ]);
 
-export const UnitSchema = z.enum([
-  'g', 'kg', 'ml', 'l', 'piece',
-  'botte', 'sachet', 'cuillere-soupe', 'cuillere-cafe',
-]);
+// Registre des unités — source de vérité pour la classification continue/discrète (ADR-007)
+export const CONTINUOUS_UNITS = ['g', 'kg', 'ml', 'l', 'cuillere-soupe', 'cuillere-cafe'] as const;
+export const DISCRETE_UNITS   = ['piece', 'botte', 'sachet'] as const;
+export const UnitSchema = z.enum([...CONTINUOUS_UNITS, ...DISCRETE_UNITS]);
+export type ContinuousUnit = typeof CONTINUOUS_UNITS[number];
+export type DiscreteUnit   = typeof DISCRETE_UNITS[number];
 
 export const EquipmentSchema = z.enum([
   'four', 'plaque', 'micro-ondes', 'barbecue', 'blender', 'robot',
@@ -78,7 +80,7 @@ const SlugSchema = z.string().regex(
 
 export const IngredientSchema = z.object({
   id: SlugSchema,
-  nom: z.string().min(1).max(100),
+  nom_singulier: z.string().min(1).max(100),
   nom_pluriel: z.string().min(1).max(100),
   categorie: IngredientCategorySchema,
   unite_base: z.enum(['g', 'ml', 'piece']),

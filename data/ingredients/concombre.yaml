@@ -1,5 +1,5 @@
 id: concombre
-nom: Concombre
+nom_singulier: Concombre
 nom_pluriel: Concombres
 categorie: fruits-legumes
 unite_base: g

@@ -1,5 +1,5 @@
 id: steak-hache-boeuf
-nom: Steak haché de bœuf
+nom_singulier: Steak haché de bœuf
 nom_pluriel: Steaks hachés de bœuf
 categorie: viandes-poissons
 unite_base: g

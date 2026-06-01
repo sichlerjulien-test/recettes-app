@@ -1,5 +1,5 @@
 id: farine-riz
-nom: Farine de riz
+nom_singulier: Farine de riz
 nom_pluriel: Farines de riz
 categorie: epicerie-salee
 unite_base: g

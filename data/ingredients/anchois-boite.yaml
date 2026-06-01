@@ -1,5 +1,5 @@
 id: anchois-boite
-nom: Anchois en boîte (à l'huile)
+nom_singulier: Anchois en boîte (à l'huile)
 nom_pluriel: Anchois en boîte
 categorie: viandes-poissons
 unite_base: g

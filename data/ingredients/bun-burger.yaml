@@ -1,5 +1,5 @@
 id: bun-burger
-nom: Bun burger
+nom_singulier: Bun burger
 nom_pluriel: Buns burger
 categorie: boulangerie
 unite_base: piece

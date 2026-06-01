@@ -1,5 +1,5 @@
 id: pain-sans-gluten
-nom: Pain sans gluten
+nom_singulier: Pain sans gluten
 nom_pluriel: Pains sans gluten
 categorie: boulangerie
 unite_base: g

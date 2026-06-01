@@ -1,5 +1,5 @@
 id: aubergine
-nom: Aubergine
+nom_singulier: Aubergine
 nom_pluriel: Aubergines
 categorie: fruits-legumes
 unite_base: piece

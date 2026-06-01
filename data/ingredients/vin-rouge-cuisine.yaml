@@ -1,5 +1,5 @@
 id: vin-rouge-cuisine
-nom: Vin rouge (cuisine)
+nom_singulier: Vin rouge (cuisine)
 nom_pluriel: Vin rouge
 categorie: epicerie-salee
 unite_base: ml

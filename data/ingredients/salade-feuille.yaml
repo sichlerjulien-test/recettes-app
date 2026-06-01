@@ -1,5 +1,5 @@
 id: salade-feuille
-nom: Feuille de salade
+nom_singulier: Feuille de salade
 nom_pluriel: Feuilles de salade
 categorie: fruits-legumes
 unite_base: piece

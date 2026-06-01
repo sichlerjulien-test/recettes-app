@@ -1,5 +1,5 @@
 id: bouillon-poulet
-nom: Bouillon de poulet
+nom_singulier: Bouillon de poulet
 nom_pluriel: Bouillon de poulet
 categorie: epicerie-salee
 unite_base: ml

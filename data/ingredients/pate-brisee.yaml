@@ -1,5 +1,5 @@
 id: pate-brisee
-nom: Pâte brisée (rouleau)
+nom_singulier: Pâte brisée (rouleau)
 nom_pluriel: Pâtes brisées
 categorie: boulangerie
 unite_base: piece

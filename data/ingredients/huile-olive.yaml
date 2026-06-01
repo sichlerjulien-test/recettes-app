@@ -1,5 +1,5 @@
 id: huile-olive
-nom: Huile d'olive
+nom_singulier: Huile d'olive
 nom_pluriel: Huiles d'olive
 categorie: condiments-epices
 unite_base: ml

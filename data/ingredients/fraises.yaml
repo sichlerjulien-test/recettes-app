@@ -1,5 +1,5 @@
 id: fraises
-nom: Fraise
+nom_singulier: Fraise
 nom_pluriel: Fraises
 categorie: fruits-legumes
 unite_base: g

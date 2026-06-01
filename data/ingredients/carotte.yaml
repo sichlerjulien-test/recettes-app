@@ -1,5 +1,5 @@
 id: carotte
-nom: Carotte
+nom_singulier: Carotte
 nom_pluriel: Carottes
 categorie: fruits-legumes
 unite_base: g

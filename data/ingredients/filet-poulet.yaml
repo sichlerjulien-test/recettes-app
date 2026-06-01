@@ -1,5 +1,5 @@
 id: filet-poulet
-nom: Filet de poulet
+nom_singulier: Filet de poulet
 nom_pluriel: Filets de poulet
 categorie: viandes-poissons
 unite_base: g

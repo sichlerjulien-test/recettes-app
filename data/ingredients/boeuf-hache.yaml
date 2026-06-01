@@ -1,5 +1,5 @@
 id: boeuf-hache
-nom: Bœuf haché
+nom_singulier: Bœuf haché
 nom_pluriel: Bœuf haché
 categorie: viandes-poissons
 unite_base: g

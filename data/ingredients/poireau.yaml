@@ -1,5 +1,5 @@
 id: poireau
-nom: Poireau
+nom_singulier: Poireau
 nom_pluriel: Poireaux
 categorie: fruits-legumes
 unite_base: piece

@@ -1,5 +1,5 @@
 id: pain-complet
-nom: Pain complet
+nom_singulier: Pain complet
 nom_pluriel: Pains complets
 categorie: boulangerie
 unite_base: g

@@ -80,7 +80,7 @@ describe('buildShoppingList', () => {
     // et en 'cuillere-soupe' dans une autre → deux items distincts dans la liste
     const ingredientLocal: Ingredient = {
       id: 'sauce-locale',
-      nom: 'Sauce locale',
+      nom_singulier: 'Sauce locale',
       nom_pluriel: 'Sauces locales',
       categorie: 'condiments-epices',
       unite_base: 'ml',
@@ -302,7 +302,7 @@ describe('buildShoppingList', () => {
     // 'cuillere-soupe' ≠ 'ml' → pas de conversion, unite_affichee = 'cuillere-soupe'
     const ingredient: Ingredient = {
       id: 'huile-locale',
-      nom: "Huile d'olive",
+      nom_singulier: "Huile d'olive",
       nom_pluriel: "Huiles d'olive",
       categorie: 'condiments-epices',
       unite_base: 'ml',
@@ -338,7 +338,7 @@ describe('buildShoppingList', () => {
     // 240g / 800 = 0.3 → ceil = 1
     const ingredient: Ingredient = {
       id: 'chou-fleur',
-      nom: 'Chou-fleur',
+      nom_singulier: 'Chou-fleur',
       nom_pluriel: 'Choux-fleurs',
       categorie: 'fruits-legumes',
       unite_base: 'g',
@@ -373,7 +373,7 @@ describe('buildShoppingList', () => {
     // si on arrondissait avant : ceil(240/800)+ceil(240/800) = 1+1 = 2 (faux)
     const ingredient: Ingredient = {
       id: 'chou-fleur-b',
-      nom: 'Chou-fleur',
+      nom_singulier: 'Chou-fleur',
       nom_pluriel: 'Choux-fleurs',
       categorie: 'fruits-legumes',
       unite_base: 'g',
@@ -404,6 +404,76 @@ describe('buildShoppingList', () => {
       .find((i) => i.ingredient_id === 'chou-fleur-b');
     expect(chou?.quantite_totale).toBe(1);
     expect(chou?.unite_affichee).toBe('piece');
+  });
+
+  // === Pluralisation et suppression du mot «pièce» ===
+
+  it('should use nom_pluriel for nom_affiche when quantite_totale > 1 (discrete piece)', () => {
+    // omelette-legumes : portions_base=2, oeuf-entier=4 piece
+    // nbParticipants=6 → facteur=3 → 4*3=12 → quantite_totale=12 > 1 → nom_pluriel
+    const planning = makePlanning([
+      { jour: 1, repas: 'midi', recette_id: 'omelette-legumes' },
+    ]);
+    const result = buildShoppingList(planning, recettesMap, ingredientsMap, 6);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const oeufs = result.items_par_categorie['cremerie-oeufs']
+      .find((i) => i.ingredient_id === 'oeuf-entier');
+    expect(oeufs?.quantite_totale).toBe(12);
+    expect(oeufs?.unite_affichee).toBe('piece');
+    expect(oeufs?.nom_affiche).toBe('Œufs entiers');
+  });
+
+  it('should use nom_singulier for nom_affiche when quantite_totale <= 1 (discrete piece)', () => {
+    // Fixture locale : 1 seule pièce → quantite_totale = 1, NOT > 1 → nom_singulier
+    const ingredient: Ingredient = {
+      id: 'oeuf-test-singulier',
+      nom_singulier: 'Œuf test',
+      nom_pluriel: 'Œufs test',
+      categorie: 'cremerie-oeufs',
+      unite_base: 'piece',
+      unite_achat: 'piece',
+      conversion: 1,
+      allergenes: [],
+      contient_trace: [],
+      substituts: [],
+    };
+    const recette: Recette = {
+      ...BASE_RECETTE,
+      id: 'recette-oeuf-singulier',
+      portions_base: 4,
+      ingredients: [
+        { ingredient_id: 'oeuf-test-singulier', quantite_base: 1, unite: 'piece', optionnel: false, groupe: undefined },
+      ],
+    };
+    const localRecettes = new Map<string, Recette>([['recette-oeuf-singulier', recette]]);
+    const localIngredients = new Map<string, Ingredient>([['oeuf-test-singulier', ingredient]]);
+    const planning = makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-oeuf-singulier' }]);
+    const result = buildShoppingList(planning, localRecettes, localIngredients, 4);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const oeuf = result.items_par_categorie['cremerie-oeufs']
+      .find((i) => i.ingredient_id === 'oeuf-test-singulier');
+    expect(oeuf?.quantite_totale).toBe(1);
+    expect(oeuf?.unite_affichee).toBe('piece');
+    expect(oeuf?.nom_affiche).toBe('Œuf test');
+  });
+
+  it('should use nom_pluriel for nom_affiche when quantite_totale > 1 (continuous kg)', () => {
+    // pates-bolognaise + salade-tomate-basilic : tomate 400g + 600g = 1000g → 1 kg
+    // 1 kg NOT > 1 → nom_singulier ; mais avec 2 recettes on obtient exactement 1 kg
+    // Utilisation de nbParticipants=8 pour doubler : 1000g * 2 / 1000 = 2 kg > 1 → nom_pluriel
+    const planning = makePlanning([
+      { jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' },
+      { jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic' },
+    ]);
+    const result = buildShoppingList(planning, recettesMap, ingredientsMap, 8);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const tomate = result.items_par_categorie['fruits-legumes']
+      .find((i) => i.ingredient_id === 'tomate');
+    expect(tomate?.quantite_totale).toBe(2);
+    expect(tomate?.nom_affiche).toBe('Tomates');
   });
 
   // === Cas d'erreur ===

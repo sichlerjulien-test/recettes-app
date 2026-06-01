@@ -1,5 +1,5 @@
 id: croissant
-nom: Croissant
+nom_singulier: Croissant
 nom_pluriel: Croissants
 categorie: boulangerie
 unite_base: piece

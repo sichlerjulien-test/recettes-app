@@ -40,7 +40,7 @@ function createMockSupabase(tableQueues: Record<string, MockResult[]>) {
 
 const RAW_INGREDIENT_ROW = {
   id: 'tomate',
-  nom: 'Tomate',
+  nom_singulier: 'Tomate',
   nom_pluriel: 'Tomates',
   categorie: 'fruits-legumes',
   unite_base: 'g',
@@ -74,7 +74,7 @@ describe('ingredients DAL', () => {
       if (result.ok) {
         expect(result.ingredients).toHaveLength(1);
         expect(result.ingredients[0]?.id).toBe('tomate');
-        expect(result.ingredients[0]?.nom).toBe('Tomate');
+        expect(result.ingredients[0]?.nom_singulier).toBe('Tomate');
       }
     });
   });
@@ -115,7 +115,7 @@ describe('ingredients DAL', () => {
         expect(result.ingredients).toBeInstanceOf(Map);
         expect(result.ingredients.size).toBe(1);
         expect(result.ingredients.has('tomate')).toBe(true);
-        expect(result.ingredients.get('tomate')?.nom).toBe('Tomate');
+        expect(result.ingredients.get('tomate')?.nom_singulier).toBe('Tomate');
       }
     });
   });

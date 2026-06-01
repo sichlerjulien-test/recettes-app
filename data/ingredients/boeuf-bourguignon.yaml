@@ -1,5 +1,5 @@
 id: boeuf-bourguignon
-nom: Bœuf à braiser (paleron ou joue)
+nom_singulier: Bœuf à braiser (paleron ou joue)
 nom_pluriel: Bœuf à braiser
 categorie: viandes-poissons
 unite_base: g

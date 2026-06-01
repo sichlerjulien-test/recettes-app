@@ -26,7 +26,7 @@ function mapIngredientRow(item: unknown): unknown {
 
   return {
     id: row['id'],
-    nom: row['nom'],
+    nom_singulier: row['nom_singulier'],
     nom_pluriel: row['nom_pluriel'],
     categorie: row['categorie'],
     unite_base: row['unite_base'],

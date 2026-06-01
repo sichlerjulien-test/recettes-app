@@ -1,5 +1,5 @@
 id: pain-campagne
-nom: Pain de campagne (tranche)
+nom_singulier: Pain de campagne (tranche)
 nom_pluriel: Tranches de pain de campagne
 categorie: boulangerie
 unite_base: piece

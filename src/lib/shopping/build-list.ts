@@ -1,4 +1,4 @@
-import { IngredientCategorySchema } from '../types/schemas';
+import { IngredientCategorySchema, DISCRETE_UNITS } from '../types/schemas';
 import type {
   Planning,
   Recette,
@@ -25,9 +25,9 @@ type AggregItem = {
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
 
-const DISCRETE_UNITS: ReadonlySet<Unit> = new Set(['piece', 'botte', 'sachet']);
+const DISCRETE_UNIT_SET = new Set<string>(DISCRETE_UNITS);
 const finalize = (q: number, u: Unit): number =>
-  DISCRETE_UNITS.has(u) ? Math.ceil(q) : round2(q);
+  DISCRETE_UNIT_SET.has(u) ? Math.ceil(q) : round2(q);
 
 /**
  * Construit le contenu de la liste de courses à partir d'un planning.
@@ -135,7 +135,7 @@ export function buildShoppingList(
 
     items_par_categorie[ingredient.categorie].push({
       ingredient_id: aggItem.ingredient_id,
-      nom_affiche: ingredient.nom,
+      nom_affiche: quantite_totale > 1 ? ingredient.nom_pluriel : ingredient.nom_singulier,
       quantite_totale,
       unite_affichee,
       categorie: ingredient.categorie,

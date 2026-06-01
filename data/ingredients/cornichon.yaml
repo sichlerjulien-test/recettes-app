@@ -1,5 +1,5 @@
 id: cornichon
-nom: Cornichon
+nom_singulier: Cornichon
 nom_pluriel: Cornichons
 categorie: epicerie-salee
 unite_base: piece

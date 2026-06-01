@@ -1,5 +1,5 @@
 id: lait-entier
-nom: Lait entier
+nom_singulier: Lait entier
 nom_pluriel: Lait entier
 categorie: cremerie-oeufs
 unite_base: ml

@@ -1,5 +1,5 @@
 id: citron
-nom: Citron jaune
+nom_singulier: Citron jaune
 nom_pluriel: Citrons jaunes
 categorie: fruits-legumes
 unite_base: piece
