@@ -4,7 +4,7 @@ import {
   ALLERGEN_LABELS,
   DIETARY_LABELS,
 } from '../../../data/seed-allergenes';
-import type { IngredientCategory } from '../types/domain';
+import type { IngredientCategory, MainIngredient } from '../types/domain';
 
 export type { Allergen, DietaryRestriction } from '../../../data/seed-allergenes';
 export { EU14_ALLERGENS, DIETARY_RESTRICTIONS };
@@ -23,6 +23,22 @@ export const CATEGORY_LABELS: Record<IngredientCategory, string> = {
   'condiments-epices': 'Condiments & épices',
   'boissons': 'Boissons',
   'frais-traiteur': 'Frais & traiteur',
+};
+
+export const MAIN_INGREDIENT_LABELS: Record<MainIngredient, string> = {
+  'poulet':        'Poulet',
+  'boeuf':         'Bœuf',
+  'porc':          'Porc',
+  'agneau':        'Agneau',
+  'poisson':       'Poisson',
+  'fruits-de-mer': 'Fruits de mer',
+  'oeufs':         'Œufs',
+  'legumineuses':  'Légumineuses',
+  'fromage':       'Fromage',
+  'tofu':          'Tofu',
+  'legumes':       'Légumes',
+  'fruits':        'Fruits',
+  'pain':          'Pain',
 };
 
 export const CATEGORY_ORDER: IngredientCategory[] = [

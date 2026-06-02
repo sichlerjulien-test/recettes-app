@@ -56,8 +56,10 @@ export const CuisineTypeSchema = z.enum([
 ]);
 
 export const MainIngredientSchema = z.enum([
-  'poulet', 'boeuf', 'porc', 'poisson',
-  'oeufs', 'legumineuses', 'fromage', 'legumes', 'fruits', 'pain',
+  'poulet', 'boeuf', 'porc', 'agneau',
+  'poisson', 'fruits-de-mer',
+  'oeufs', 'legumineuses', 'fromage', 'tofu',
+  'legumes', 'fruits', 'pain',
 ]);
 
 export const DominantStarchSchema = z.enum([

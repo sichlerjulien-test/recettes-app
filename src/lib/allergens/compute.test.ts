@@ -186,6 +186,51 @@ describe('computeRecipeMetadata', () => {
       .toThrow('ingredient-inexistant-xyz');
   });
 
+  it('doit retourner est_vegetarien=false pour une recette agneau', () => {
+    const recette: RecetteSansCalculs = {
+      ...BASE,
+      id: 'test-agneau',
+      nom: 'Gigot test',
+      ingredient_principal: 'agneau',
+      ingredients: [
+        { ingredient_id: 'tomate', quantite_base: 200, unite: 'g', optionnel: false, groupe: undefined },
+      ],
+    };
+    const result = computeRecipeMetadata(recette, ingredientsMap);
+    expect(result.est_vegetarien).toBe(false);
+    expect(result.est_vegan).toBe(false);
+  });
+
+  it('doit retourner est_vegetarien=false pour une recette fruits-de-mer', () => {
+    const recette: RecetteSansCalculs = {
+      ...BASE,
+      id: 'test-fruits-de-mer',
+      nom: 'Paella fruits de mer test',
+      ingredient_principal: 'fruits-de-mer',
+      ingredients: [
+        { ingredient_id: 'tomate', quantite_base: 200, unite: 'g', optionnel: false, groupe: undefined },
+      ],
+    };
+    const result = computeRecipeMetadata(recette, ingredientsMap);
+    expect(result.est_vegetarien).toBe(false);
+    expect(result.est_vegan).toBe(false);
+  });
+
+  it('doit retourner est_vegetarien=true pour une recette tofu', () => {
+    const recette: RecetteSansCalculs = {
+      ...BASE,
+      id: 'test-tofu',
+      nom: 'Tofu sauté test',
+      ingredient_principal: 'tofu',
+      ingredients: [
+        { ingredient_id: 'tomate', quantite_base: 200, unite: 'g', optionnel: false, groupe: undefined },
+        { ingredient_id: 'carotte', quantite_base: 150, unite: 'g', optionnel: false, groupe: undefined },
+      ],
+    };
+    const result = computeRecipeMetadata(recette, ingredientsMap);
+    expect(result.est_vegetarien).toBe(true);
+  });
+
   it("doit fonctionner sans erreur ni mutation si l'input est gele via Object.freeze", () => {
     const frozen = Object.freeze({
       ...RIZ_LEGUMES,
