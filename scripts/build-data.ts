@@ -18,12 +18,26 @@ import { createClient } from '@supabase/supabase-js';
 import { IngredientSchema, RecetteInputSchema } from '../src/lib/types/schemas';
 import type { IngredientOutput, RecetteOutput } from '../src/lib/types/schemas';
 import { computeRecipeMetadata } from '../src/lib/allergens/compute';
+import { resolveEnvFile, isProdEnvFile } from './resolve-env-file';
 
 // ---------------------------------------------------------------------------
 // ENV
 // ---------------------------------------------------------------------------
 
-dotenv.config({ path: '.env.local' });
+const envFile = resolveEnvFile();
+
+if (isProdEnvFile(envFile) && !process.argv.includes('--prod')) {
+  console.error('ERREUR : fichier env prod détecté sans confirmation explicite.');
+  console.error('  Validez d\'abord sur dev, puis utilisez : npm run build-data:prod');
+  process.exit(1);
+}
+
+const envResult = dotenv.config({ path: envFile });
+if (envResult.error) {
+  console.error(`Fichier env introuvable : ${envFile}`);
+  process.exit(1);
+}
+console.log(`[build-data] env chargé depuis : ${envFile}`);
 
 function requireEnv(name: string): string {
   const value = process.env[name];

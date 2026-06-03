@@ -8,6 +8,7 @@
     "start": "next start",
     "validate": "tsx scripts/validate.ts",
     "build-data": "tsx scripts/build-data.ts",
+    "build-data:prod": "npm run validate && ENV_FILE=.env.prod.local tsx scripts/build-data.ts --prod",
     "test": "vitest run",
     "test:integration": "vitest run --config vitest.integration.config.ts"
   },
