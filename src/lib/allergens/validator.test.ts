@@ -151,4 +151,26 @@ describe('validatePlanning', () => {
     expect(result.violations).toHaveLength(0);
   });
 
+  it('doit emettre allergen(gluten) + regime(vegan) pour un participant coeliaque-vegan sur une recette avec gluten non-vegan', () => {
+    // pates-bolognaise : penne (gluten) + boeuf-hache (est_vegan=false, est_vegetarien=false)
+    // participantCoeliaqueVegan : allergies=['gluten'], regimes=['vegan']
+    // Ce test vérifie que les deux branches (allergen ET regime) sont indépendantes
+    // et s'appliquent simultanément sans court-circuit de type else-if.
+    const planning = makePlanning(['pates-bolognaise']);
+    const result = validatePlanning(planning, recettesMap, [participantCoeliaqueVegan]);
+    expect(result.valid).toBe(false);
+    const kinds = result.violations.map((v) => v.kind);
+    expect(kinds).toContain('allergen');
+    expect(kinds).toContain('regime');
+    const allergenV = result.violations.find(
+      (v): v is AllergenViolation => v.kind === 'allergen' && v.allergene === 'gluten',
+    );
+    expect(allergenV?.participant_id).toBe(participantCoeliaqueVegan.id);
+    const regimeV = result.violations.find((v) => v.kind === 'regime');
+    expect(regimeV?.participant_id).toBe(participantCoeliaqueVegan.id);
+    if (regimeV?.kind === 'regime') {
+      expect(regimeV.regime).toBe('vegan');
+    }
+  });
+
 });

@@ -191,4 +191,27 @@ describe('validateCoherence', () => {
     expect(violations.filter((v) => v.kind === 'ingredient_principal_consecutif')).toHaveLength(0);
   });
 
+  it('ne doit pas lever dexception quand toutes les recettes sont inconnues avec expectedSlots non vides', () => {
+    // Comportement défensif : les recettes inconnues sont ignorées silencieusement.
+    // Les slots ne correspondent pas (slots attendus ≠ slots réels) → slots_mismatch uniquement.
+    const planning: Planning = {
+      id: 'planning-test',
+      sejour_id: 'sejour-test',
+      entries: [
+        { jour: 1, repas: 'midi', recette_id: 'fantome-a', portions: 4 },
+        { jour: 1, repas: 'soir', recette_id: 'fantome-b', portions: 4 },
+      ],
+      genere_le: '2026-04-21T00:00:00Z',
+      contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+    };
+    const expectedSlots = [{ jour: 1, repas: 'midi' as const }, { jour: 1, repas: 'soir' as const }];
+    const violations = validateCoherence(planning, recettesMap, expectedSlots);
+    // slots_mismatch ne se déclenche pas (slots correspondent exactement)
+    expect(violations.filter((v) => v.kind === 'slots_mismatch')).toHaveLength(0);
+    // ingredient_principal_consecutif ne se déclenche pas (recettes inconnues ignorées)
+    expect(violations.filter((v) => v.kind === 'ingredient_principal_consecutif')).toHaveLength(0);
+    // recette_dupliquee ne se déclenche pas (deux IDs distincts)
+    expect(violations.filter((v) => v.kind === 'recette_dupliquee')).toHaveLength(0);
+  });
+
 });
