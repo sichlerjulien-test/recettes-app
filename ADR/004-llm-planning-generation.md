@@ -4,6 +4,7 @@
 **Date** : 2026-04-26
 **Auteur** : Équipe Meal Planner
 **Décideurs** : Tous les membres du projet
+**Amendé partiellement par** : ADR-009 (2026-06-03)
 
 ## Contexte
 
@@ -149,3 +150,23 @@ Cette décision sera réévaluée si :
 - ADR-001 : architecture de validation allergènes
 - Anthropic tool use docs : https://docs.claude.com/en/docs/build-with-claude/tool-use
 - CLAUDE.md règles 3.1 (allergies) et 3.4 (UX)
+
+---
+
+## Amendements
+
+### ADR-009 (2026-06-03) — Séparation du validateur de cohérence
+
+**Section "Placement du module" — couplage minimal**
+L'énoncé "Pas d'autre dépendance" est caduc. `generatePlanning` dépend
+désormais aussi de `lib/coherence/` (en plus de `lib/allergens/filter` et
+`lib/allergens/validator`). La validation post-LLM passe d'un validateur
+unique à deux validateurs en séquence : `validatePlanning` (sécurité) puis
+`validateCoherence` (cohérence).
+
+**Section "Gestion des erreurs" — cas 2 (violation post-LLM)**
+Le retry ne se déclenche plus sur "toute violation post-LLM" mais sur
+**(violation sécurité) OU (violation cohérence `'bloquant'`)**. Les violations
+de sévérité `'qualite'` n'entraînent pas de retry : elles sont renvoyées
+comme avertissements (`warnings?`) sur un planning retourné en succès
+(`ok: true`).
