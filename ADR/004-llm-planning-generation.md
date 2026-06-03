@@ -49,7 +49,7 @@ Le LLM reçoit uniquement :
 - Contexte séjour : nb_jours, répartition (midis/soirs/brunchs),
   niveau_cuisine, temps_disponible
 - Règles de cohérence (dans le system prompt) : pas deux fois la même
-  recette, pas deux fois la même protéine en 24h, respect du temps si
+  recette, pas deux fois la même protéine par jour, respect du temps si
   "rapide", variété des types de cuisine
 
 La sécurité allergènes est garantie par filter.ts en amont (pool déjà

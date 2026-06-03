@@ -26,24 +26,18 @@ function makePlanning(recetteIds: string[]): Planning {
   };
 }
 
-/** Dérive les expectedSlots depuis un planning existant (slots_mismatch ne déclenche pas). */
-function slotsFrom(planning: Planning) {
-  return planning.entries.map((e) => ({ jour: e.jour, repas: e.repas }));
-}
-
 describe('validatePlanning', () => {
 
   it('doit retourner valid=true pour un planning sans violation', () => {
-    // omelette-legumes (oeufs) ≠ salade-tomate-basilic (legumes) → pas de conflit de jour
     const planning = makePlanning(['salade-tomate-basilic', 'omelette-legumes']);
-    const result = validatePlanning(planning, recettesMap, [participantCoeliaque], slotsFrom(planning));
+    const result = validatePlanning(planning, recettesMap, [participantCoeliaque]);
     expect(result.valid).toBe(true);
     expect(result.violations).toHaveLength(0);
   });
 
   it('doit emettre une AllergenViolation quand la recette contient un allergene du participant', () => {
     const planning = makePlanning(['pates-bolognaise']); // gluten
-    const result = validatePlanning(planning, recettesMap, [participantCoeliaque], slotsFrom(planning));
+    const result = validatePlanning(planning, recettesMap, [participantCoeliaque]);
     expect(result.valid).toBe(false);
     const v = result.violations[0];
     expect(v?.kind).toBe('allergen');
@@ -59,7 +53,7 @@ describe('validatePlanning', () => {
     // participantAllergiesMultiples: gluten, lait, fruits-coque, arachides
     // carbonara-classique: gluten, lait, oeufs -> 2 croisements
     const planning = makePlanning(['carbonara-classique']);
-    const result = validatePlanning(planning, recettesMap, [participantAllergiesMultiples], slotsFrom(planning));
+    const result = validatePlanning(planning, recettesMap, [participantAllergiesMultiples]);
     expect(result.valid).toBe(false);
     const allergenViolations = result.violations
       .filter((v): v is AllergenViolation => v.kind === 'allergen');
@@ -71,7 +65,7 @@ describe('validatePlanning', () => {
 
   it('doit emettre une RegimeViolation kind=vegan quand la recette nest pas vegan', () => {
     const planning = makePlanning(['omelette-legumes']); // est_vegan=false
-    const result = validatePlanning(planning, recettesMap, [participantVegan], slotsFrom(planning));
+    const result = validatePlanning(planning, recettesMap, [participantVegan]);
     expect(result.valid).toBe(false);
     const v = result.violations.find((v) => v.kind === 'regime');
     expect(v).toBeDefined();
@@ -83,7 +77,7 @@ describe('validatePlanning', () => {
 
   it('doit emettre une RegimeViolation kind=vegetarien quand la recette contient de la viande', () => {
     const planning = makePlanning(['pates-bolognaise']); // est_vegetarien=false
-    const result = validatePlanning(planning, recettesMap, [participantVegetarien], slotsFrom(planning));
+    const result = validatePlanning(planning, recettesMap, [participantVegetarien]);
     expect(result.valid).toBe(false);
     const v = result.violations.find((v) => v.kind === 'regime');
     expect(v).toBeDefined();
@@ -95,7 +89,7 @@ describe('validatePlanning', () => {
 
   it('doit emettre une RecetteInconnueViolation pour une recette absente du catalogue', () => {
     const planning = makePlanning(['recette-fantome-xyz']);
-    const result = validatePlanning(planning, recettesMap, [participantSansContrainte], slotsFrom(planning));
+    const result = validatePlanning(planning, recettesMap, [participantSansContrainte]);
     expect(result.valid).toBe(false);
     const v = result.violations.find((v) => v.kind === 'recette_inconnue');
     expect(v).toBeDefined();
@@ -108,7 +102,7 @@ describe('validatePlanning', () => {
 
   it('doit retourner valid=true pour un participant sans contrainte sur des recettes avec allergenes', () => {
     const planning = makePlanning(['carbonara-classique', 'pad-thai', 'quiche-lorraine']);
-    const result = validatePlanning(planning, recettesMap, [participantSansContrainte], slotsFrom(planning));
+    const result = validatePlanning(planning, recettesMap, [participantSansContrainte]);
     expect(result.valid).toBe(true);
     expect(result.violations).toHaveLength(0);
   });
@@ -118,7 +112,7 @@ describe('validatePlanning', () => {
     const result = validatePlanning(planning, recettesMap, [
       participantCoeliaque,
       participantCoeliaqueVegan,
-    ], slotsFrom(planning));
+    ]);
     expect(result.valid).toBe(false);
     const glutenViolations = result.violations
       .filter((v): v is AllergenViolation => v.kind === 'allergen' && v.allergene === 'gluten');
@@ -130,7 +124,7 @@ describe('validatePlanning', () => {
 
   it("doit n'emettre qu'une seule RecetteInconnueViolation quand la meme id apparait plusieurs fois", () => {
     const planning = makePlanning(['recette-fantome', 'recette-fantome', 'recette-fantome']);
-    const result = validatePlanning(planning, recettesMap, [participantSansContrainte], slotsFrom(planning));
+    const result = validatePlanning(planning, recettesMap, [participantSansContrainte]);
     const unknownViolations = result.violations.filter((v) => v.kind === 'recette_inconnue');
     expect(unknownViolations).toHaveLength(1);
   });
@@ -142,7 +136,7 @@ describe('validatePlanning', () => {
     const result = validatePlanning(planning, recettesMap, [
       participantCoeliaque,
       participantVegan,
-    ], slotsFrom(planning));
+    ]);
     expect(result.valid).toBe(false);
     const kinds = result.violations.map((v) => v.kind);
     expect(kinds).toContain('allergen');
@@ -152,57 +146,9 @@ describe('validatePlanning', () => {
 
   it('doit retourner valid=true pour un planning vide', () => {
     const planning = makePlanning([]);
-    const result = validatePlanning(planning, recettesMap, [participantCoeliaque], slotsFrom(planning));
+    const result = validatePlanning(planning, recettesMap, [participantCoeliaque]);
     expect(result.valid).toBe(true);
     expect(result.violations).toHaveLength(0);
-  });
-
-  // ── Règle ingredient_principal_consecutif (groupement par jour) ──────────────
-
-  it('doit echouer si meme ingredient_principal au matin et au soir du meme jour (midi differe)', () => {
-    // Correction 1 : la règle est journalière, pas séquentielle.
-    // pancakes-brunch (oeufs) + pates-bolognaise (boeuf) + omelette-legumes (oeufs) → même jour.
-    // La paire (matin=oeufs, soir=oeufs) n'est pas adjacente dans la séquence mais viole la règle.
-    const planning: Planning = {
-      id: 'planning-test',
-      sejour_id: 'sejour-test',
-      entries: [
-        { jour: 1, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch',   portions: 4 },
-        { jour: 1, repas: 'midi',           recette_id: 'pates-bolognaise',  portions: 4 },
-        { jour: 1, repas: 'soir',           recette_id: 'omelette-legumes',  portions: 4 },
-      ],
-      genere_le: '2026-04-21T00:00:00Z',
-      contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
-    };
-    const expectedSlots = planning.entries.map((e) => ({ jour: e.jour, repas: e.repas }));
-    const result = validatePlanning(planning, recettesMap, [], expectedSlots);
-    expect(result.valid).toBe(false);
-    const v = result.violations.find((v) => v.kind === 'ingredient_principal_consecutif');
-    expect(v).toBeDefined();
-    if (v?.kind === 'ingredient_principal_consecutif') {
-      expect(v.ingredient_principal).toBe('oeufs');
-      expect(v.slot_a.jour).toBe(1);
-      expect(v.slot_b.jour).toBe(1);
-    }
-  });
-
-  it('ne doit pas echouer si meme ingredient_principal au soir J1 et au matin J2 (jours distincts)', () => {
-    // Choix délibéré : frontière = jour calendaire, pas 24h glissantes.
-    // soir J1 (oeufs) et petit-dejeuner J2 (oeufs) sont sur des jours différents → pas de violation.
-    const planning: Planning = {
-      id: 'planning-test',
-      sejour_id: 'sejour-test',
-      entries: [
-        { jour: 1, repas: 'soir',           recette_id: 'omelette-legumes', portions: 4 },
-        { jour: 2, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch',  portions: 4 },
-      ],
-      genere_le: '2026-04-21T00:00:00Z',
-      contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
-    };
-    const expectedSlots = planning.entries.map((e) => ({ jour: e.jour, repas: e.repas }));
-    const result = validatePlanning(planning, recettesMap, [], expectedSlots);
-    expect(result.valid).toBe(true);
-    expect(result.violations.filter((v) => v.kind === 'ingredient_principal_consecutif')).toHaveLength(0);
   });
 
 });

@@ -1,6 +1,8 @@
 import type { Participant, PlanningEntry, Recette, ValidationViolation } from '../types/domain';
 import { filterRecipes, type FilterConstraints } from '../allergens/filter';
 import { validatePlanning } from '../allergens/validator';
+import { validateCoherence, COHERENCE_SEVERITY } from '../coherence';
+import type { CoherenceWarning } from '../coherence';
 import { buildSequence } from '../planning/build-sequence';
 import type { LLMClient } from './client';
 import type { GeneratePlanningInput, LLMError } from './types';
@@ -13,6 +15,12 @@ const MAX_ATTEMPTS = 3;
  *
  * La fonction ne lance jamais d'exception : elle retourne toujours un résultat discriminé.
  * Le LLM ne reçoit jamais les allergies des participants (garantie architecturale ADR-001).
+ *
+ * Après réception de la sortie LLM, deux validateurs s'exécutent en séquence (ADR-009) :
+ *   1. validatePlanning (sécurité : allergènes, régimes, recette_inconnue)
+ *   2. validateCoherence (cohérence : slots, doublons, ingredient_principal)
+ * Le retry se déclenche sur violation sécurité OU violation cohérence 'bloquant'.
+ * Les violations 'qualite' ne déclenchent pas de retry ; elles sont renvoyées comme warnings.
  *
  * @param client          - Client LLM injectable (Anthropic ou mock de test)
  * @param catalogue       - Catalogue complet des recettes
@@ -28,7 +36,7 @@ export async function generatePlanning(
   filterConstraints: FilterConstraints,
   participants: readonly Participant[],
   sejourContexte: GeneratePlanningInput['contexte'],
-): Promise<{ ok: true; entries: PlanningEntry[] } | { ok: false; error: LLMError }> {
+): Promise<{ ok: true; entries: PlanningEntry[]; warnings?: CoherenceWarning[] } | { ok: false; error: LLMError }> {
   const pool = filterRecipes(catalogue, filterConstraints);
 
   if (pool.length === 0) {
@@ -60,23 +68,30 @@ export async function generatePlanning(
         },
       };
 
-      const result = validatePlanning(
-        planningForValidation,
-        recettesMap,
-        participants,
-        expectedSlots,
-      );
+      const securityResult = validatePlanning(planningForValidation, recettesMap, participants);
+      const coherenceViolations = validateCoherence(planningForValidation, recettesMap, expectedSlots);
 
-      if (result.valid) {
-        return { ok: true, entries: planningEntries };
+      const bloquantCoherence = coherenceViolations.filter(
+        (v) => COHERENCE_SEVERITY[v.kind] === 'bloquant',
+      );
+      const qualiteCoherence = coherenceViolations.filter(
+        (v) => COHERENCE_SEVERITY[v.kind] === 'qualite',
+      ) as CoherenceWarning[];
+
+      if (securityResult.violations.length === 0 && bloquantCoherence.length === 0) {
+        return {
+          ok: true,
+          entries: planningEntries,
+          ...(qualiteCoherence.length > 0 ? { warnings: qualiteCoherence } : {}),
+        };
       }
 
-      lastViolations = result.violations;
+      lastViolations = [...securityResult.violations, ...bloquantCoherence];
       // MVP : log via console.warn. Logger injectable à introduire au Sprint 1
       // si besoin d'audit structuré (cf. ADR-001 mention "audit").
       console.warn(
-        `[generatePlanning] tentative ${attempt + 1}/${MAX_ATTEMPTS} — ${result.violations.length} violation(s)`,
-        result.violations,
+        `[generatePlanning] tentative ${attempt + 1}/${MAX_ATTEMPTS} — ${lastViolations.length} violation(s)`,
+        lastViolations,
       );
     }
 
