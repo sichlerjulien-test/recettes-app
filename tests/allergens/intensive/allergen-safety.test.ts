@@ -76,8 +76,7 @@ function runProfile(
     const selected = pickUniqueN(filtered, nb, rng).map((r) => r.id);
 
     const planning = buildPlanning(selected);
-    const expectedSlots = planning.entries.map((e) => ({ jour: e.jour, repas: e.repas }));
-    const result = validatePlanning(planning, recettesMap, participants, expectedSlots);
+    const result = validatePlanning(planning, recettesMap, participants);
 
     // Ce test vérifie uniquement la sécurité allergènes/régimes après filtrage.
     // Les violations structurelles (slots_mismatch, ingredient_consecutif) ne sont
