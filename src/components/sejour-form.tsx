@@ -290,7 +290,6 @@ export function SejourForm({
                           value={field.value}
                           onChange={field.onChange}
                           onBlur={field.onBlur}
-                          min={1}
                         />
                       </FormControl>
                       <FormMessage />
@@ -362,7 +361,6 @@ export function SejourForm({
                             value={field.value}
                             onChange={field.onChange}
                             onBlur={field.onBlur}
-                            min={0}
                           />
                         </FormControl>
                         <FormMessage />
@@ -381,7 +379,6 @@ export function SejourForm({
                             value={field.value}
                             onChange={field.onChange}
                             onBlur={field.onBlur}
-                            min={0}
                           />
                         </FormControl>
                         <FormMessage />
@@ -400,7 +397,6 @@ export function SejourForm({
                             value={field.value}
                             onChange={field.onChange}
                             onBlur={field.onBlur}
-                            min={0}
                           />
                         </FormControl>
                         <FormMessage />

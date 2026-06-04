@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeRawInput, applyBlurFloor } from './number-field'
+import { normalizeRawInput } from './number-field'
 
 describe('normalizeRawInput', () => {
   it("vider → '' et non 0 (discriminant anti-régression NaN→0)", () => {
@@ -28,23 +28,5 @@ describe('normalizeRawInput', () => {
 
   it('"42" → 42', () => {
     expect(normalizeRawInput('42')).toBe(42)
-  })
-})
-
-describe('applyBlurFloor', () => {
-  it("blur sur '' avec min=1 → 1 (nb_jours)", () => {
-    expect(applyBlurFloor('', 1)).toBe(1)
-  })
-
-  it("blur sur '' avec min=0 → 0 (compteurs repas)", () => {
-    expect(applyBlurFloor('', 0)).toBe(0)
-  })
-
-  it('blur sur valeur positive → valeur inchangée', () => {
-    expect(applyBlurFloor(5, 1)).toBe(5)
-  })
-
-  it('blur sur zéro avec min=0 → zéro conservé', () => {
-    expect(applyBlurFloor(0, 0)).toBe(0)
   })
 })

@@ -8,10 +8,6 @@ export function normalizeRawInput(raw: string): number | '' {
   return Number.isNaN(n) ? '' : n
 }
 
-export function applyBlurFloor(value: number | '', min: number): number {
-  return value === '' ? min : value
-}
-
 interface NumberFieldProps extends Omit<
   React.ComponentProps<typeof Input>,
   'value' | 'onChange' | 'onBlur' | 'type' | 'inputMode' | 'pattern' | 'min'
@@ -19,10 +15,9 @@ interface NumberFieldProps extends Omit<
   value: number | ''
   onChange: (v: number | '') => void
   onBlur?: () => void
-  min: number
 }
 
-export function NumberField({ value, onChange, onBlur, min, ...rest }: NumberFieldProps) {
+export function NumberField({ value, onChange, onBlur, ...rest }: NumberFieldProps) {
   return (
     <Input
       type="text"
@@ -30,10 +25,7 @@ export function NumberField({ value, onChange, onBlur, min, ...rest }: NumberFie
       pattern="[0-9]*"
       value={value}
       onChange={(e) => onChange(normalizeRawInput(e.target.value))}
-      onBlur={() => {
-        if (value === '') onChange(min)
-        onBlur?.()
-      }}
+      onBlur={() => onBlur?.()}
       {...rest}
     />
   )
