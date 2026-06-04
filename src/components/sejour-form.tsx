@@ -25,15 +25,29 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { NumberField } from "@/components/ui/number-field"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 
+// Accepte number | '' en saisie, produit number en sortie.
+// Permet à NumberField de maintenir un champ vide sans snap NaN→0 par frappe.
+const Count = (c: z.ZodNumber) =>
+  z.union([z.number(), z.literal('')])
+    .transform((v): number => v === '' ? 0 : v)
+    .pipe(c)
+
 // Réécrit sans .default([]) pour aligner les types input/output Zod
 // (exactOptionalPropertyTypes cause une incompatibilité resolver sinon).
 export const SejourFormSchema = CreateSejourBodySchema.extend({
   nom: z.string().max(100).optional(),
+  nb_jours: Count(z.number().int().min(1).max(7)),
+  repartition_repas: CreateSejourBodySchema.shape.repartition_repas.extend({
+    midis: Count(z.number().int().nonnegative()),
+    soirs: Count(z.number().int().nonnegative()),
+    brunchs: Count(z.number().int().nonnegative()),
+  }),
   participants: z.array(z.object({
     nom: z.string().min(1).max(50),
     allergies: z.array(AllergenSchema),
@@ -79,7 +93,8 @@ const DEFAULT_FORM_VALUES: SejourFormData = {
   participants: [{ ...EMPTY_PARTICIPANT }],
 }
 
-function safeNumber(value: number): number {
+function safeNumber(value: number | ''): number {
+  if (value === '') return 0
   return Number.isNaN(value) ? 0 : value
 }
 
@@ -131,7 +146,7 @@ export function SejourForm({
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const form = useForm<SejourFormData>({
+  const form = useForm<z.input<typeof SejourFormSchema>, unknown, z.output<typeof SejourFormSchema>>({
     resolver: zodResolver(SejourFormSchema),
     mode: "onTouched",
     defaultValues: {
@@ -146,17 +161,12 @@ export function SejourForm({
   })
 
   const participants = form.watch("participants")
-  const nbJours = form.watch("nb_jours") ?? 0
-  const midis = form.watch("repartition_repas.midis") ?? 0
-  const soirs = form.watch("repartition_repas.soirs") ?? 0
-  const brunchs = form.watch("repartition_repas.brunchs") ?? 0
+  const nbJours = safeNumber(form.watch("nb_jours"))
+  const midis = safeNumber(form.watch("repartition_repas.midis"))
+  const soirs = safeNumber(form.watch("repartition_repas.soirs"))
+  const brunchs = safeNumber(form.watch("repartition_repas.brunchs"))
 
-  const repasValidation = computeRepasValidation(
-    safeNumber(nbJours),
-    safeNumber(midis),
-    safeNumber(soirs),
-    safeNumber(brunchs),
-  )
+  const repasValidation = computeRepasValidation(nbJours, midis, soirs, brunchs)
 
   function toggleAllergen(index: number, allergen: Allergen) {
     const allParticipants = form.getValues("participants")
@@ -276,13 +286,10 @@ export function SejourForm({
                     <FormItem>
                       <FormLabel>Nombre de jours</FormLabel>
                       <FormControl>
-                        <Input
-                          type="text"
-                          inputMode="numeric"
-                          pattern="[0-9]*"
-                          {...field}
+                        <NumberField
                           value={field.value}
-                          onChange={(e) => field.onChange(safeNumber(parseInt(e.target.value, 10)))}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
                         />
                       </FormControl>
                       <FormMessage />
@@ -350,13 +357,10 @@ export function SejourForm({
                       <FormItem>
                         <FormLabel>Petit-déjeuner</FormLabel>
                         <FormControl>
-                          <Input
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            {...field}
+                          <NumberField
                             value={field.value}
-                            onChange={(e) => field.onChange(safeNumber(parseInt(e.target.value, 10)))}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
                           />
                         </FormControl>
                         <FormMessage />
@@ -371,13 +375,10 @@ export function SejourForm({
                       <FormItem>
                         <FormLabel>Midi</FormLabel>
                         <FormControl>
-                          <Input
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            {...field}
+                          <NumberField
                             value={field.value}
-                            onChange={(e) => field.onChange(safeNumber(parseInt(e.target.value, 10)))}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
                           />
                         </FormControl>
                         <FormMessage />
@@ -392,13 +393,10 @@ export function SejourForm({
                       <FormItem>
                         <FormLabel>Soir</FormLabel>
                         <FormControl>
-                          <Input
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            {...field}
+                          <NumberField
                             value={field.value}
-                            onChange={(e) => field.onChange(safeNumber(parseInt(e.target.value, 10)))}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
                           />
                         </FormControl>
                         <FormMessage />
