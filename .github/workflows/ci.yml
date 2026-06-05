@@ -1,0 +1,61 @@
+name: CI
+
+# Trois jobs distincts = trois required status checks indépendants dans la
+# branch protection. Un seul job multi-steps est interdit (cf. TK-06).
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Annule les runs périmés sur la même PR ; évite les faux verts obsolètes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Hypothèse Node : pas de .nvmrc dans le repo, @types/node ^20, on épingle 20
+  # pour rester cohérent avec l'environnement Vercel de prod.
+
+  typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: tsc --noEmit repo-wide
+        run: npx tsc --noEmit
+      - name: Guard — tests/ dans le scope tsc
+        run: |
+          npx tsc --noEmit --listFiles | grep -q '/tests/' || { echo "tsconfig ne couvre plus tests/"; exit 1; }
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Vitest
+        run: npm run test
+
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Validation des données YAML
+        run: npm run validate

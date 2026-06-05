@@ -45,21 +45,9 @@ Sous-tâches :
 
 ## P2 — Dette interne (invisible utilisateur)
 
-### TK-06 — CI workflows  ·  M
-Protéger les futures PR (validation données + tests). Inchangé depuis la pause.
+### TK-06 — CI workflows  ·  ✅ Fait
 
-Origine : dette pré-pause (validation données + tests) + épisode signature validatePlanning (cette session).
-Aucune CI ne tourne aujourd'hui. La seule barrière pré-merge est manuelle (architect / allergen-guard / qa-engineer). L'épisode validatePlanning (4→3 args) l'a prouvé à froid : le test intensif allergènes — la forteresse, 600 itérations — était type-cassé et passait quand même au vert. Vitest transpile sans typechecker (esbuild strip les types ; un 4e argument sur une fonction JS est ignoré à l'exécution). Seul allergen-guard, lançant tsc à la main, l'a vu. Le test le plus critique du projet peut pourrir sans qu'aucune automatisation ne crie. npm run test vert n'est PAS une preuve de compilation.
-Sous-tâches :
-
-Gate typecheck repo-wide (le plus critique) : tsc --noEmit sur tout le repo, tests/ inclus, distinct de npm run test et surtout pas next build — next build ne typeche que le graphe de l'app ; les fichiers de test non importés lui échappent par construction. Confirmer que le tsconfig utilisé par la CI couvre bien tests/ (allergen-guard l'a vu, mais vérifier la commande exacte que la CI lancera, ne pas le supposer).
-Gate tests : npm run test (Vitest) vert obligatoire. Ne remplace pas le gate typecheck.
-Gate validation données : npm run validate vert obligatoire.
-Test discriminant du gate lui-même : une erreur de type introduite volontairement dans un fichier de tests/ doit faire rougir la CI. Sans cette vérif, on ne sait pas si le gate couvre réellement les tests ou seulement src/ — c'est précisément ce qu'on a failli ne jamais voir.
-
-Critères d'acceptation : une PR avec une erreur de type dans tests/ est bloquée en CI, pas seulement par un agent qui lance tsc à la main. CI verte et npm run test vert deviennent une vraie preuve, pas une fausse confiance.
-
-Sans ce ticket, le check #7 de qa-engineer ("CI verte") est vide — il n'y a pas de CI à être verte. Et son check #2 ("Compilation TypeScript zéro erreur") est ambigu : il faut le figer en tsc --noEmit repo-wide, pas next build. À aligner dans AGENTS.md quand TK-06 atterrit.
+`.github/workflows/ci.yml` — trois required status checks distincts : `typecheck` (tsc --noEmit repo-wide + guard tests/ dans scope), `test` (Vitest), `validate` (données YAML). qa-engineer mis à jour : check #7 pointe sur le gate CI réel, Règle 4 nomme les trois checks.
 
 
 ### TK-09 — Nettoyage DAL sejours : double SELECT + Zod-first  ·  M
@@ -231,7 +219,7 @@ avec un trou.
 | TK-03 | Édition séjour + flow génération | P0 | L | Fait |
 | TK-04 | Bug inputs number iPhone | P0 | S | Fait |
 | TK-05 | Exclusions alimentaires | P1 | M | À faire |
-| TK-06 | CI workflows | P2 | M | À faire |
+| TK-06 | CI workflows | P2 | M | Fait |
 | TK-07 | Scission Supabase dev/prod | P2 | M | Fait |
 | TK-08 | Réutilisation ingrédients | V2 | — | À faire |
 | TK-09 | Nettoyage DAL sejours | P2 | M | À faire |
@@ -245,10 +233,7 @@ avec un trou.
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
 | TK-18 | Bug hydratation ShareLink | P2 | S | À faire |
 
-**Ordre conseillé :** TK-04 (dernier P0, bug S, vide la ligne P0) → TK-11 (forteresse :
-comble le trou combos lait+œufs, c'est la promesse zéro-erreur) → TK-06 (le gate CI,
-protège chaque PR future) → TK-05 (P1, après son pré-requis archi) → reste de la dette
-data/DAL (TK-09, TK-10, TK-13, TK-12) quand le fonctionnel est stable → V2 (TK-08, TK-14).
+**Ordre conseillé :** TK-05 (P1, après son pré-requis archi) → reste de la dette data/DAL (TK-09, TK-10, TK-13, TK-12) quand le fonctionnel est stable → V2 (TK-08, TK-14).
 
 ## — Fait
 

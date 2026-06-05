@@ -60,8 +60,11 @@ grep -rn "@ts-expect-error" src/ --include="*.ts" --include="*.tsx"
 # Non-null assertion — pattern évite !=, !==, !flag (cible uniquement l'opérateur postfixe)
 grep -rEn '\w+!\s*[.;,)\]]' src/ --include="*.ts" --include="*.tsx"
 
-# 7. État de la CI sur la branche actuelle (si gh est disponible)
-gh run list --branch $(git branch --show-current) --limit 3 2>/dev/null || echo "gh CLI unavailable"
+# 7. CI gate — confirme que les trois checks requis sont verts (post-TK-06)
+# Checks requis : "typecheck", "test", "validate" (définis dans .github/workflows/ci.yml)
+# L'agent confirme que la CI a tourné et est verte ; il ne re-lance pas tsc
+# comme défense primaire — le gate CI est la preuve, pas la sortie locale de tsc.
+gh run list --branch $(git branch --show-current) --limit 5 2>/dev/null || echo "gh CLI unavailable — vérifier manuellement sur GitHub"
 ```
 
 ## Règles de refus (autorité de blocage)
@@ -84,7 +87,7 @@ Exemple : commit "ajoute 12 ingrédients" mais 11 fichiers `data/ingredients/*.y
 
 ### Règle 4 — CI rouge
 
-Si la dernière exécution de la CI sur la branche actuelle est en échec, refus de merge.
+Si les checks CI requis (`typecheck`, `test`, `validate`) ne sont pas tous verts sur la branche actuelle, refus de merge.
 
 ### Règle 5 — Coverage critique manquant
 
@@ -133,7 +136,7 @@ Sorties des vérifications systématiques :
 - npm run test : [X tests passed / failures]
 - npm run validate : [OK / erreurs]
 - Recherche raccourcis TS : [OK / occurrences trouvées]
-- État CI : [vert / rouge / inconnu]
+- État CI (typecheck / test / validate) : [vert / rouge / inconnu]
 
 Refus bloquants :
 - [Règle X : description précise + fichier:ligne + correction attendue]
