@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { RecetteInputSchema } from '@/lib/types/schemas';
 
+// TK-06 acceptance proof — erreur de type volontaire, à retirer après vérification CI
+const _typeError: number = "cette ligne doit faire rougir tsc";
+
 // Fixture minimale valide.
 const BASE = {
   id: 'salade-verte',
