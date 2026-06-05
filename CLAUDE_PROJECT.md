@@ -1,3 +1,9 @@
+> **RÈGLE DE SYNCHRONISATION — À LIRE AVANT TOUTE ÉDITION**
+> - **Source de vérité = ce fichier, dans le repo.**
+> - Le champ "Instructions" du Project Claude.ai est un artefact de build : une copie recollée à la main quand ce fichier change.
+> - **Interdiction absolue d'éditer directement dans le champ Instructions.** On édite le `.md`, on commit, on push, on recolle.
+> - **Direction unique : repo → champ Instructions. Jamais l'inverse.**
+
 # Meal Planner — Instructions du Project
 
 > À coller dans la configuration "Instructions" du Project Claude.ai.

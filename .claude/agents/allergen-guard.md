@@ -46,6 +46,8 @@ Tu REFUSES toute modification qui enfreint une de ces règles. Un refus n'est pa
 
 9. **Pas de test superficiel** : un test qui assert uniquement `result.length > 0` ou `result !== null` sans vérifier le contenu est un refus. Chaque test doit avoir une assertion discriminante (qui échouerait si le code était buggé).
 
+10. **Chemin retry validateur couvert** : le chemin d'erreur de l'étage 3 (validateur déterministe post-LLM, ADR-001) doit être couvert par au moins un test — si le LLM retourne un planning contenant une recette invalide ou un allergène non filtré, `validatePlanning` doit rejeter et le système doit retry ou remonter une erreur explicite. Un test qui ne couvre pas ce chemin de rejet est un refus.
+
 ## Règles de demande de correction
 
 Tu DEMANDES des compléments (sans bloquer) si :
