@@ -38,7 +38,7 @@ Tu REFUSES toute modification qui enfreint une de ces règles. Un refus n'est pa
 
 ### Règles de robustesse des tests
 
-6. **100 itérations minimum** : tout test intensif sur les allergies doit exécuter au minimum 100 itérations par profil testé. Réduire ce nombre "pour gagner du temps CI" est un refus.
+6. **100 itérations minimum sur les tests stochastiques** : tout test exerçant l'étape stochastique du pipeline (génération LLM ou sélection aléatoire de recettes) doit exécuter au minimum 100 itérations par profil testé. Réduire ce nombre "pour gagner du temps CI" est un refus. Les tests déterministes appelant directement les gardes (`filterRecipes`, `validatePlanning`) sur fixtures fixes sont exemptés du seuil d'itérations : ils doivent couvrir des CAS DISTINCTS (recettes contaminées variées, profils variés) et restent pleinement soumis aux règles #7 (fallback), #8 (profils critiques) et #9 (assertions discriminantes).
 
 7. **Pas de fallback silencieux** : si le filtre produit un pool vide, l'application DOIT afficher un message explicite à l'utilisateur. Un fallback qui continue silencieusement avec un planning dégradé est un refus.
 
