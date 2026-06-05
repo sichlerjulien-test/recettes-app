@@ -57,6 +57,8 @@ grep -rn "as any" src/ --include="*.ts" --include="*.tsx"
 grep -rn "as unknown as" src/ --include="*.ts" --include="*.tsx"
 grep -rn "@ts-ignore" src/ --include="*.ts" --include="*.tsx"
 grep -rn "@ts-expect-error" src/ --include="*.ts" --include="*.tsx"
+# Non-null assertion — pattern évite !=, !==, !flag (cible uniquement l'opérateur postfixe)
+grep -rEn '\w+!\s*[.;,)\]]' src/ --include="*.ts" --include="*.tsx"
 
 # 7. État de la CI sur la branche actuelle (si gh est disponible)
 gh run list --branch $(git branch --show-current) --limit 3 2>/dev/null || echo "gh CLI unavailable"
@@ -103,6 +105,7 @@ Présence dans `src/` de :
 - `as unknown as` (sauf justifié par un type guard explicite)
 - `@ts-ignore`
 - `@ts-expect-error` sans commentaire de justification
+- opérateur non-null assertion `!` postfixe (détecté via `\w+!\s*[.;,)\]]` — évite les faux positifs `!=`, `!==`, `!flag`)
 
 Tous = refus automatique.
 
