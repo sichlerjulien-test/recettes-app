@@ -62,3 +62,30 @@ export const participantVegetarienAllergique: Participant = {
   aime: [],
   n_aime_pas: [],
 };
+
+export const participantLaitOeufs: Participant = {
+  id: 'p-lait-oeufs',
+  nom: 'Inès',
+  allergies: ['lait', 'oeufs'],
+  regimes: [],
+  aime: [],
+  n_aime_pas: [],
+};
+
+export const participantHauteCardinalite: Participant = {
+  id: 'p-haute-cardinalite',
+  nom: 'Bastien',
+  allergies: ['gluten', 'lait', 'oeufs', 'arachides', 'crustaces'],
+  regimes: [],
+  aime: [],
+  n_aime_pas: [],
+};
+
+export const participantVegetarienLait: Participant = {
+  id: 'p-vegetarien-lait',
+  nom: 'Chloé',
+  allergies: ['lait'],
+  regimes: ['vegetarien'],
+  aime: [],
+  n_aime_pas: [],
+};

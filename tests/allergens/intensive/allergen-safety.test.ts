@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { FilterConstraints } from '@/lib/allergens/filter';
-import type { Participant, Planning } from '@/lib/types/domain';
+import type { AllergenViolation, Participant, Planning } from '@/lib/types/domain';
 import { EU14_ALLERGENS } from '../../../data/seed-allergenes';
 import { filterRecipes } from '@/lib/allergens/filter';
 import { validatePlanning } from '@/lib/allergens/validator';
@@ -8,9 +8,12 @@ import {
   participantAllergiesMultiples,
   participantCoeliaque,
   participantCoeliaqueVegan,
+  participantHauteCardinalite,
+  participantLaitOeufs,
   participantSansContrainte,
   participantVegan,
   participantVegetarienAllergique,
+  participantVegetarienLait,
 } from '../../fixtures/participants';
 import { allRecettes, recettesMap } from '../../fixtures/recettes';
 
@@ -63,6 +66,31 @@ function runProfile(
 ): void {
   const rng = mulberry32(seed);
   const catalogue = allRecettes();
+  const allergenSet = new Set(constraints.allergenes_groupe);
+
+  // C. Assertion discriminante : vérifier qu'au moins une recette du catalogue
+  //    contient un allergène déclaré, puis qu'elle est absente du pool filtré.
+  //    Sans cette vérification, un test avec aucune recette contaminée passerait
+  //    même avec le filtre allergènes désactivé — test invalide par construction.
+  if (allergenSet.size > 0) {
+    const contaminatedIds = catalogue
+      .filter((r) => r.allergenes_calcules.some((a) => allergenSet.has(a)))
+      .map((r) => r.id);
+
+    expect(
+      contaminatedIds.length,
+      `Profil ${label}: aucune recette du catalogue ne porte les allergènes [${[...allergenSet]}] — test trivial, non discriminant`,
+    ).toBeGreaterThan(0);
+
+    const filteredOnce = filterRecipes(catalogue, constraints);
+    for (const id of contaminatedIds) {
+      expect(
+        filteredOnce.some((r) => r.id === id),
+        `[${label}] Recette contaminée "${id}" toujours présente dans le pool filtré — filtre inopérant`,
+      ).toBe(false);
+    }
+  }
+
   let skippedIterations = 0;
 
   for (let i = 0; i < iterations; i++) {
@@ -99,7 +127,9 @@ function runProfile(
   ).toBeLessThan(iterations);
 }
 
-describe('allergen-safety (600 iterations)', () => {
+describe('allergen-safety (1100 iterations)', () => {
+
+  // ─── Profils de base (inchangés) ─────────────────────────────────────────────
 
   it('profil coeliaque: 100 plannings filtrés sont tous valides', () => {
     runProfile(
@@ -182,6 +212,143 @@ describe('allergen-safety (600 iterations)', () => {
       100,
     );
   });
+
+  // ─── Profils TK-11 : combinaisons manquantes ──────────────────────────────────
+
+  it('profil lait+oeufs: 100 plannings filtrés sont tous valides', () => {
+    runProfile(
+      'lait+oeufs',
+      [participantLaitOeufs],
+      {
+        allergenes_groupe: ['lait', 'oeufs'],
+        regimes_groupe: [],
+        equipement_disponible: ALL_EQUIPMENT,
+      },
+      0x7F809192,
+      100,
+    );
+  });
+
+  it('profil haute-cardinalite (gluten+lait+oeufs+arachides+crustaces): 100 plannings filtrés sont tous valides', () => {
+    runProfile(
+      'haute-cardinalite',
+      [participantHauteCardinalite],
+      {
+        allergenes_groupe: ['gluten', 'lait', 'oeufs', 'arachides', 'crustaces'],
+        regimes_groupe: [],
+        equipement_disponible: ALL_EQUIPMENT,
+      },
+      0x8091A2B3,
+      100,
+    );
+  });
+
+  it('profil gluten+arachides: 100 plannings filtrés sont tous valides', () => {
+    const participant: Participant = {
+      id: 'p-gluten-arachides', nom: 'Test',
+      allergies: ['gluten', 'arachides'], regimes: [], aime: [], n_aime_pas: [],
+    };
+    runProfile(
+      'gluten+arachides',
+      [participant],
+      {
+        allergenes_groupe: ['gluten', 'arachides'],
+        regimes_groupe: [],
+        equipement_disponible: ALL_EQUIPMENT,
+      },
+      0x91A2B3C4,
+      100,
+    );
+  });
+
+  it('profil poissons+crustaces: 100 plannings filtrés sont tous valides', () => {
+    const participant: Participant = {
+      id: 'p-poissons-crustaces', nom: 'Test',
+      allergies: ['poissons', 'crustaces'], regimes: [], aime: [], n_aime_pas: [],
+    };
+    runProfile(
+      'poissons+crustaces',
+      [participant],
+      {
+        allergenes_groupe: ['poissons', 'crustaces'],
+        regimes_groupe: [],
+        equipement_disponible: ALL_EQUIPMENT,
+      },
+      0xA2B3C4D5,
+      100,
+    );
+  });
+
+  // ─── Profils transverses régime × allergène ────────────────────────────────────
+
+  it('profil vegetarien+lait: 100 plannings filtrés sont tous valides', () => {
+    runProfile(
+      'vegetarien+lait',
+      [participantVegetarienLait],
+      {
+        allergenes_groupe: ['lait'],
+        regimes_groupe: ['vegetarien'],
+        equipement_disponible: ALL_EQUIPMENT,
+      },
+      0xB3C4D5E6,
+      100,
+    );
+  });
+
+  // ─── Test discriminant vegan+cœliaque ─────────────────────────────────────────
+  // Un planning qui viole l'une OU l'autre contrainte doit échouer indépendamment.
+
+  it('test discriminant coeliaque+vegan : violation gluten OU non-vegan déclenche chacune un échec', () => {
+    // Cas 1 : recette non-vegan (oeufs) → violation régime 'vegan'
+    const planningNonVegan = buildPlanning(['omelette-legumes']);
+    const resultNonVegan = validatePlanning(planningNonVegan, recettesMap, [participantCoeliaqueVegan]);
+    expect(resultNonVegan.valid).toBe(false);
+    expect(resultNonVegan.violations.some((v) => v.kind === 'regime')).toBe(true);
+
+    // Cas 2 : recette avec gluten → violation allergène 'gluten'
+    const planningGluten = buildPlanning(['pates-bolognaise']);
+    const resultGluten = validatePlanning(planningGluten, recettesMap, [participantCoeliaqueVegan]);
+    expect(resultGluten.valid).toBe(false);
+    expect(resultGluten.violations.some((v) => v.kind === 'allergen')).toBe(true);
+  });
+
+  // ─── Fallback LLM injecté ────────────────────────────────────────────────────
+  // Simule une réponse LLM contenant une recette contaminée malgré le profil
+  // allergique. Le validateur post-LLM doit la détecter et la rejeter (ce qui
+  // déclencherait un retry dans le pipeline de génération, ADR-001 Étage 3).
+  // Table de cas distincts : 4 recettes portant chacune lait via un ingrédient différent.
+
+  const RECETTES_CONTAMINEES_LAIT = [
+    { recette_id: 'carbonara-classique', ingredient: 'parmesan'    },
+    { recette_id: 'gratin-dauphinois',   ingredient: 'lait-entier' },
+    { recette_id: 'quiche-lorraine',     ingredient: 'lait-entier' },
+    { recette_id: 'souffle-fromage',     ingredient: 'parmesan'    },
+  ] as const;
+
+  it.each(RECETTES_CONTAMINEES_LAIT)(
+    'fallback LLM : $recette_id (lait via $ingredient) rejeté par le validateur post-LLM',
+    ({ recette_id }) => {
+      const planningContamine = buildPlanning([recette_id]);
+      const result = validatePlanning(planningContamine, recettesMap, [participantLaitOeufs]);
+
+      expect(result.valid).toBe(false);
+
+      const allergenViolations = result.violations.filter(
+        (v): v is AllergenViolation => v.kind === 'allergen',
+      );
+      expect(allergenViolations.length).toBeGreaterThan(0);
+
+      const laitViolation = allergenViolations.find(
+        (v) => v.recette_id === recette_id && v.allergene === 'lait',
+      );
+      expect(
+        laitViolation,
+        `Le validateur doit détecter lait dans ${recette_id} pour un profil lait+oeufs`,
+      ).toBeDefined();
+    },
+  );
+
+  // ─── Pool vide ────────────────────────────────────────────────────────────────
 
   it('doit signaler explicitement un pool filtré vide', () => {
     // Contraintes maximales : tous les allergènes EU14 + vegan + aucun équipement
