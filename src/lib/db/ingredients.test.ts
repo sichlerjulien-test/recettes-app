@@ -26,14 +26,15 @@ function makeChain(result: Promise<MockResult>) {
   };
 }
 
-function createMockSupabase(tableQueues: Record<string, MockResult[]>) {
+function createMockSupabase(tableQueues: Record<string, MockResult[]>): ReturnType<typeof getSupabaseClient> {
+  // cast nécessaire : mock partiel — seule from est implémentée, pas l'interface complète
   return {
     from: (table: string) => {
       const queue = tableQueues[table] ?? [];
       const next = queue.shift() ?? { data: null, error: null };
       return makeChain(Promise.resolve(next));
     },
-  };
+  } as unknown as ReturnType<typeof getSupabaseClient>;
 }
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -65,7 +66,7 @@ describe('ingredients DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           ingredients: [{ data: [RAW_INGREDIENT_ROW], error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await getAllIngredients();
@@ -84,7 +85,7 @@ describe('ingredients DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           ingredients: [{ data: null, error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await getIngredientById('unknown-slug');
@@ -105,7 +106,7 @@ describe('ingredients DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           ingredients: [{ data: [RAW_INGREDIENT_ROW], error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await getAllIngredientsAsMap();
