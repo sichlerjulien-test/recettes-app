@@ -8,8 +8,58 @@
 
 ## P0 — Bloquant avant un test élargi
 
+### TK-01 — Moteur de planning cohérent  ·  XL  ·  ✅ Fait
+**Origine :** feedbacks 4, 5, 8 · angle mort phase 1 jamais tranché.
 
+Le moteur produit des plannings incohérents. C'est la priorité absolue : tant qu'il est cassé, tout le reste est du polish sur une fondation bancale.
 
+Sous-tâches :
+- Structure journalière stricte : exactement 1 petit-déj + 1 midi + 1 soir par jour, dans l'ordre chronologique. Jamais plusieurs midis le même jour.
+- Contrainte de non-répétition : pas deux fois la même recette sur un séjour.
+- Pas deux fois le même ingrédient principal en 24h.
+- Expansion du catalogue de recettes pour nourrir la variété (le LLM se répète quand le pool filtré est trop maigre).
+
+**Critères d'acceptation :** un séjour de N jours produit exactement N petits-déj, N midis, N soirs, ordonnés, sans recette dupliquée. Validé par le validateur déterministe post-LLM.
+
+### TK-02 — Bug d'arrondi des unités d'achat  ·  ✅ Fait (effort réel : S, pas L)
+
+Le "0.3 piece de chou-fleur" n'était PAS un problème de modèle de données.
+Le schéma committé (`unite_base`/`unite_achat`/`conversion`) suffisait. Deux
+bugs dans `build-list.ts` uniquement :
+- arrondi cumulatif (`Math.ceil` par occurrence avant sommation → biais haut) ;
+- pas de `Math.ceil` final sur les unités discrètes (piece/botte/sachet).
+
+Fix : accumulation brute + `finalize()` qui arrondit une fois selon le type
+d'unité. ~12 lignes, zéro champ nouveau, zéro migration DB.
+
+> Leçon d'estimation : ticket coté L parce que mal cadré (faux "refactor de
+> modèle"). Le vrai défaut était une régression de logique runtime. Quand un
+> ticket gonfle, vérifier d'abord que le problème est bien là où on le croit.
+
+Résidu éventuel (PAS le modèle de données) : afficher l'unité en français
+("1 chou-fleur" plutôt que "1 piece"). À vérifier dans `src/lib/ui/labels.ts`
+— c'est peut-être déjà géré. Si non, c'est un ticket UI S, distinct.
+
+### TK-03 — Édition d'un séjour + flow de génération  ·  L  ·  ✅ Fait
+**Origine :** feedbacks 3 et 2 (même zone de code · point A validé).
+
+Aujourd'hui la page séjour est un cul-de-sac : impossible de revenir modifier les inputs, ajouter une personne, ajuster une contrainte. Et le clic "générer le planning" paraît inutile faute d'être expliqué.
+
+Sous-tâches :
+- À la validation du formulaire : génération directe du planning (supprime le clic perçu comme inutile) avec écran de chargement explicite.
+- Rendre le séjour éditable après création : modifier participants, contraintes, paramètres.
+- Une réédition propose de régénérer le planning (la génération coûte un appel LLM — pas de re-génération silencieuse à chaque micro-changement).
+
+**Critères d'acceptation :** Sarah peut ajouter un participant oublié après création et régénérer, sans recréer le séjour de zéro.
+
+### TK-04 — Bug inputs number iPhone Safari  ·  S  ·  ✅ Fait
+**Origine :** feedback 1 · dette pré-pause confirmée terrain.
+
+Le "zéro fantôme" persiste à l'affichage quand on modifie une quantité sur smartphone. Fix connu : passer les inputs `type="number"` en `type="text" inputMode="numeric"`, ajuster le schema Zod si besoin.
+
+**Critères d'acceptation :** modifier une quantité sur iPhone Safari ne laisse pas de 0 fantôme.
+
+> Victoire rapide. Bon candidat pour ouvrir une session avant d'attaquer TK-01.
 
 ---
 
@@ -39,7 +89,19 @@ Sous-tâches :
 
 **Critères d'acceptation :** l'ami sujet à la goutte peut exclure la viande rouge ; le planning n'en contient aucune ; la forteresse allergènes reste inchangée.
 
+### TK-11 — Combinaisons allergènes manquantes en test intensif  ·  S/M  ·  ✅ Fait
+**Origine :** allergen-guard (TK-03). Forteresse — P1.
 
+Le binôme lait+œufs (et d'autres combinaisons courantes) n'est pas couvert par la suite
+intensive 100 itérations. Une régression sur ces combos passerait inaperçue : trou direct
+dans la promesse "zéro erreur".
+
+Sous-tâches :
+- Recenser les combinaisons critiques manquantes (lait+œufs en priorité).
+- Les ajouter à la paramétrisation des tests intensifs allergens.
+- 100 itérations sans erreur, assertions discriminantes.
+
+**Critères :** lait+œufs et les combos courants couverts en intensif. Passe allergen-guard obligatoire.
 
 ---
 
@@ -48,6 +110,9 @@ Sous-tâches :
 ### TK-06 — CI workflows  ·  ✅ Fait
 
 `.github/workflows/ci.yml` — trois required status checks distincts : `typecheck` (tsc --noEmit repo-wide + guard tests/ dans scope), `test` (Vitest), `validate` (données YAML). qa-engineer mis à jour : check #7 pointe sur le gate CI réel, Règle 4 nomme les trois checks.
+
+### TK-07 — Scission instances Supabase dev/prod  ·  M  ·  ✅ Fait
+Dev et prod partagent `ymxqahqrmzerlnyertjf`. Créer une 2e instance (free tier) pour le dev, garder l'actuelle en prod uniquement.
 
 
 ### TK-09 — Nettoyage DAL sejours : double SELECT + Zod-first  ·  M
@@ -235,74 +300,3 @@ avec un trou.
 
 **Ordre conseillé :** TK-05 (P1, après son pré-requis archi) → reste de la dette data/DAL (TK-09, TK-10, TK-13, TK-12) quand le fonctionnel est stable → V2 (TK-08, TK-14).
 
-## — Fait
-
-### TK-02 — Bug d'arrondi des unités d'achat  ·  ✅ Fait (effort réel : S, pas L)
-
-Le "0.3 piece de chou-fleur" n'était PAS un problème de modèle de données.
-Le schéma committé (`unite_base`/`unite_achat`/`conversion`) suffisait. Deux
-bugs dans `build-list.ts` uniquement :
-- arrondi cumulatif (`Math.ceil` par occurrence avant sommation → biais haut) ;
-- pas de `Math.ceil` final sur les unités discrètes (piece/botte/sachet).
-
-Fix : accumulation brute + `finalize()` qui arrondit une fois selon le type
-d'unité. ~12 lignes, zéro champ nouveau, zéro migration DB.
-
-> Leçon d'estimation : ticket coté L parce que mal cadré (faux "refactor de
-> modèle"). Le vrai défaut était une régression de logique runtime. Quand un
-> ticket gonfle, vérifier d'abord que le problème est bien là où on le croit.
-
-Résidu éventuel (PAS le modèle de données) : afficher l'unité en français
-("1 chou-fleur" plutôt que "1 piece"). À vérifier dans `src/lib/ui/labels.ts`
-— c'est peut-être déjà géré. Si non, c'est un ticket UI S, distinct.
-
-### TK-03 — Édition d'un séjour + flow de génération  ·  L
-**Origine :** feedbacks 3 et 2 (même zone de code · point A validé).
-
-Aujourd'hui la page séjour est un cul-de-sac : impossible de revenir modifier les inputs, ajouter une personne, ajuster une contrainte. Et le clic "générer le planning" paraît inutile faute d'être expliqué.
-
-Sous-tâches :
-- À la validation du formulaire : génération directe du planning (supprime le clic perçu comme inutile) avec écran de chargement explicite.
-- Rendre le séjour éditable après création : modifier participants, contraintes, paramètres.
-- Une réédition propose de régénérer le planning (la génération coûte un appel LLM — pas de re-génération silencieuse à chaque micro-changement).
-
-**Critères d'acceptation :** Sarah peut ajouter un participant oublié après création et régénérer, sans recréer le séjour de zéro.
-
-### TK-01 — Moteur de planning cohérent  ·  XL
-**Origine :** feedbacks 4, 5, 8 · angle mort phase 1 jamais tranché.
-
-Le moteur produit des plannings incohérents. C'est la priorité absolue : tant qu'il est cassé, tout le reste est du polish sur une fondation bancale.
-
-Sous-tâches :
-- Structure journalière stricte : exactement 1 petit-déj + 1 midi + 1 soir par jour, dans l'ordre chronologique. Jamais plusieurs midis le même jour.
-- Contrainte de non-répétition : pas deux fois la même recette sur un séjour.
-- Pas deux fois le même ingrédient principal en 24h.
-- Expansion du catalogue de recettes pour nourrir la variété (le LLM se répète quand le pool filtré est trop maigre).
-
-**Critères d'acceptation :** un séjour de N jours produit exactement N petits-déj, N midis, N soirs, ordonnés, sans recette dupliquée. Validé par le validateur déterministe post-LLM.
-
-### TK-07 — Scission instances Supabase dev/prod  ·  M
-Dev et prod partagent `ymxqahqrmzerlnyertjf`. Créer une 2e instance (free tier) pour le dev, garder l'actuelle en prod uniquement.
-
-### TK-04 — Bug inputs number iPhone Safari  ·  S
-**Origine :** feedback 1 · dette pré-pause confirmée terrain.
-
-Le "zéro fantôme" persiste à l'affichage quand on modifie une quantité sur smartphone. Fix connu : passer les inputs `type="number"` en `type="text" inputMode="numeric"`, ajuster le schema Zod si besoin.
-
-**Critères d'acceptation :** modifier une quantité sur iPhone Safari ne laisse pas de 0 fantôme.
-
-> Victoire rapide. Bon candidat pour ouvrir une session avant d'attaquer TK-01.
-
-### TK-11 — Combinaisons allergènes manquantes en test intensif  ·  S/M
-**Origine :** allergen-guard (TK-03). Forteresse — P1.
-
-Le binôme lait+œufs (et d'autres combinaisons courantes) n'est pas couvert par la suite
-intensive 100 itérations. Une régression sur ces combos passerait inaperçue : trou direct
-dans la promesse "zéro erreur".
-
-Sous-tâches :
-- Recenser les combinaisons critiques manquantes (lait+œufs en priorité).
-- Les ajouter à la paramétrisation des tests intensifs allergens.
-- 100 itérations sans erreur, assertions discriminantes.
-
-**Critères :** lait+œufs et les combos courants couverts en intensif. Passe allergen-guard obligatoire.
