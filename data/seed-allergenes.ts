@@ -32,29 +32,11 @@ export const EU14_ALLERGENS = [
 export type Allergen = typeof EU14_ALLERGENS[number];
 
 /**
- * Régimes alimentaires traités comme contraintes dures, au même niveau
- * que les allergènes. Liste figée également.
- */
-export const DIETARY_RESTRICTIONS = [
-  'vegetarien',
-  'vegan',
-] as const;
-
-export type DietaryRestriction = typeof DIETARY_RESTRICTIONS[number];
-
-/**
  * Type guard utilitaire pour valider qu'une string est un allergène EU14.
  * À utiliser systématiquement avant tout cast.
  */
 export function isAllergen(value: string): value is Allergen {
   return EU14_ALLERGENS.includes(value as Allergen);
-}
-
-/**
- * Type guard utilitaire pour valider qu'une string est un régime reconnu.
- */
-export function isDietaryRestriction(value: string): value is DietaryRestriction {
-  return DIETARY_RESTRICTIONS.includes(value as DietaryRestriction);
 }
 
 /**
@@ -78,7 +60,3 @@ export const ALLERGEN_LABELS: Record<Allergen, string> = {
   'mollusques': 'Mollusques',
 };
 
-export const DIETARY_LABELS: Record<DietaryRestriction, string> = {
-  'vegetarien': 'Végétarien',
-  'vegan': 'Vegan',
-};

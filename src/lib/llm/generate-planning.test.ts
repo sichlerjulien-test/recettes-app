@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { filterRecipes, type FilterConstraints } from '../allergens/filter';
+import { filterRecipes } from '../allergens/filter';
 import type { LLMClient } from './client';
-import { generatePlanning } from './generate-planning';
+import { generatePlanning, type PlanningConstraints } from './generate-planning';
 import type { GeneratePlanningInput, GeneratePlanningOutput } from './types';
 import { allRecettes, recettesMap } from '../../../tests/fixtures/recettes';
 import {
   participantSansContrainte,
   participantCoeliaque,
+  participantCoeliaqueVegan,
   participantVegan,
   participantAllergiesMultiples,
 } from '../../../tests/fixtures/participants';
@@ -14,11 +15,11 @@ import { EU14_ALLERGENS } from '../../../data/seed-allergenes';
 
 // ─── Constantes de test ───────────────────────────────────────────────────────
 
-const ALL_EQUIPMENT: FilterConstraints['equipement_disponible'] = [
+const ALL_EQUIPMENT: PlanningConstraints['equipement_disponible'] = [
   'four', 'plaque', 'micro-ondes', 'barbecue', 'blender', 'robot',
 ];
 
-const NO_CONSTRAINTS: FilterConstraints = {
+const NO_CONSTRAINTS: PlanningConstraints = {
   allergenes_groupe: [],
   regimes_groupe: [],
   equipement_disponible: ALL_EQUIPMENT,
@@ -116,7 +117,7 @@ describe('generatePlanning', () => {
   });
 
   it('should pass exactly the filtered pool to the LLM when constraints exclude some recipes', async () => {
-    const constraints: FilterConstraints = {
+    const constraints: PlanningConstraints = {
       ...NO_CONSTRAINTS,
       allergenes_groupe: ['gluten'],
     };
@@ -138,7 +139,7 @@ describe('generatePlanning', () => {
   });
 
   it('should NEVER pass allergens to the LLM when group has allergen constraints', async () => {
-    const constraints: FilterConstraints = {
+    const constraints: PlanningConstraints = {
       ...NO_CONSTRAINTS,
       allergenes_groupe: ['gluten', 'lait'],
     };
@@ -363,19 +364,24 @@ describe('generatePlanning', () => {
   describe('profils contraints', () => {
 
     // Contraintes dérivées directement depuis le profil participant (même logique que la route)
-    const COELIAQUE_CONSTRAINTS: FilterConstraints = {
+    const COELIAQUE_CONSTRAINTS: PlanningConstraints = {
       allergenes_groupe: participantCoeliaque.allergies,
       regimes_groupe: participantCoeliaque.regimes,
       equipement_disponible: ALL_EQUIPMENT,
     };
-    const VEGAN_CONSTRAINTS: FilterConstraints = {
+    const VEGAN_CONSTRAINTS: PlanningConstraints = {
       allergenes_groupe: participantVegan.allergies,
       regimes_groupe: participantVegan.regimes,
       equipement_disponible: ALL_EQUIPMENT,
     };
-    const ALLERGIES_MULTIPLES_CONSTRAINTS: FilterConstraints = {
+    const ALLERGIES_MULTIPLES_CONSTRAINTS: PlanningConstraints = {
       allergenes_groupe: participantAllergiesMultiples.allergies,
       regimes_groupe: participantAllergiesMultiples.regimes,
+      equipement_disponible: ALL_EQUIPMENT,
+    };
+    const COELIAQUE_VEGAN_CONSTRAINTS: PlanningConstraints = {
+      allergenes_groupe: participantCoeliaqueVegan.allergies,
+      regimes_groupe: participantCoeliaqueVegan.regimes,
       equipement_disponible: ALL_EQUIPMENT,
     };
 
@@ -448,6 +454,29 @@ describe('generatePlanning', () => {
         for (const entry of result.entries) {
           const recette = recettesMap.get(entry.recette_id)!;
           expect(recette.est_vegan).toBe(true);
+        }
+      }
+    });
+
+    it('participantCoeliaqueVegan : ok:true avec planning vegan et sans gluten (allergen + dietary en séquence)', async () => {
+      // salade-tomate-basilic : est_vegan=true, pas de gluten → passe les deux validateurs
+      const mockClient = createMockClient({ kind: 'success', output: { entries: [{ jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' }] } });
+
+      const result = await generatePlanning(
+        mockClient,
+        allRecettes(),
+        recettesMap,
+        COELIAQUE_VEGAN_CONSTRAINTS,
+        [participantCoeliaqueVegan],
+        { nb_jours: 1, repartition_repas: { premier_repas: 'midi', midis: 1, soirs: 0, brunchs: 0 }, niveau_cuisine: 'facile', temps_disponible: 'standard' },
+      );
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        for (const entry of result.entries) {
+          const recette = recettesMap.get(entry.recette_id)!;
+          expect(recette.est_vegan).toBe(true);
+          expect(recette.allergenes_calcules).not.toContain('gluten');
         }
       }
     });
@@ -568,7 +597,7 @@ describe('generatePlanning', () => {
     // EU14 + pas d'équipement : tous les allergènes connus excluent ~13 recettes sur 19 ;
     // les 6 recettes sans allergène restantes sont toutes exclues par equipement_disponible: []
     // car toutes requièrent au moins 'plaque' ou 'four'.
-    const saturatingConstraints: FilterConstraints = {
+    const saturatingConstraints: PlanningConstraints = {
       allergenes_groupe: [...EU14_ALLERGENS],
       regimes_groupe: [],
       equipement_disponible: [],

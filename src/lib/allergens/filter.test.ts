@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Recette } from '../types/domain';
-import { allRecettes, getRecette, recettesMap } from '../../../tests/fixtures/recettes';
+import { allRecettes } from '../../../tests/fixtures/recettes';
 import { filterRecipes } from './filter';
 import type { FilterConstraints } from './filter';
 
@@ -10,7 +10,6 @@ const ALL_EQUIPMENT: FilterConstraints['equipement_disponible'] = [
 
 const NO_CONSTRAINTS: FilterConstraints = {
   allergenes_groupe: [],
-  regimes_groupe: [],
   equipement_disponible: ALL_EQUIPMENT,
 };
 
@@ -42,43 +41,6 @@ describe('filterRecipes', () => {
     for (const r of result) {
       expect(r.allergenes_calcules).not.toContain('gluten');
       expect(r.allergenes_calcules).not.toContain('lait');
-    }
-  });
-
-  it('doit retourner uniquement les recettes vegan quand regime=vegan', () => {
-    const result = filterRecipes(allRecettes(), {
-      ...NO_CONSTRAINTS,
-      regimes_groupe: ['vegan'],
-    });
-    for (const r of result) {
-      expect(r.est_vegan).toBe(true);
-    }
-    expect(result.length).toBeGreaterThan(0);
-  });
-
-  it('doit retourner les recettes vegetariennes ET vegan quand regime=vegetarien', () => {
-    const result = filterRecipes(allRecettes(), {
-      ...NO_CONSTRAINTS,
-      regimes_groupe: ['vegetarien'],
-    });
-    for (const r of result) {
-      expect(r.est_vegetarien).toBe(true);
-    }
-    // Les recettes vegan doivent aussi passer (elles sont vegetariennes)
-    expect(result.some((r) => r.est_vegan)).toBe(true);
-    // Les recettes carnees doivent etre exclues
-    expect(result.some((r) => r.id === 'pates-bolognaise')).toBe(false);
-  });
-
-  it('doit retourner uniquement les recettes vegan sans gluten quand vegan + allergie gluten', () => {
-    const result = filterRecipes(allRecettes(), {
-      ...NO_CONSTRAINTS,
-      allergenes_groupe: ['gluten'],
-      regimes_groupe: ['vegan'],
-    });
-    for (const r of result) {
-      expect(r.est_vegan).toBe(true);
-      expect(r.allergenes_calcules).not.toContain('gluten');
     }
   });
 
@@ -155,26 +117,6 @@ describe('filterRecipes', () => {
     }
     // Le catalogue doit contenir au moins quelques recettes sans lait ni oeufs
     expect(result.length).toBeGreaterThan(0);
-  });
-
-  it("doit respecter l'intersection stricte vegan + coeliaque + sans four + midi", () => {
-    const result = filterRecipes(allRecettes(), {
-      allergenes_groupe: ['gluten'],
-      regimes_groupe: ['vegan'],
-      equipement_disponible: ['plaque'],
-      type_repas_requis: 'midi',
-    });
-    for (const r of result) {
-      expect(r.est_vegan).toBe(true);
-      expect(r.allergenes_calcules).not.toContain('gluten');
-      expect(r.equipement.every((e) => e === 'plaque')).toBe(true);
-      expect(r.type_repas).toContain('midi');
-    }
-    // salade-midi et soupe-legumes-midi sont vegan, sans gluten, plaque, midi
-    expect(result.some((r) => r.id === 'salade-midi')).toBe(true);
-    expect(result.some((r) => r.id === 'soupe-legumes-midi')).toBe(true);
-    // tajine-agneau-soir est soir-only -> exclu
-    expect(result.some((r) => r.id === 'tajine-agneau-soir')).toBe(false);
   });
 
 });

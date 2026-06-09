@@ -1,16 +1,8 @@
 import type { Allergen } from '../../../data/seed-allergenes';
-import type { Ingredient, MainIngredient, Recette } from '../types/domain';
+import type { Ingredient, Recette } from '../types/domain';
+import { computeDietaryMetadata } from '../dietary/compute';
 
 type RecetteSansCalculs = Omit<Recette, 'allergenes_calcules' | 'est_vegetarien' | 'est_vegan'>;
-
-const MAIN_INGREDIENTS_NON_VEGETARIEN = new Set<MainIngredient>([
-  'poulet', 'boeuf', 'porc', 'agneau',
-  'poisson', 'fruits-de-mer',
-]);
-
-const CATEGORIES_NON_VEGAN = new Set(['viandes-poissons', 'cremerie-oeufs'] as const);
-
-const MAIN_INGREDIENTS_NON_VEGAN = new Set<MainIngredient>(['oeufs', 'fromage']);
 
 /**
  * Calcule les métadonnées dérivées d'une recette à partir de ses ingrédients.
@@ -43,7 +35,6 @@ export function computeRecipeMetadata(
   est_vegan: boolean;
 } {
   const allergeneSet = new Set<Allergen>();
-  let hasNonVeganCategory = false;
 
   for (const ri of recette.ingredients) {
     if (ri.optionnel) continue;
@@ -58,20 +49,10 @@ export function computeRecipeMetadata(
     for (const allergen of ingredient.allergenes) {
       allergeneSet.add(allergen);
     }
-
-    if (CATEGORIES_NON_VEGAN.has(ingredient.categorie as 'viandes-poissons' | 'cremerie-oeufs')) {
-      hasNonVeganCategory = true;
-    }
   }
 
   const allergenes_calcules = [...allergeneSet].sort();
-
-  const est_vegetarien = !MAIN_INGREDIENTS_NON_VEGETARIEN.has(recette.ingredient_principal);
-
-  const est_vegan =
-    est_vegetarien &&
-    !hasNonVeganCategory &&
-    !MAIN_INGREDIENTS_NON_VEGAN.has(recette.ingredient_principal);
+  const { est_vegetarien, est_vegan } = computeDietaryMetadata(recette, ingredientsMap);
 
   return { allergenes_calcules, est_vegetarien, est_vegan };
 }
