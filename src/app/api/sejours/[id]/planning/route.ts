@@ -4,7 +4,7 @@ import { getAllRecettes, getAllRecettesAsMap } from '@/lib/db/recettes';
 import { createPlanning, getPlanningBySejourId } from '@/lib/db/plannings';
 import { createAnthropicClient } from '@/lib/llm/client';
 import { generatePlanning } from '@/lib/llm/generate-planning';
-import type { FilterConstraints } from '@/lib/allergens/filter';
+import type { PlanningConstraints } from '@/lib/llm/generate-planning';
 import { jsonError, jsonSuccess } from '@/lib/api/responses';
 import { dbErrorToResponse } from '@/lib/api/error-mapping';
 
@@ -70,7 +70,7 @@ export async function POST(
     return jsonError(503, 'llm_unavailable', 'Configuration LLM manquante');
   }
 
-  const filterConstraints: FilterConstraints = {
+  const constraints: PlanningConstraints = {
     allergenes_groupe: [...new Set(sejour.participants.flatMap((p) => p.allergies))],
     regimes_groupe: [...new Set(sejour.participants.flatMap((p) => p.regimes))],
     equipement_disponible: sejour.parametres.equipement_disponible,
@@ -89,7 +89,7 @@ export async function POST(
     client,
     catalogueResult.recettes,
     recettesMapResult.recettes,
-    filterConstraints,
+    constraints,
     sejour.participants,
     contexte,
   );
@@ -117,9 +117,9 @@ export async function POST(
     sejour_id: sejour.id,
     entries: planningResult.entries,
     contraintes_utilisees: {
-      allergenes: filterConstraints.allergenes_groupe,
-      regimes: filterConstraints.regimes_groupe,
-      equipement: filterConstraints.equipement_disponible,
+      allergenes: constraints.allergenes_groupe,
+      regimes: constraints.regimes_groupe,
+      equipement: constraints.equipement_disponible,
     },
   });
 

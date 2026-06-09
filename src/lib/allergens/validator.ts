@@ -4,24 +4,23 @@ import type {
   Planning,
   Recette,
   RecetteInconnueViolation,
-  RegimeViolation,
   ValidationResult,
   ValidationViolation,
 } from '../types/domain';
 
 /**
- * Valide un planning contre les contraintes de sécurité du groupe.
+ * Valide un planning contre les contraintes de sécurité allergènes du groupe.
  *
  * C'est la dernière ligne de défense sécurité avant persistance (Étage 3 selon l'ADR-001).
  * Les règles de cohérence structurelle (slots, doublons, ingredient_principal) sont dans
  * lib/coherence/validate-coherence.ts (ADR-009).
+ * Les règles de régime alimentaire sont dans lib/dietary/validator.ts (TK-05 Phase 1).
  *
  * Règles vérifiées :
  *   - Intégrité : toute recette référencée dans le planning doit exister
  *   - Allergènes : aucune recette ne peut contenir un allergène déclaré par un participant
- *   - Régimes : aucune recette ne peut violer le régime déclaré par un participant
  *
- * Les violations allergènes/régimes ne sont PAS déduplicées par participant (3 cœliaques
+ * Les violations allergènes ne sont PAS déduplicées par participant (3 cœliaques
  * = 3 violations distinctes). L'UI est responsable de la consolidation de l'affichage.
  * Une seule `RecetteInconnueViolation` est émise par `recette_id` manquant.
  *
@@ -64,30 +63,6 @@ export function validatePlanning(
             recette_id: recette.id,
             recette_nom: recette.nom,
             allergene: allergen,
-            participant_id: participant.id,
-            participant_nom: participant.nom,
-          };
-          violations.push(v);
-        }
-      }
-
-      for (const regime of participant.regimes) {
-        if (regime === 'vegan' && !recette.est_vegan) {
-          const v: RegimeViolation = {
-            kind: 'regime',
-            recette_id: recette.id,
-            recette_nom: recette.nom,
-            regime: 'vegan',
-            participant_id: participant.id,
-            participant_nom: participant.nom,
-          };
-          violations.push(v);
-        } else if (regime === 'vegetarien' && !recette.est_vegetarien) {
-          const v: RegimeViolation = {
-            kind: 'regime',
-            recette_id: recette.id,
-            recette_nom: recette.nom,
-            regime: 'vegetarien',
             participant_id: participant.id,
             participant_nom: participant.nom,
           };

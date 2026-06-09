@@ -17,7 +17,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { createAnthropicClient } from './client';
 import { generatePlanning } from './generate-planning';
 import type { GeneratePlanningInput } from './types';
-import type { FilterConstraints } from '../allergens/filter';
+import type { PlanningConstraints } from './generate-planning';
 import { EU14_ALLERGENS } from '../../../data/seed-allergenes';
 import { allRecettes, recettesMap } from '../../../tests/fixtures/recettes';
 import {
@@ -38,7 +38,7 @@ const SEJOUR_3_JOURS: GeneratePlanningInput['contexte'] = {
   temps_disponible: 'standard',
 };
 
-const CONSTRAINTS_VEGETARIEN: FilterConstraints = {
+const CONSTRAINTS_VEGETARIEN: PlanningConstraints = {
   allergenes_groupe: [],
   regimes_groupe: ['vegetarien'],
   equipement_disponible: ['plaque', 'four'],
@@ -109,7 +109,7 @@ describe('generatePlanning — intégration API Anthropic réelle', () => {
       // Garantie de pool vide indépendante des fixtures :
       // toutes les recettes nécessitent plaque ou four ; avec equipement_disponible:[],
       // aucune ne passe le filtre, même en combinaison avec EU14+vegan.
-      const constraints: FilterConstraints = {
+      const constraints: PlanningConstraints = {
         allergenes_groupe: [...EU14_ALLERGENS],
         regimes_groupe: ['vegan'],
         equipement_disponible: [],

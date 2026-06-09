@@ -10,7 +10,8 @@
  */
 
 import { z } from 'zod';
-import { EU14_ALLERGENS, DIETARY_RESTRICTIONS } from '../../../data/seed-allergenes';
+import { EU14_ALLERGENS } from '../../../data/seed-allergenes';
+import { DIETARY_RESTRICTIONS } from '../../../data/seed-dietary';
 
 // ============================================================================
 // PRIMITIVES

@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import type { FilterConstraints } from '@/lib/allergens/filter';
+import type { PlanningConstraints } from '@/lib/llm/generate-planning';
 import type { AllergenViolation, Participant, Planning } from '@/lib/types/domain';
 import { EU14_ALLERGENS } from '../../../data/seed-allergenes';
 import { filterRecipes } from '@/lib/allergens/filter';
+import { filterByDietary } from '@/lib/dietary/filter';
 import { validatePlanning } from '@/lib/allergens/validator';
+import { validateDietary } from '@/lib/dietary/validator';
 import {
   participantAllergiesMultiples,
   participantCoeliaque,
@@ -28,7 +30,7 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-const ALL_EQUIPMENT: FilterConstraints['equipement_disponible'] = [
+const ALL_EQUIPMENT: PlanningConstraints['equipement_disponible'] = [
   'four', 'plaque', 'micro-ondes', 'barbecue', 'blender', 'robot',
 ];
 
@@ -60,7 +62,7 @@ function pickUniqueN<T>(arr: T[], n: number, rng: () => number): T[] {
 function runProfile(
   label: string,
   participants: Participant[],
-  constraints: FilterConstraints,
+  constraints: PlanningConstraints,
   seed: number,
   iterations: number,
 ): void {
@@ -82,7 +84,7 @@ function runProfile(
       `Profil ${label}: aucune recette du catalogue ne porte les allergènes [${[...allergenSet]}] — test trivial, non discriminant`,
     ).toBeGreaterThan(0);
 
-    const filteredOnce = filterRecipes(catalogue, constraints);
+    const filteredOnce = filterByDietary(filterRecipes(catalogue, constraints), constraints);
     for (const id of contaminatedIds) {
       expect(
         filteredOnce.some((r) => r.id === id),
@@ -94,7 +96,7 @@ function runProfile(
   let skippedIterations = 0;
 
   for (let i = 0; i < iterations; i++) {
-    const filtered = filterRecipes(catalogue, constraints);
+    const filtered = filterByDietary(filterRecipes(catalogue, constraints), constraints);
     if (filtered.length === 0) {
       skippedIterations++;
       continue;
@@ -104,14 +106,16 @@ function runProfile(
     const selected = pickUniqueN(filtered, nb, rng).map((r) => r.id);
 
     const planning = buildPlanning(selected);
-    const result = validatePlanning(planning, recettesMap, participants);
+    const allergenResult = validatePlanning(planning, recettesMap, participants);
+    const dietaryViolations = validateDietary(planning, recettesMap, participants);
 
     // Ce test vérifie uniquement la sécurité allergènes/régimes après filtrage.
     // Les violations structurelles (slots_mismatch, ingredient_consecutif) ne sont
     // pas pertinentes pour des plannings aléatoires construits hors buildSequence.
-    const safetyViolations = result.violations.filter(
-      (v) => v.kind === 'allergen' || v.kind === 'regime',
-    );
+    const safetyViolations = [
+      ...allergenResult.violations.filter((v) => v.kind === 'allergen'),
+      ...dietaryViolations,
+    ];
     if (safetyViolations.length > 0) {
       throw new Error(
         `[${label}] Iteration ${i + 1}: Planning invalide après filtrage.\n` +
@@ -185,10 +189,10 @@ describe('allergen-safety (1100 iterations)', () => {
     ];
     const allergenes = [
       ...new Set(participants.flatMap((p) => p.allergies)),
-    ] as FilterConstraints['allergenes_groupe'];
+    ] as PlanningConstraints['allergenes_groupe'];
     const regimes = [
       ...new Set(participants.flatMap((p) => p.regimes)),
-    ] as FilterConstraints['regimes_groupe'];
+    ] as PlanningConstraints['regimes_groupe'];
 
     runProfile(
       'groupe-mixte',
@@ -299,13 +303,12 @@ describe('allergen-safety (1100 iterations)', () => {
   // Un planning qui viole l'une OU l'autre contrainte doit échouer indépendamment.
 
   it('test discriminant coeliaque+vegan : violation gluten OU non-vegan déclenche chacune un échec', () => {
-    // Cas 1 : recette non-vegan (oeufs) → violation régime 'vegan'
+    // Cas 1 : recette non-vegan (oeufs) → violation régime 'vegan' (validateDietary)
     const planningNonVegan = buildPlanning(['omelette-legumes']);
-    const resultNonVegan = validatePlanning(planningNonVegan, recettesMap, [participantCoeliaqueVegan]);
-    expect(resultNonVegan.valid).toBe(false);
-    expect(resultNonVegan.violations.some((v) => v.kind === 'regime')).toBe(true);
+    const dietaryViolationsNonVegan = validateDietary(planningNonVegan, recettesMap, [participantCoeliaqueVegan]);
+    expect(dietaryViolationsNonVegan.some((v) => v.kind === 'regime')).toBe(true);
 
-    // Cas 2 : recette avec gluten → violation allergène 'gluten'
+    // Cas 2 : recette avec gluten → violation allergène 'gluten' (validatePlanning)
     const planningGluten = buildPlanning(['pates-bolognaise']);
     const resultGluten = validatePlanning(planningGluten, recettesMap, [participantCoeliaqueVegan]);
     expect(resultGluten.valid).toBe(false);
@@ -353,11 +356,11 @@ describe('allergen-safety (1100 iterations)', () => {
   it('doit signaler explicitement un pool filtré vide', () => {
     // Contraintes maximales : tous les allergènes EU14 + vegan + aucun équipement
     // → aucune recette du catalogue ne peut passer ces trois filtres cumulés.
-    const filtered = filterRecipes(allRecettes(), {
+    const allergenFiltered = filterRecipes(allRecettes(), {
       allergenes_groupe: [...EU14_ALLERGENS],
-      regimes_groupe: ['vegan'],
       equipement_disponible: [],
     });
+    const filtered = filterByDietary(allergenFiltered, { regimes_groupe: ['vegan'] });
     expect(filtered.length).toBe(0);
     // Contrat documenté : la couche appelante DOIT détecter ce cas (filtered.length === 0)
     // et remonter une erreur explicite à l'utilisateur. Jamais continuer silencieusement.

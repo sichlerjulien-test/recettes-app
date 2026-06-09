@@ -1,6 +1,8 @@
 import type { Participant, PlanningEntry, Recette, ValidationViolation } from '../types/domain';
 import { filterRecipes, type FilterConstraints } from '../allergens/filter';
+import { filterByDietary, type DietaryConstraints } from '../dietary/filter';
 import { validatePlanning } from '../allergens/validator';
+import { validateDietary } from '../dietary/validator';
 import { validateCoherence, COHERENCE_SEVERITY } from '../coherence';
 import type { CoherenceWarning } from '../coherence';
 import { buildSequence } from '../planning/build-sequence';
@@ -11,21 +13,28 @@ import type { GeneratePlanningInput, LLMError } from './types';
 const MAX_ATTEMPTS = 3;
 
 /**
+ * Type combiné des contraintes de planification : allergènes + régimes + équipement.
+ * Utilisé par generatePlanning et ses appelants (route, tests).
+ */
+export type PlanningConstraints = FilterConstraints & DietaryConstraints;
+
+/**
  * Orchestre la génération de planning : filtre → LLM → validation → retry.
  *
  * La fonction ne lance jamais d'exception : elle retourne toujours un résultat discriminé.
  * Le LLM ne reçoit jamais les allergies des participants (garantie architecturale ADR-001).
  *
- * Après réception de la sortie LLM, deux validateurs s'exécutent en séquence (ADR-009) :
- *   1. validatePlanning (sécurité : allergènes, régimes, recette_inconnue)
- *   2. validateCoherence (cohérence : slots, doublons, ingredient_principal)
+ * Après réception de la sortie LLM, trois validateurs s'exécutent en séquence (ADR-009) :
+ *   1. validatePlanning (sécurité : allergènes, recette_inconnue)
+ *   2. validateDietary (régimes : vegan, végétarien)
+ *   3. validateCoherence (cohérence : slots, doublons, ingredient_principal)
  * Le retry se déclenche sur violation sécurité OU violation cohérence 'bloquant'.
  * Les violations 'qualite' ne déclenchent pas de retry ; elles sont renvoyées comme warnings.
  *
  * @param client          - Client LLM injectable (Anthropic ou mock de test)
  * @param catalogue       - Catalogue complet des recettes
  * @param recettesMap     - Index recette_id → Recette pour la validation
- * @param filterConstraints - Contraintes extraites du groupe (allergènes, régimes, équipement)
+ * @param constraints     - Contraintes extraites du groupe (allergènes, régimes, équipement)
  * @param participants    - Participants du séjour (pour la validation post-LLM)
  * @param sejourContexte  - Paramètres du séjour transmis au LLM
  */
@@ -33,11 +42,12 @@ export async function generatePlanning(
   client: LLMClient,
   catalogue: Recette[],
   recettesMap: Map<string, Recette>,
-  filterConstraints: FilterConstraints,
+  constraints: PlanningConstraints,
   participants: readonly Participant[],
   sejourContexte: GeneratePlanningInput['contexte'],
 ): Promise<{ ok: true; entries: PlanningEntry[]; warnings?: CoherenceWarning[] } | { ok: false; error: LLMError }> {
-  const pool = filterRecipes(catalogue, filterConstraints);
+  const allergenPool = filterRecipes(catalogue, constraints);
+  const pool = filterByDietary(allergenPool, constraints);
 
   if (pool.length === 0) {
     return { ok: false, error: { kind: 'pool_empty' } };
@@ -62,13 +72,14 @@ export async function generatePlanning(
         entries: planningEntries,
         genere_le: new Date().toISOString(),
         contraintes_utilisees: {
-          allergenes: filterConstraints.allergenes_groupe,
-          regimes: filterConstraints.regimes_groupe,
-          equipement: filterConstraints.equipement_disponible,
+          allergenes: constraints.allergenes_groupe,
+          regimes: constraints.regimes_groupe,
+          equipement: constraints.equipement_disponible,
         },
       };
 
       const securityResult = validatePlanning(planningForValidation, recettesMap, participants);
+      const dietaryViolations = validateDietary(planningForValidation, recettesMap, participants);
       const coherenceViolations = validateCoherence(planningForValidation, recettesMap, expectedSlots);
 
       const bloquantCoherence = coherenceViolations.filter(
@@ -78,7 +89,7 @@ export async function generatePlanning(
         (v) => COHERENCE_SEVERITY[v.kind] === 'qualite',
       ) as CoherenceWarning[];
 
-      if (securityResult.violations.length === 0 && bloquantCoherence.length === 0) {
+      if (securityResult.violations.length === 0 && dietaryViolations.length === 0 && bloquantCoherence.length === 0) {
         return {
           ok: true,
           entries: planningEntries,
@@ -86,7 +97,7 @@ export async function generatePlanning(
         };
       }
 
-      lastViolations = [...securityResult.violations, ...bloquantCoherence];
+      lastViolations = [...securityResult.violations, ...dietaryViolations, ...bloquantCoherence];
       // MVP : log via console.warn. Logger injectable à introduire au Sprint 1
       // si besoin d'audit structuré (cf. ADR-001 mention "audit").
       console.warn(
