@@ -60,7 +60,8 @@ describe('generatePlanning — intégration API Anthropic réelle', () => {
     async () => {
       console.log('[integration][test1] Démarrage happy path...');
 
-      const client = createAnthropicClient(process.env.ANTHROPIC_API_KEY!);
+      const apiKey = process.env.ANTHROPIC_API_KEY ?? '';
+      const client = createAnthropicClient(apiKey);
       const catalogue = allRecettes();
 
       console.log(`[integration][test1] Catalogue : ${catalogue.length} recettes`);
@@ -145,7 +146,8 @@ describe('generatePlanning — intégration API Anthropic réelle', () => {
     async () => {
       console.log('[integration][test3] Démarrage mesure latence...');
 
-      const client = createAnthropicClient(process.env.ANTHROPIC_API_KEY!);
+      const apiKey = process.env.ANTHROPIC_API_KEY ?? '';
+      const client = createAnthropicClient(apiKey);
 
       const start = performance.now();
       const result = await generatePlanning(

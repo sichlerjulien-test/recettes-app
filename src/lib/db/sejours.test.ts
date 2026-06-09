@@ -46,6 +46,13 @@ function createMockSupabase(
   };
 }
 
+// cast nécessaire : mock partiel inclut _rpcSpy (spy de test) absent de l'interface Supabase
+function asMockClient(
+  m: ReturnType<typeof createMockSupabase>,
+): ReturnType<typeof getSupabaseClient> {
+  return m as unknown as ReturnType<typeof getSupabaseClient>;
+}
+
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 const SEJOUR_INPUT: SejourDALInput = {
@@ -93,13 +100,13 @@ describe('sejours DAL', () => {
   describe('createSejour', () => {
     it('should return ok with sejour when DB inserts succeed', async () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
-        createMockSupabase({
+        asMockClient(createMockSupabase({
           sejours: [
             { data: { id: 'sejour-uuid-123' }, error: null },
             { data: SEJOUR_DB_ROW, error: null },
           ],
           participants: [{ data: null, error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        })),
       );
 
       const result = await createSejour(SEJOUR_INPUT, [PARTICIPANT_INPUT]);
@@ -113,9 +120,9 @@ describe('sejours DAL', () => {
 
     it('should return query_failed when sejour insert errors', async () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
-        createMockSupabase({
+        asMockClient(createMockSupabase({
           sejours: [{ data: null, error: { message: 'DB connection failed' } }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        })),
       );
 
       const result = await createSejour(SEJOUR_INPUT, [PARTICIPANT_INPUT]);
@@ -131,10 +138,10 @@ describe('sejours DAL', () => {
 
     it('should return query_failed when participants insert errors (sejour persisted — known transactional risk)', async () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
-        createMockSupabase({
+        asMockClient(createMockSupabase({
           sejours: [{ data: { id: 'sejour-uuid-123' }, error: null }],
           participants: [{ data: null, error: { message: 'Participants insert failed' } }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        })),
       );
 
       const result = await createSejour(SEJOUR_INPUT, [PARTICIPANT_INPUT]);
@@ -150,12 +157,12 @@ describe('sejours DAL', () => {
 
     it('should generate a UUID token via crypto.randomUUID (token non-empty and matches UUID v4 pattern)', async () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
-        createMockSupabase({
+        asMockClient(createMockSupabase({
           sejours: [
             { data: { id: 'sejour-uuid-123' }, error: null },
             { data: SEJOUR_DB_ROW, error: null },
           ],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        })),
       );
 
       const result = await createSejour(SEJOUR_INPUT, []);
@@ -172,9 +179,9 @@ describe('sejours DAL', () => {
   describe('getSejourById', () => {
     it('should return not_found when row is null', async () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
-        createMockSupabase({
+        asMockClient(createMockSupabase({
           sejours: [{ data: null, error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        })),
       );
 
       const result = await getSejourById('unknown-id');
@@ -191,9 +198,9 @@ describe('sejours DAL', () => {
 
     it('should return query_failed when DB errors', async () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
-        createMockSupabase({
+        asMockClient(createMockSupabase({
           sejours: [{ data: null, error: { message: 'query error' } }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        })),
       );
 
       const result = await getSejourById('some-id');
@@ -209,9 +216,9 @@ describe('sejours DAL', () => {
       delete invalidRow['nb_jours'];
 
       vi.mocked(getSupabaseClient).mockReturnValue(
-        createMockSupabase({
+        asMockClient(createMockSupabase({
           sejours: [{ data: invalidRow, error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        })),
       );
 
       const result = await getSejourById('sejour-uuid-123');
@@ -226,9 +233,9 @@ describe('sejours DAL', () => {
   describe('getSejourByToken', () => {
     it('should return ok with sejour when token matches', async () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
-        createMockSupabase({
+        asMockClient(createMockSupabase({
           sejours: [{ data: SEJOUR_DB_ROW, error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        })),
       );
 
       const result = await getSejourByToken('12345678-1234-4abc-8abc-123456789012');
@@ -248,7 +255,7 @@ describe('sejours DAL', () => {
         [{ data: null, error: null }],
       );
       vi.mocked(getSupabaseClient).mockReturnValue(
-        mock as unknown as ReturnType<typeof getSupabaseClient>,
+        asMockClient(mock),
       );
 
       const result = await updateSejour('sejour-uuid-123', SEJOUR_INPUT, [PARTICIPANT_INPUT]);
@@ -277,7 +284,7 @@ describe('sejours DAL', () => {
         [{ data: null, error: { message: 'RPC procedure failed' } }],
       );
       vi.mocked(getSupabaseClient).mockReturnValue(
-        mock as unknown as ReturnType<typeof getSupabaseClient>,
+        asMockClient(mock),
       );
 
       const result = await updateSejour('sejour-uuid-123', SEJOUR_INPUT, [PARTICIPANT_INPUT]);

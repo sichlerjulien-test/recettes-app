@@ -29,14 +29,15 @@ function makeChain(result: Promise<MockResult>) {
   };
 }
 
-function createMockSupabase(tableQueues: Record<string, MockResult[]>) {
+function createMockSupabase(tableQueues: Record<string, MockResult[]>): ReturnType<typeof getSupabaseClient> {
+  // cast nécessaire : mock partiel — seule from est implémentée, pas l'interface complète
   return {
     from: (table: string) => {
       const queue = tableQueues[table] ?? [];
       const next = queue.shift() ?? { data: null, error: null };
       return makeChain(Promise.resolve(next));
     },
-  };
+  } as unknown as ReturnType<typeof getSupabaseClient>;
 }
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -75,7 +76,7 @@ describe('plannings DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           plannings: [{ data: RAW_PLANNING_ROW, error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await getPlanningBySejourId('sejour-uuid');
@@ -92,7 +93,7 @@ describe('plannings DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           plannings: [{ data: null, error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await getPlanningBySejourId('sejour-uuid');
@@ -113,7 +114,7 @@ describe('plannings DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           plannings: [{ data: RAW_PLANNING_ROW, error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await createPlanning(PLANNING_INPUT);
@@ -131,7 +132,7 @@ describe('plannings DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           plannings: [{ data: null, error: { message: 'insert failed' } }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await createPlanning(PLANNING_INPUT);
@@ -152,7 +153,7 @@ describe('plannings DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           plannings: [{ data: invalidRow, error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await createPlanning(PLANNING_INPUT);

@@ -26,14 +26,15 @@ function makeChain(result: Promise<MockResult>) {
   };
 }
 
-function createMockSupabase(tableQueues: Record<string, MockResult[]>) {
+function createMockSupabase(tableQueues: Record<string, MockResult[]>): ReturnType<typeof getSupabaseClient> {
+  // cast nécessaire : mock partiel — seule from est implémentée, pas l'interface complète
   return {
     from: (table: string) => {
       const queue = tableQueues[table] ?? [];
       const next = queue.shift() ?? { data: null, error: null };
       return makeChain(Promise.resolve(next));
     },
-  };
+  } as unknown as ReturnType<typeof getSupabaseClient>;
 }
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -75,7 +76,7 @@ describe('recettes DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           recettes: [{ data: [RAW_RECETTE_ROW], error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await getAllRecettes();
@@ -92,7 +93,7 @@ describe('recettes DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           recettes: [{ data: null, error: { message: 'connection refused' } }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await getAllRecettes();
@@ -112,7 +113,7 @@ describe('recettes DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           recettes: [{ data: [invalidRow], error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await getAllRecettes();
@@ -129,7 +130,7 @@ describe('recettes DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           recettes: [{ data: null, error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await getRecetteById('unknown-slug');
@@ -150,7 +151,7 @@ describe('recettes DAL', () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           recettes: [{ data: [RAW_RECETTE_ROW], error: null }],
-        }) as unknown as ReturnType<typeof getSupabaseClient>,
+        }),
       );
 
       const result = await getAllRecettesAsMap();
