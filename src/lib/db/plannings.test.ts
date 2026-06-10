@@ -69,7 +69,7 @@ const RAW_PLANNING_ROW_OLD_FORMAT = {
   ...RAW_PLANNING_ROW,
   contraintes_utilisees: {
     allergenes: [],
-    regimes: ['vegan'],
+    regimes: ['vegetarien'],
     equipement: ['four'],
   },
 };
@@ -175,9 +175,9 @@ describe('plannings DAL', () => {
     });
   });
 
-  // Discriminant : ancien format DB (regimes au lieu d'exclusions) ne doit pas jeter (ADR-011 §8)
+  // Discriminant : ancien format DB (regimes au lieu d'exclusions) doit conserver la valeur (ADR-011 §8)
   describe('compatibilité ancien format (regimes dans contraintes_utilisees)', () => {
-    it('getPlanningBySejourId ne retourne PAS row_validation_failed pour un planning ancien format', async () => {
+    it('getPlanningBySejourId normalise regimes en exclusions pour un planning ancien format', async () => {
       vi.mocked(getSupabaseClient).mockReturnValue(
         createMockSupabase({
           plannings: [{ data: RAW_PLANNING_ROW_OLD_FORMAT, error: null }],
@@ -187,9 +187,9 @@ describe('plannings DAL', () => {
       const result = await getPlanningBySejourId('sejour-uuid');
 
       expect(result.ok).toBe(true);
-      if (!result.ok) {
-        // Si ce test échoue avec row_validation_failed, le schéma tolérant est cassé
-        expect(result.error.kind).not.toBe('row_validation_failed');
+      if (result.ok) {
+        expect(result.planning.contraintes_utilisees.exclusions).toContain('vegetarien');
+        expect('regimes' in result.planning.contraintes_utilisees).toBe(false);
       }
     });
   });

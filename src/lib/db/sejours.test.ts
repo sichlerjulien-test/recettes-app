@@ -90,6 +90,20 @@ const SEJOUR_DB_ROW = {
   cree_le: '2026-04-28T00:00:00.000Z',
 };
 
+const SEJOUR_DB_ROW_WITH_LEGACY_PARTICIPANT = {
+  ...SEJOUR_DB_ROW,
+  participants: [
+    {
+      id: 'participant-uuid-123',
+      nom: 'Alex',
+      allergies: [],
+      regimes: ['vegetarien'],
+      aime: [],
+      n_aime_pas: [],
+    },
+  ],
+};
+
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('sejours DAL', () => {
@@ -226,6 +240,22 @@ describe('sejours DAL', () => {
       expect(result.ok).toBe(false);
       if (!result.ok) {
         expect(result.error.kind).toBe('row_validation_failed');
+      }
+    });
+
+    it('normalise participant regimes en exclusions à la lecture', async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        asMockClient(createMockSupabase({
+          sejours: [{ data: SEJOUR_DB_ROW_WITH_LEGACY_PARTICIPANT, error: null }],
+        })),
+      );
+
+      const result = await getSejourById('sejour-uuid-123');
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.sejour.participants[0]?.exclusions).toEqual(['vegetarien']);
+        expect('regimes' in result.sejour.participants[0]!).toBe(false);
       }
     });
   });

@@ -505,3 +505,15 @@ Cette décision sera réévaluée si :
   non-objectifs incluaient "ADR dédié aux exclusions alimentaires"
 - BACKLOG.md TK-05 — Critères d'acceptation : pool_empty si pool vide, forteresse
   inchangée après Phase 2
+
+## Historique d'implémentation
+
+- Phase 1 mergée le 2026-06-09 via PR #21.
+- Phase 2A mergée le 2026-06-10 via PR #22.
+- Décision Étape 0 gravée : les colonnes DB `regimes`, `est_vegetarien` et
+  `est_vegan` sont conservées ; le mapping app<->DB se fait au DAL ; la lecture
+  de `contraintes_utilisees` est normalisée (`regimes` -> `exclusions`) ; zéro
+  migration SQL en 2A. Motif : éviter une dérive de schéma classe TK-15/16.
+- Dette créée : la colonne `regimes` porte désormais une sémantique
+  `ExclusionTag`. Pré-condition Session C = renommage + élargissement CHECK
+  (TK-19, à logger hors PR).

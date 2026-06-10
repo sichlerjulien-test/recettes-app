@@ -72,6 +72,44 @@ export const CookingLevelSchema = z.enum(['facile', 'normal']);
 
 export const TimeAvailableSchema = z.enum(['rapide', 'standard']);
 
+type ExclusionTag = typeof DIETARY_RESTRICTIONS[number];
+
+const LEGACY_REGIME_TO_EXCLUSION: Record<string, ExclusionTag> = {
+  vegetarien: 'vegetarien',
+  vegan: 'vegan',
+};
+
+function normalizeLegacyRegimes(value: unknown, context: string): unknown[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.map((regime) => {
+    if (typeof regime === 'string' && regime in LEGACY_REGIME_TO_EXCLUSION) {
+      return LEGACY_REGIME_TO_EXCLUSION[regime];
+    }
+
+    console.warn(
+      `[schemas] ${context}: valeur legacy regimes inconnue, validation conserve l'erreur`,
+      regime,
+    );
+    return regime;
+  });
+}
+
+function normalizeRegimesToExclusions(input: unknown, context: string): unknown {
+  if (typeof input !== 'object' || input === null || Array.isArray(input)) return input;
+
+  const row = input as Record<string, unknown>;
+
+  if ('exclusions' in row && row['exclusions'] !== undefined) {
+    return row;
+  }
+
+  return {
+    ...row,
+    exclusions: normalizeLegacyRegimes(row['regimes'], context),
+  };
+}
+
 // Slug : minuscules, chiffres, tirets uniquement
 const SlugSchema = z.string().regex(
   /^[a-z0-9]+(-[a-z0-9]+)*$/,
@@ -149,14 +187,17 @@ export const RecetteSchema = RecetteInputSchema.extend({
 // PARTICIPANT & SEJOUR
 // ============================================================================
 
-export const ParticipantSchema = z.object({
-  id: z.string(),
-  nom: z.string().min(1).max(50),
-  allergies: z.array(AllergenSchema).default([]),
-  exclusions: z.array(ExclusionTagSchema).default([]),
-  aime: z.array(z.string()).default([]),
-  n_aime_pas: z.array(z.string()).default([]),
-});
+export const ParticipantSchema = z.preprocess(
+  (input) => normalizeRegimesToExclusions(input, 'participant'),
+  z.object({
+    id: z.string(),
+    nom: z.string().min(1).max(50),
+    allergies: z.array(AllergenSchema).default([]),
+    exclusions: z.array(ExclusionTagSchema).default([]),
+    aime: z.array(z.string()).default([]),
+    n_aime_pas: z.array(z.string()).default([]),
+  }),
+);
 
 export const SejourParametresSchema = z.object({
   niveau_cuisine: CookingLevelSchema,
@@ -216,13 +257,15 @@ export const PlanningSchema = z.object({
   entries: z.array(PlanningEntryFullSchema),
   genere_le: z.string(),
   /** Trace des contraintes utilisées pour la génération (audit).
-   * regimes est optionnel pour compatibilité avec les anciennes lignes en base (voir ADR-011 §8). */
-  contraintes_utilisees: z.object({
-    allergenes: z.array(AllergenSchema),
-    regimes: z.array(DietaryRestrictionSchema).optional(),
-    exclusions: z.array(ExclusionTagSchema).optional(),
-    equipement: z.array(EquipmentSchema),
-  }),
+   * Les anciennes lignes `regimes` sont normalisées en `exclusions` à la lecture. */
+  contraintes_utilisees: z.preprocess(
+    (input) => normalizeRegimesToExclusions(input, 'contraintes_utilisees'),
+    z.object({
+      allergenes: z.array(AllergenSchema),
+      exclusions: z.array(ExclusionTagSchema),
+      equipement: z.array(EquipmentSchema),
+    }),
+  ),
 });
 
 // ============================================================================
