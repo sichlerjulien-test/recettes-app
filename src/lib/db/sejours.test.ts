@@ -69,7 +69,7 @@ const SEJOUR_INPUT: SejourDALInput = {
 const PARTICIPANT_INPUT: ParticipantDALInput = {
   nom: 'Alex',
   allergies: [],
-  regimes: [],
+  exclusions: [],
   aime: [],
   n_aime_pas: [],
 };

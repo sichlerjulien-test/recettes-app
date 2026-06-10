@@ -40,7 +40,7 @@ const SEJOUR_3_JOURS: GeneratePlanningInput['contexte'] = {
 
 const CONSTRAINTS_VEGETARIEN: PlanningConstraints = {
   allergenes_groupe: [],
-  regimes_groupe: ['vegetarien'],
+  exclusions_groupe: ['vegetarien'],
   equipement_disponible: ['plaque', 'four'],
 };
 
@@ -92,7 +92,7 @@ describe('generatePlanning — intégration API Anthropic réelle', () => {
         if (recette === undefined) continue;
 
         expect(
-          recette.est_vegetarien || recette.est_vegan,
+          recette.exclusions_compatibles.includes('vegetarien') || recette.exclusions_compatibles.includes('vegan'),
           `Recette non-végétarienne dans le planning : ${recette.nom} (${recette.id})`,
         ).toBe(true);
       }
@@ -111,7 +111,7 @@ describe('generatePlanning — intégration API Anthropic réelle', () => {
       // aucune ne passe le filtre, même en combinaison avec EU14+vegan.
       const constraints: PlanningConstraints = {
         allergenes_groupe: [...EU14_ALLERGENS],
-        regimes_groupe: ['vegan'],
+        exclusions_groupe: ['vegan'],
         equipement_disponible: [],
       };
 

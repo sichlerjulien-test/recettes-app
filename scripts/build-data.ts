@@ -18,6 +18,7 @@ import { createClient } from '@supabase/supabase-js';
 import { IngredientSchema, RecetteInputSchema } from '../src/lib/types/schemas';
 import type { IngredientOutput, RecetteOutput } from '../src/lib/types/schemas';
 import { computeRecipeMetadata } from '../src/lib/allergens/compute';
+import { computeDietaryMetadata } from '../src/lib/dietary/compute';
 import { resolveEnvFile, isProdEnvFile } from './resolve-env-file';
 
 // ---------------------------------------------------------------------------
@@ -303,13 +304,18 @@ async function main(): Promise<void> {
   const recetteRows: RecetteInsert[] = [];
 
   for (const recette of recettes.values()) {
-    let meta: { allergenes_calcules: string[]; est_vegetarien: boolean; est_vegan: boolean };
+    let allergenMeta: { allergenes_calcules: string[] };
+    let dietaryMeta: { exclusions_compatibles: string[] };
     try {
-      meta = computeRecipeMetadata(recette, ingredientsMap);
+      allergenMeta = computeRecipeMetadata(recette, ingredientsMap);
+      dietaryMeta = computeDietaryMetadata(recette, ingredientsMap);
     } catch (err) {
       buildErrors.push(`[${recette.id}] Calcul métadonnées : ${(err as Error).message}`);
       continue;
     }
+
+    const est_vegetarien = dietaryMeta.exclusions_compatibles.includes('vegetarien');
+    const est_vegan = dietaryMeta.exclusions_compatibles.includes('vegan');
 
     recetteRows.push({
       id: recette.id,
@@ -327,9 +333,9 @@ async function main(): Promise<void> {
       feculent_dominant: recette.feculent_dominant,
       etapes: [...recette.etapes],
       tags_libres: [...recette.tags_libres],
-      allergenes_calcules: [...meta.allergenes_calcules],
-      est_vegetarien: meta.est_vegetarien,
-      est_vegan: meta.est_vegan,
+      allergenes_calcules: [...allergenMeta.allergenes_calcules],
+      est_vegetarien,
+      est_vegan,
     });
   }
 

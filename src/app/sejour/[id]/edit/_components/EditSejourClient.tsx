@@ -24,7 +24,7 @@ function sejourToFormValues(sejour: Sejour): SejourFormData {
     participants: sejour.participants.map((p) => ({
       nom: p.nom,
       allergies: p.allergies,
-      regimes: p.regimes,
+      exclusions: p.exclusions,
       aime: p.aime,
       n_aime_pas: p.n_aime_pas,
     })),

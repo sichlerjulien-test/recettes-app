@@ -19,6 +19,7 @@ import { DIETARY_RESTRICTIONS } from '../../../data/seed-dietary';
 
 export const AllergenSchema = z.enum(EU14_ALLERGENS);
 export const DietaryRestrictionSchema = z.enum(DIETARY_RESTRICTIONS);
+export const ExclusionTagSchema = z.enum(DIETARY_RESTRICTIONS);
 
 export const IngredientCategorySchema = z.enum([
   'fruits-legumes',
@@ -92,6 +93,7 @@ export const IngredientSchema = z.object({
   allergenes: z.array(AllergenSchema).default([]),
   contient_trace: z.array(AllergenSchema).default([]),
   substituts: z.array(SlugSchema).default([]),
+  exclusion_tags: z.array(ExclusionTagSchema).default([]),
   saisonnalite: z.array(z.number().int().min(1).max(12)).optional(),
   notes: z.string().optional(),
 });
@@ -140,8 +142,7 @@ export const RecetteInputSchema = z.object({
  */
 export const RecetteSchema = RecetteInputSchema.extend({
   allergenes_calcules: z.array(AllergenSchema),
-  est_vegetarien: z.boolean(),
-  est_vegan: z.boolean(),
+  exclusions_compatibles: z.array(ExclusionTagSchema),
 });
 
 // ============================================================================
@@ -152,7 +153,7 @@ export const ParticipantSchema = z.object({
   id: z.string(),
   nom: z.string().min(1).max(50),
   allergies: z.array(AllergenSchema).default([]),
-  regimes: z.array(DietaryRestrictionSchema).default([]),
+  exclusions: z.array(ExclusionTagSchema).default([]),
   aime: z.array(z.string()).default([]),
   n_aime_pas: z.array(z.string()).default([]),
 });
@@ -214,10 +215,12 @@ export const PlanningSchema = z.object({
   sejour_id: z.string(),
   entries: z.array(PlanningEntryFullSchema),
   genere_le: z.string(),
-  /** Trace des contraintes utilisées pour la génération (audit) */
+  /** Trace des contraintes utilisées pour la génération (audit).
+   * regimes est optionnel pour compatibilité avec les anciennes lignes en base (voir ADR-011 §8). */
   contraintes_utilisees: z.object({
     allergenes: z.array(AllergenSchema),
-    regimes: z.array(DietaryRestrictionSchema),
+    regimes: z.array(DietaryRestrictionSchema).optional(),
+    exclusions: z.array(ExclusionTagSchema).optional(),
     equipement: z.array(EquipmentSchema),
   }),
 });
@@ -258,12 +261,12 @@ export const AllergenViolationSchema = z.object({
   participant_nom: z.union([z.string(), z.undefined()]),
 });
 
-/** Violation liée à un régime alimentaire déclaré par un participant. */
-export const RegimeViolationSchema = z.object({
-  kind: z.literal('regime'),
+/** Violation liée à une exclusion alimentaire déclarée par un participant. */
+export const ExclusionViolationSchema = z.object({
+  kind: z.literal('exclusion'),
   recette_id: z.string(),
   recette_nom: z.string(),
-  regime: DietaryRestrictionSchema,
+  exclusion: ExclusionTagSchema,
   participant_id: z.union([z.string(), z.undefined()]),
   participant_nom: z.union([z.string(), z.undefined()]),
 });
@@ -297,7 +300,7 @@ export const IngredientConsecutifViolationSchema = z.object({
 
 export const ValidationViolationSchema = z.discriminatedUnion('kind', [
   AllergenViolationSchema,
-  RegimeViolationSchema,
+  ExclusionViolationSchema,
   RecetteInconnueViolationSchema,
   SlotsMismatchViolationSchema,
   RecetteDupliqueeViolationSchema,
@@ -407,7 +410,7 @@ export const CreateSejourBodySchema = z.object({
   participants: z.array(z.object({
     nom: z.string().min(1).max(50),
     allergies: z.array(AllergenSchema).default([]),
-    regimes: z.array(DietaryRestrictionSchema).default([]),
+    exclusions: z.array(ExclusionTagSchema).default([]),
     aime: z.array(z.string()).default([]),
     n_aime_pas: z.array(z.string()).default([]),
   })).min(1).max(12),

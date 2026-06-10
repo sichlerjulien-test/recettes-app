@@ -47,7 +47,7 @@ const PLANNING_INPUT: CreatePlanningInput = {
   entries: [{ jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 }],
   contraintes_utilisees: {
     allergenes: [],
-    regimes: [],
+    exclusions: [],
     equipement: ['four'],
   },
 };
@@ -58,10 +58,20 @@ const RAW_PLANNING_ROW = {
   entries: [{ jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 }],
   contraintes_utilisees: {
     allergenes: [],
-    regimes: [],
+    exclusions: [],
     equipement: ['four'],
   },
   genere_le: '2026-04-28T00:00:00.000Z',
+};
+
+// Ligne ancienne format (regimes au lieu d'exclusions) — tolérée par le schéma de lecture (ADR-011 §8).
+const RAW_PLANNING_ROW_OLD_FORMAT = {
+  ...RAW_PLANNING_ROW,
+  contraintes_utilisees: {
+    allergenes: [],
+    regimes: ['vegan'],
+    equipement: ['four'],
+  },
 };
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
@@ -161,6 +171,25 @@ describe('plannings DAL', () => {
       expect(result.ok).toBe(false);
       if (!result.ok) {
         expect(result.error.kind).toBe('row_validation_failed');
+      }
+    });
+  });
+
+  // Discriminant : ancien format DB (regimes au lieu d'exclusions) ne doit pas jeter (ADR-011 §8)
+  describe('compatibilité ancien format (regimes dans contraintes_utilisees)', () => {
+    it('getPlanningBySejourId ne retourne PAS row_validation_failed pour un planning ancien format', async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        createMockSupabase({
+          plannings: [{ data: RAW_PLANNING_ROW_OLD_FORMAT, error: null }],
+        }),
+      );
+
+      const result = await getPlanningBySejourId('sejour-uuid');
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) {
+        // Si ce test échoue avec row_validation_failed, le schéma tolérant est cassé
+        expect(result.error.kind).not.toBe('row_validation_failed');
       }
     });
   });

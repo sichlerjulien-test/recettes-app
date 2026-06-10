@@ -8,7 +8,7 @@ import {
   participantCoeliaqueVegan,
   participantVegetarienLait,
 } from '../../../tests/fixtures/participants';
-import { validateDietary } from './validator';
+import { validateExclusions } from './validator';
 
 function makePlanning(recetteIds: string[]): Planning {
   return {
@@ -21,75 +21,111 @@ function makePlanning(recetteIds: string[]): Planning {
       portions: 4,
     })),
     genere_le: '2026-04-21T00:00:00Z',
-    contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+    contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
   };
 }
 
-describe('validateDietary', () => {
+describe('validateExclusions', () => {
 
-  it('doit retourner [] pour un participant sans régime sur une recette non-vegan', () => {
+  it('doit retourner [] pour un participant sans exclusion sur une recette non-vegan', () => {
     const planning = makePlanning(['omelette-legumes']);
-    const result = validateDietary(planning, recettesMap, [participantSansContrainte]);
+    const result = validateExclusions(planning, recettesMap, [participantSansContrainte]);
     expect(result).toHaveLength(0);
   });
 
-  it('doit émettre une RegimeViolation kind=vegan quand la recette n\'est pas vegan', () => {
-    const planning = makePlanning(['omelette-legumes']); // est_vegan=false
-    const result = validateDietary(planning, recettesMap, [participantVegan]);
+  it('doit émettre une ExclusionViolation kind=exclusion quand la recette n\'est pas vegan', () => {
+    const planning = makePlanning(['omelette-legumes']); // exclusions_compatibles n'inclut pas 'vegan'
+    const result = validateExclusions(planning, recettesMap, [participantVegan]);
     expect(result).toHaveLength(1);
-    expect(result[0]?.kind).toBe('regime');
-    expect(result[0]?.regime).toBe('vegan');
+    expect(result[0]?.kind).toBe('exclusion');
+    expect(result[0]?.exclusion).toBe('vegan');
     expect(result[0]?.participant_id).toBe(participantVegan.id);
   });
 
-  it('doit émettre une RegimeViolation kind=vegetarien quand la recette contient de la viande', () => {
-    const planning = makePlanning(['pates-bolognaise']); // est_vegetarien=false
-    const result = validateDietary(planning, recettesMap, [participantVegetarien]);
+  it('doit émettre une ExclusionViolation kind=exclusion quand la recette contient de la viande', () => {
+    const planning = makePlanning(['pates-bolognaise']); // exclusions_compatibles = []
+    const result = validateExclusions(planning, recettesMap, [participantVegetarien]);
     expect(result).toHaveLength(1);
-    expect(result[0]?.kind).toBe('regime');
-    expect(result[0]?.regime).toBe('vegetarien');
+    expect(result[0]?.kind).toBe('exclusion');
+    expect(result[0]?.exclusion).toBe('vegetarien');
     expect(result[0]?.participant_id).toBe(participantVegetarien.id);
   });
 
   it('doit retourner [] pour un planning vide', () => {
     const planning = makePlanning([]);
-    const result = validateDietary(planning, recettesMap, [participantVegan]);
+    const result = validateExclusions(planning, recettesMap, [participantVegan]);
     expect(result).toHaveLength(0);
   });
 
   it('doit ignorer silencieusement une recette inconnue (recette_inconnue est remonté par validatePlanning)', () => {
     const planning = makePlanning(['recette-fantome-xyz']);
-    const result = validateDietary(planning, recettesMap, [participantVegan]);
+    const result = validateExclusions(planning, recettesMap, [participantVegan]);
     expect(result).toHaveLength(0);
   });
 
-  it('doit émettre regime(vegan) pour un participant coeliaque-vegan sur une recette non-vegan', () => {
-    // participantCoeliaqueVegan : allergies=['gluten'], regimes=['vegan']
-    // omelette-legumes est_vegan=false → violation régime 'vegan'
+  it('doit émettre exclusion(vegan) pour un participant coeliaque-vegan sur une recette non-vegan', () => {
     const planning = makePlanning(['omelette-legumes']);
-    const result = validateDietary(planning, recettesMap, [participantCoeliaqueVegan]);
+    const result = validateExclusions(planning, recettesMap, [participantCoeliaqueVegan]);
     expect(result).toHaveLength(1);
-    expect(result[0]?.regime).toBe('vegan');
+    expect(result[0]?.exclusion).toBe('vegan');
     expect(result[0]?.participant_id).toBe(participantCoeliaqueVegan.id);
   });
 
-  it('doit émettre une RegimeViolation végétarien pour participantVegetarienLait (régime + allergie indépendants)', () => {
-    // pates-bolognaise : est_vegetarien=false → violation végétarien
-    // participantVegetarienLait a aussi allergie lait, mais validateDietary ne gère que les régimes
+  it('doit émettre une ExclusionViolation végétarien pour participantVegetarienLait (exclusion + allergie indépendants)', () => {
     const planning = makePlanning(['pates-bolognaise']);
-    const result = validateDietary(planning, recettesMap, [participantVegetarienLait]);
+    const result = validateExclusions(planning, recettesMap, [participantVegetarienLait]);
     expect(result).toHaveLength(1);
-    expect(result[0]?.regime).toBe('vegetarien');
+    expect(result[0]?.exclusion).toBe('vegetarien');
     expect(result[0]?.participant_id).toBe(participantVegetarienLait.id);
   });
 
   it('doit émettre 2 violations quand 2 participants vegan reçoivent une recette non-vegan', () => {
     const planning = makePlanning(['omelette-legumes']);
-    const result = validateDietary(planning, recettesMap, [participantVegan, participantCoeliaqueVegan]);
+    const result = validateExclusions(planning, recettesMap, [participantVegan, participantCoeliaqueVegan]);
     expect(result).toHaveLength(2);
     const ids = result.map((v) => v.participant_id);
     expect(ids).toContain(participantVegan.id);
     expect(ids).toContain(participantCoeliaqueVegan.id);
+  });
+
+  // ── Intensif : 100 tirages — jamais de violation après filtrage correct ───────────────────────
+
+  it('intensif : 100 tirages — validateExclusions retourne [] sur recettes vegan pour participants vegan', () => {
+    const veganRecettes = [...recettesMap.values()].filter(
+      (r) => r.exclusions_compatibles.includes('vegan'),
+    );
+    const planning: Planning = {
+      id: 'planning-intensif',
+      sejour_id: 'sejour-intensif',
+      entries: veganRecettes.map((r, i) => ({
+        jour: i + 1, repas: 'midi' as const, recette_id: r.id, portions: 2,
+      })),
+      genere_le: '2026-06-10T00:00:00Z',
+      contraintes_utilisees: { allergenes: [], exclusions: ['vegan'], equipement: [] },
+    };
+    for (let i = 0; i < 100; i++) {
+      const violations = validateExclusions(planning, recettesMap, [participantVegan]);
+      expect(violations).toHaveLength(0);
+    }
+  });
+
+  it('intensif : 100 tirages — validateExclusions retourne [] sur recettes vegetariennes pour participants vegetariens', () => {
+    const vegRecettes = [...recettesMap.values()].filter(
+      (r) => r.exclusions_compatibles.includes('vegetarien'),
+    );
+    const planning: Planning = {
+      id: 'planning-intensif-veg',
+      sejour_id: 'sejour-intensif',
+      entries: vegRecettes.map((r, i) => ({
+        jour: i + 1, repas: 'midi' as const, recette_id: r.id, portions: 2,
+      })),
+      genere_le: '2026-06-10T00:00:00Z',
+      contraintes_utilisees: { allergenes: [], exclusions: ['vegetarien'], equipement: [] },
+    };
+    for (let i = 0; i < 100; i++) {
+      const violations = validateExclusions(planning, recettesMap, [participantVegetarien]);
+      expect(violations).toHaveLength(0);
+    }
   });
 
 });

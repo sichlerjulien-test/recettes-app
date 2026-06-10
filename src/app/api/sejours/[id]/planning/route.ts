@@ -72,7 +72,7 @@ export async function POST(
 
   const constraints: PlanningConstraints = {
     allergenes_groupe: [...new Set(sejour.participants.flatMap((p) => p.allergies))],
-    regimes_groupe: [...new Set(sejour.participants.flatMap((p) => p.regimes))],
+    exclusions_groupe: [...new Set(sejour.participants.flatMap((p) => p.exclusions))],
     equipement_disponible: sejour.parametres.equipement_disponible,
   };
 
@@ -118,7 +118,7 @@ export async function POST(
     entries: planningResult.entries,
     contraintes_utilisees: {
       allergenes: constraints.allergenes_groupe,
-      regimes: constraints.regimes_groupe,
+      exclusions: constraints.exclusions_groupe,
       equipement: constraints.equipement_disponible,
     },
   });

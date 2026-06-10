@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { Plus, Trash2 } from "lucide-react"
 
 import { setupZodFr } from "@/lib/zod-config"
-import { CreateSejourBodySchema, EquipmentSchema, AllergenSchema, DietaryRestrictionSchema } from "@/lib/types/schemas"
+import { CreateSejourBodySchema, EquipmentSchema, AllergenSchema, ExclusionTagSchema } from "@/lib/types/schemas"
 import {
   ALLERGEN_LABELS,
   REGIME_LABELS,
@@ -16,6 +16,7 @@ import {
   DIETARY_RESTRICTIONS,
 } from "@/lib/ui/labels"
 import type { Allergen, DietaryRestriction } from "@/lib/ui/labels"
+import type { ExclusionTag } from "@/lib/types/domain"
 import {
   Form,
   FormControl,
@@ -51,7 +52,7 @@ export const SejourFormSchema = CreateSejourBodySchema.extend({
   participants: z.array(z.object({
     nom: z.string().min(1).max(50),
     allergies: z.array(AllergenSchema),
-    regimes: z.array(DietaryRestrictionSchema),
+    exclusions: z.array(ExclusionTagSchema),
     aime: z.array(z.string()),
     n_aime_pas: z.array(z.string()),
   })).min(1).max(12),
@@ -76,7 +77,7 @@ const PREMIER_REPAS_OPTIONS: { value: 'matin' | 'midi' | 'soir'; label: string }
 const EMPTY_PARTICIPANT = {
   nom: "",
   allergies: [] as Allergen[],
-  regimes: [] as DietaryRestriction[],
+  exclusions: [] as ExclusionTag[],
   aime: [] as string[],
   n_aime_pas: [] as string[],
 }
@@ -197,9 +198,9 @@ export function SejourForm({
         i === index
           ? {
               ...p,
-              regimes: p.regimes.includes(regime)
-                ? p.regimes.filter((r) => r !== regime)
-                : [...p.regimes, regime],
+              exclusions: p.exclusions.includes(regime as ExclusionTag)
+                ? p.exclusions.filter((r) => r !== regime)
+                : [...p.exclusions, regime as ExclusionTag],
             }
           : p,
       ),
@@ -551,7 +552,7 @@ export function SejourForm({
               <div className="space-y-4">
                 {fields.map((field, index) => {
                   const participantAllergies = participants[index]?.allergies ?? []
-                  const participantRegimes = participants[index]?.regimes ?? []
+                  const participantRegimes = participants[index]?.exclusions ?? []
                   return (
                     <div
                       key={field.id}

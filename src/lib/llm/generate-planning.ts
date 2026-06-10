@@ -1,8 +1,8 @@
 import type { Participant, PlanningEntry, Recette, ValidationViolation } from '../types/domain';
 import { filterRecipes, type FilterConstraints } from '../allergens/filter';
-import { filterByDietary, type DietaryConstraints } from '../dietary/filter';
+import { filterByExclusions, type ExclusionConstraints } from '../dietary/filter';
 import { validatePlanning } from '../allergens/validator';
-import { validateDietary } from '../dietary/validator';
+import { validateExclusions } from '../dietary/validator';
 import { validateCoherence, COHERENCE_SEVERITY } from '../coherence';
 import type { CoherenceWarning } from '../coherence';
 import { buildSequence } from '../planning/build-sequence';
@@ -16,7 +16,7 @@ const MAX_ATTEMPTS = 3;
  * Type combiné des contraintes de planification : allergènes + régimes + équipement.
  * Utilisé par generatePlanning et ses appelants (route, tests).
  */
-export type PlanningConstraints = FilterConstraints & DietaryConstraints;
+export type PlanningConstraints = FilterConstraints & ExclusionConstraints;
 
 /**
  * Orchestre la génération de planning : filtre → LLM → validation → retry.
@@ -47,7 +47,7 @@ export async function generatePlanning(
   sejourContexte: GeneratePlanningInput['contexte'],
 ): Promise<{ ok: true; entries: PlanningEntry[]; warnings?: CoherenceWarning[] } | { ok: false; error: LLMError }> {
   const allergenPool = filterRecipes(catalogue, constraints);
-  const pool = filterByDietary(allergenPool, constraints);
+  const pool = filterByExclusions(allergenPool, constraints);
 
   if (pool.length === 0) {
     return { ok: false, error: { kind: 'pool_empty' } };
@@ -73,13 +73,13 @@ export async function generatePlanning(
         genere_le: new Date().toISOString(),
         contraintes_utilisees: {
           allergenes: constraints.allergenes_groupe,
-          regimes: constraints.regimes_groupe,
+          exclusions: constraints.exclusions_groupe,
           equipement: constraints.equipement_disponible,
         },
       };
 
       const securityResult = validatePlanning(planningForValidation, recettesMap, participants);
-      const dietaryViolations = validateDietary(planningForValidation, recettesMap, participants);
+      const dietaryViolations = validateExclusions(planningForValidation, recettesMap, participants);
       const coherenceViolations = validateCoherence(planningForValidation, recettesMap, expectedSlots);
 
       const bloquantCoherence = coherenceViolations.filter(

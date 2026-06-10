@@ -1,18 +1,17 @@
 import type { Allergen } from '../../../data/seed-allergenes';
 import type { Ingredient, Recette } from '../types/domain';
-import { computeDietaryMetadata } from '../dietary/compute';
 
-type RecetteSansCalculs = Omit<Recette, 'allergenes_calcules' | 'est_vegetarien' | 'est_vegan'>;
+type RecetteSansCalculs = Omit<Recette, 'allergenes_calcules' | 'exclusions_compatibles'>;
 
 /**
- * Calcule les métadonnées dérivées d'une recette à partir de ses ingrédients.
+ * Calcule les allergènes dérivés d'une recette à partir de ses ingrédients.
  *
- * Cette fonction est appelée au build pour peupler les champs calculés de
- * chaque recette. Elle ne doit jamais être appelée à la volée en runtime.
+ * Cette fonction est appelée au build pour peupler le champ allergenes_calcules
+ * de chaque recette. Elle ne doit jamais être appelée à la volée en runtime.
  *
  * @param recette - La recette sans ses champs calculés
  * @param ingredientsMap - Index de tous les ingrédients connus, clé = ingredient_id
- * @returns Les trois champs calculés : allergenes_calcules, est_vegetarien, est_vegan
+ * @returns Les allergènes calculés triés alphabétiquement
  * @throws Error si un ingredient_id référencé n'existe pas dans ingredientsMap
  *
  * IMPORTANT : les ingrédients marqués optionnel: true sont EXCLUS du calcul de
@@ -23,16 +22,12 @@ type RecetteSansCalculs = Omit<Recette, 'allergenes_calcules' | 'est_vegetarien'
  * @example
  * const meta = computeRecipeMetadata(recette, new Map(ingredients.map(i => [i.id, i])));
  * // meta.allergenes_calcules => ['gluten', 'lait']
- * // meta.est_vegetarien => false
- * // meta.est_vegan => false
  */
 export function computeRecipeMetadata(
   recette: RecetteSansCalculs,
   ingredientsMap: Map<string, Ingredient>,
 ): {
   allergenes_calcules: Allergen[];
-  est_vegetarien: boolean;
-  est_vegan: boolean;
 } {
   const allergeneSet = new Set<Allergen>();
 
@@ -52,7 +47,6 @@ export function computeRecipeMetadata(
   }
 
   const allergenes_calcules = [...allergeneSet].sort();
-  const { est_vegetarien, est_vegan } = computeDietaryMetadata(recette, ingredientsMap);
 
-  return { allergenes_calcules, est_vegetarien, est_vegan };
+  return { allergenes_calcules };
 }

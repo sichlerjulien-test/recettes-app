@@ -21,7 +21,7 @@ const ALL_EQUIPMENT: PlanningConstraints['equipement_disponible'] = [
 
 const NO_CONSTRAINTS: PlanningConstraints = {
   allergenes_groupe: [],
-  regimes_groupe: [],
+  exclusions_groupe: [],
   equipement_disponible: ALL_EQUIPMENT,
 };
 
@@ -366,22 +366,22 @@ describe('generatePlanning', () => {
     // Contraintes dérivées directement depuis le profil participant (même logique que la route)
     const COELIAQUE_CONSTRAINTS: PlanningConstraints = {
       allergenes_groupe: participantCoeliaque.allergies,
-      regimes_groupe: participantCoeliaque.regimes,
+      exclusions_groupe: participantCoeliaque.exclusions,
       equipement_disponible: ALL_EQUIPMENT,
     };
     const VEGAN_CONSTRAINTS: PlanningConstraints = {
       allergenes_groupe: participantVegan.allergies,
-      regimes_groupe: participantVegan.regimes,
+      exclusions_groupe: participantVegan.exclusions,
       equipement_disponible: ALL_EQUIPMENT,
     };
     const ALLERGIES_MULTIPLES_CONSTRAINTS: PlanningConstraints = {
       allergenes_groupe: participantAllergiesMultiples.allergies,
-      regimes_groupe: participantAllergiesMultiples.regimes,
+      exclusions_groupe: participantAllergiesMultiples.exclusions,
       equipement_disponible: ALL_EQUIPMENT,
     };
     const COELIAQUE_VEGAN_CONSTRAINTS: PlanningConstraints = {
       allergenes_groupe: participantCoeliaqueVegan.allergies,
-      regimes_groupe: participantCoeliaqueVegan.regimes,
+      exclusions_groupe: participantCoeliaqueVegan.exclusions,
       equipement_disponible: ALL_EQUIPMENT,
     };
 
@@ -453,13 +453,13 @@ describe('generatePlanning', () => {
       if (result.ok) {
         for (const entry of result.entries) {
           const recette = recettesMap.get(entry.recette_id)!;
-          expect(recette.est_vegan).toBe(true);
+          expect(recette.exclusions_compatibles).toContain('vegan');
         }
       }
     });
 
     it('participantCoeliaqueVegan : ok:true avec planning vegan et sans gluten (allergen + dietary en séquence)', async () => {
-      // salade-tomate-basilic : est_vegan=true, pas de gluten → passe les deux validateurs
+      // salade-tomate-basilic : exclusions_compatibles inclut 'vegan', pas de gluten → passe les deux validateurs
       const mockClient = createMockClient({ kind: 'success', output: { entries: [{ jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' }] } });
 
       const result = await generatePlanning(
@@ -475,7 +475,7 @@ describe('generatePlanning', () => {
       if (result.ok) {
         for (const entry of result.entries) {
           const recette = recettesMap.get(entry.recette_id)!;
-          expect(recette.est_vegan).toBe(true);
+          expect(recette.exclusions_compatibles).toContain('vegan');
           expect(recette.allergenes_calcules).not.toContain('gluten');
         }
       }
@@ -599,7 +599,7 @@ describe('generatePlanning', () => {
     // car toutes requièrent au moins 'plaque' ou 'four'.
     const saturatingConstraints: PlanningConstraints = {
       allergenes_groupe: [...EU14_ALLERGENS],
-      regimes_groupe: [],
+      exclusions_groupe: [],
       equipement_disponible: [],
     };
     const mockClient = createMockClient({ kind: 'success', output: VALID_OUTPUT });

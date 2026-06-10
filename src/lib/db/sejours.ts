@@ -125,7 +125,7 @@ export async function updateSejour(
     p_participants: participants.map((p) => ({
       nom: p.nom,
       allergies: p.allergies,
-      regimes: p.regimes,
+      regimes: p.exclusions,
       aime: p.aime,
       n_aime_pas: p.n_aime_pas,
     })),
@@ -183,7 +183,7 @@ export async function createSejour(
       sejour_id: sejourId,
       nom: p.nom,
       allergies: p.allergies,
-      regimes: p.regimes,
+      regimes: p.exclusions,
       aime: p.aime,
       n_aime_pas: p.n_aime_pas,
     }));

@@ -1,8 +1,9 @@
 import { computeRecipeMetadata } from '@/lib/allergens/compute';
+import { computeDietaryMetadata } from '@/lib/dietary/compute';
 import type { Recette } from '@/lib/types/domain';
 import { ingredientsMap } from './ingredients';
 
-type RecetteBase = Omit<Recette, 'allergenes_calcules' | 'est_vegetarien' | 'est_vegan'>;
+type RecetteBase = Omit<Recette, 'allergenes_calcules' | 'exclusions_compatibles'>;
 
 const RECETTES_BASE: RecetteBase[] = [
 
@@ -449,8 +450,9 @@ const RECETTES_BASE: RecetteBase[] = [
 
 export const recettesMap: Map<string, Recette> = new Map(
   RECETTES_BASE.map((base) => {
-    const meta = computeRecipeMetadata(base, ingredientsMap);
-    const recette: Recette = { ...base, ...meta };
+    const { allergenes_calcules } = computeRecipeMetadata(base, ingredientsMap);
+    const { exclusions_compatibles } = computeDietaryMetadata(base, ingredientsMap);
+    const recette: Recette = { ...base, allergenes_calcules, exclusions_compatibles };
     return [recette.id, recette];
   }),
 );

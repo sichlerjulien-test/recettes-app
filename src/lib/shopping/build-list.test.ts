@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildShoppingList } from './build-list';
 import { recettesMap } from '../../../tests/fixtures/recettes';
 import { ingredientsMap } from '../../../tests/fixtures/ingredients';
-import type { Planning, Recette, Ingredient, MealType } from '../types/domain';
+import type { Planning, Recette, Ingredient, MealType, ExclusionTag } from '../types/domain';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -14,7 +14,7 @@ function makePlanning(
     sejour_id: 'test-sejour',
     entries: entries.map((e) => ({ ...e, portions: 4 })),
     genere_le: '2026-04-27T12:00:00Z',
-    contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+    contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
   };
 }
 
@@ -35,8 +35,7 @@ const BASE_RECETTE = {
   etapes: ['Cuire.'],
   tags_libres: [],
   allergenes_calcules: [],
-  est_vegetarien: true,
-  est_vegan: true,
+  exclusions_compatibles: ['vegetarien', 'vegan'] as ExclusionTag[],
 };
 
 // ─── Tests ──────────────────────────────────────────────────────────────────
@@ -89,6 +88,7 @@ describe('buildShoppingList', () => {
       allergenes: [],
       contient_trace: [],
       substituts: [],
+      exclusion_tags: [],
     };
     const recetteA: Recette = {
       ...BASE_RECETTE,
@@ -311,6 +311,7 @@ describe('buildShoppingList', () => {
       allergenes: [],
       contient_trace: [],
       substituts: [],
+      exclusion_tags: [],
     };
     const recette: Recette = {
       ...BASE_RECETTE,
@@ -347,6 +348,7 @@ describe('buildShoppingList', () => {
       allergenes: [],
       contient_trace: [],
       substituts: [],
+      exclusion_tags: [],
     };
     const recette: Recette = {
       ...BASE_RECETTE,
@@ -382,6 +384,7 @@ describe('buildShoppingList', () => {
       allergenes: [],
       contient_trace: [],
       substituts: [],
+      exclusion_tags: [],
     };
     const recette: Recette = {
       ...BASE_RECETTE,
@@ -437,6 +440,7 @@ describe('buildShoppingList', () => {
       allergenes: [],
       contient_trace: [],
       substituts: [],
+      exclusion_tags: [],
     };
     const recette: Recette = {
       ...BASE_RECETTE,
@@ -489,7 +493,7 @@ describe('buildShoppingList', () => {
       unite_base: 'piece',
       unite_achat: 'piece',
       conversion: 1,
-      allergenes: [], contient_trace: [], substituts: [],
+      allergenes: [], contient_trace: [], substituts: [], exclusion_tags: [],
     };
     const recette: Recette = {
       ...BASE_RECETTE,
@@ -528,7 +532,7 @@ describe('buildShoppingList', () => {
       unite_base: 'g',
       unite_achat: 'kg',
       conversion: 1000,
-      allergenes: [], contient_trace: [], substituts: [],
+      allergenes: [], contient_trace: [], substituts: [], exclusion_tags: [],
     };
     const recette: Recette = {
       ...BASE_RECETTE,
@@ -562,7 +566,7 @@ describe('buildShoppingList', () => {
       id: 'epice-g',
       nom_singulier: 'Épice test', nom_pluriel: 'Épices test',
       categorie: 'condiments-epices', unite_base: 'g', unite_achat: 'g', conversion: 1,
-      allergenes: [], contient_trace: [], substituts: [],
+      allergenes: [], contient_trace: [], substituts: [], exclusion_tags: [],
     };
     const recette: Recette = {
       ...BASE_RECETTE, id: 'recette-epice-g', portions_base: 4,
@@ -587,7 +591,7 @@ describe('buildShoppingList', () => {
     const ingredient: Ingredient = {
       id: 'epice-g-s', nom_singulier: 'Épice small', nom_pluriel: 'Épices small',
       categorie: 'condiments-epices', unite_base: 'g', unite_achat: 'g', conversion: 1,
-      allergenes: [], contient_trace: [], substituts: [],
+      allergenes: [], contient_trace: [], substituts: [], exclusion_tags: [],
     };
     const recette: Recette = {
       ...BASE_RECETTE, id: 'recette-epice-g-s', portions_base: 4,
@@ -611,7 +615,7 @@ describe('buildShoppingList', () => {
     const ingredient: Ingredient = {
       id: 'epice-g-l', nom_singulier: 'Épice large', nom_pluriel: 'Épices large',
       categorie: 'condiments-epices', unite_base: 'g', unite_achat: 'g', conversion: 1,
-      allergenes: [], contient_trace: [], substituts: [],
+      allergenes: [], contient_trace: [], substituts: [], exclusion_tags: [],
     };
     const recette: Recette = {
       ...BASE_RECETTE, id: 'recette-epice-g-l', portions_base: 4,
@@ -638,7 +642,7 @@ describe('buildShoppingList', () => {
     const ingredient: Ingredient = {
       id: 'sauce-ml', nom_singulier: 'Sauce test', nom_pluriel: 'Sauces test',
       categorie: 'condiments-epices', unite_base: 'ml', unite_achat: 'ml', conversion: 1,
-      allergenes: [], contient_trace: [], substituts: [],
+      allergenes: [], contient_trace: [], substituts: [], exclusion_tags: [],
     };
     const recette: Recette = {
       ...BASE_RECETTE, id: 'recette-sauce-ml-r', portions_base: 4,
@@ -664,7 +668,7 @@ describe('buildShoppingList', () => {
     const ingredient: Ingredient = {
       id: 'huile-cuil', nom_singulier: "Huile d'olive", nom_pluriel: "Huiles d'olive",
       categorie: 'condiments-epices', unite_base: 'ml', unite_achat: 'l', conversion: 1000,
-      allergenes: [], contient_trace: [], substituts: [],
+      allergenes: [], contient_trace: [], substituts: [], exclusion_tags: [],
     };
     const recette: Recette = {
       ...BASE_RECETTE, id: 'recette-cuil', portions_base: 6,
