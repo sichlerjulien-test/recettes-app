@@ -31,6 +31,7 @@ import type {
   IngredientOutput,
   RecetteOutput,
 } from '../src/lib/types/schemas';
+import { validateIngredientExclusionCompleteness } from './ingredient-exclusion-completeness';
 
 const DATA_DIR = join(process.cwd(), 'data');
 const INGREDIENTS_DIR = join(DATA_DIR, 'ingredients');
@@ -189,6 +190,12 @@ async function main(): Promise<void> {
 
   console.log('Vérification des substituts…');
   validateIngredientReferences(ingredients);
+
+  console.log('Vérification de complétude des exclusion_tags…');
+  for (const error of validateIngredientExclusionCompleteness(ingredients)) {
+    const match = error.match(/^\[([^\]]+)\] (.+)$/);
+    logError(match?.[1] ?? 'ingredients', match?.[2] ?? error);
+  }
 
   printReport(ingredients.size, recettes.size);
 

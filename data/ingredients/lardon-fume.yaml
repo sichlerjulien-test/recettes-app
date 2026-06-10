@@ -9,3 +9,5 @@ allergenes: []
 contient_trace:
   - sulfites
 substituts: []
+exclusion_tags:
+  - sans-porc

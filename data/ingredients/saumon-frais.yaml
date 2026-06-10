@@ -9,4 +9,6 @@ allergenes:
   - poissons
 contient_trace: []
 substituts: []
+exclusion_tags:
+  - sans-poisson
 notes: Préférer pavés sans peau pour cuisson au four.

@@ -20,6 +20,7 @@ import type { IngredientOutput, RecetteOutput } from '../src/lib/types/schemas';
 import { computeRecipeMetadata } from '../src/lib/allergens/compute';
 import { computeDietaryMetadata } from '../src/lib/dietary/compute';
 import { resolveEnvFile, isProdEnvFile } from './resolve-env-file';
+import { validateIngredientExclusionCompleteness } from './ingredient-exclusion-completeness';
 
 // ---------------------------------------------------------------------------
 // ENV
@@ -252,6 +253,7 @@ async function main(): Promise<void> {
   const { items: ingredients, errors: ingredientLoadErrors } =
     await loadYamlFiles<IngredientOutput>(INGREDIENTS_DIR, IngredientSchema);
   buildErrors.push(...ingredientLoadErrors);
+  buildErrors.push(...validateIngredientExclusionCompleteness(ingredients));
 
   console.log('Chargement des recettes YAML…');
   const { items: recettes, errors: recetteLoadErrors } =

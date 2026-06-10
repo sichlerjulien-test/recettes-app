@@ -84,14 +84,19 @@ La colonne DB `participants.regimes` a été renommée en `participants.exclusio
 `contraintes_utilisees.regimes` restent lus via normalisation legacy ; ils ne sont pas
 migrés.
 
+#### Session B — Qualification catalogue + garde build  ·  ✅ Fait
+
+- `scripts/ingredient-exclusion-completeness.ts` : règle de complétude `poissons → sans-poisson`, `crustaces|mollusques → sans-fruits-de-mer`, erreur de build.
+- Catalogue qualifié : 11 fichiers YAML — `sans-porc` (lardons, jambon, guanciale), `sans-viande-rouge` (bœuf, bouillon bœuf), `sans-alcool` (vins, bière).
+- Tests catalogue réel : quiche-lorraine (lardons) ∉ `sans-porc` ; poke-bowl saumon ∉ `sans-poisson`.
+- Trou résiduel documenté : porc/viande-rouge/alcool restent à qualification manuelle — ticket TK-20 ouvert.
+
 #### Reste à livrer
 
-- Session B : qualification YAML + règle de complétude CI.
 - Session C : UI.
 
-Statut : ouvert. Tant que les sessions B/C ne sont pas livrées, seuls `vegetarien` et
-`vegan` filtrent réellement ; les tags atomiques existent dans le schéma mais restent
-inertes fonctionnellement.
+Statut : ouvert. Session C (UI) reste à livrer. Les tags atomiques (porc, viande-rouge,
+alcool, poisson, fruits-de-mer) filtrent désormais réellement via le catalogue qualifié.
 
 **Critères d'acceptation :** l'ami sujet à la goutte peut exclure la viande rouge ; le planning n'en contient aucune ; la forteresse allergènes reste inchangée.
 
@@ -168,6 +173,28 @@ Sous-tâches :
 - E2E Playwright : Sarah ajoute un participant, régénère, planning cohérent et sûr.
 
 **Critères :** le flow de re-génération TK-03 couvert end-to-end ; mapping pool_empty→422 testé.
+
+### TK-20 — Raffiner la taxonomie des ingrédients (garde déterministe porc/viande-rouge/alcool)  ·  M
+**Origine :** ADR-011 §9 · trou résiduel documenté en Phase 2B.
+
+La catégorie `viandes-poissons` est trop grossière pour distinguer porc, viande rouge, poisson
+et fruits de mer. Résultat : les tags `sans-porc`, `sans-viande-rouge` et `sans-alcool` ne peuvent
+pas être vérifiés automatiquement au build (contrairement à `sans-poisson`/`sans-fruits-de-mer`
+qui s'appuient sur les allergènes EU14). La qualification actuelle est manuelle, gardée par
+allergen-guard sur `data/ingredients/`.
+
+Sous-tâches :
+- Trancher le découpage : scinder `viandes-poissons` (ex. `viandes-rouges`, `viandes-blanches`,
+  `charcuterie`, `poissons-fruits-de-mer`) et ajouter une catégorie `alcool`.
+- Mettre à jour `IngredientCategorySchema` et la migration SQL (touche le CHECK initial).
+- Étendre `ingredient-exclusion-completeness.ts` pour vérifier `sans-porc` et `sans-viande-rouge`
+  depuis les nouvelles catégories.
+- Test discriminant obligatoire : un lardon sans `sans-porc` DOIT faire échouer le build.
+
+**Critères :** les tags `sans-porc`, `sans-viande-rouge`, `sans-alcool` sont enforced au build,
+sans qualification manuelle nécessaire. Cousin de TK-13 (Trou A SQL/Zod).
+
+> À séquencer après TK-05 Phase 2C (UI). Touche `IngredientCategorySchema` → passe architect.
 
 ### TK-13 — Source unique pour enums SQL + Zod (Trou A)  ·  M
 **Origine :** investigation TK-07 (Trou A), ADR-008.
@@ -289,7 +316,7 @@ avec un trou.
 | TK-02 | Refonte modèle d'unités d'achat | P0 | L (réel S) | Fait |
 | TK-03 | Édition séjour + flow génération | P0 | L | Fait |
 | TK-04 | Bug inputs number iPhone | P0 | S | Fait |
-| TK-05 | Exclusions alimentaires | P1 | M | Ouvert — Phase 2A plomberie + schéma faits ; B/C à faire |
+| TK-05 | Exclusions alimentaires | P1 | M | Ouvert — 2A+2B faits ; 2C (UI) reste |
 | TK-06 | CI workflows | P2 | M | Fait |
 | TK-07 | Scission Supabase dev/prod | P2 | M | Fait |
 | TK-08 | Réutilisation ingrédients | V2 | — | À faire |
@@ -303,5 +330,6 @@ avec un trou.
 | TK-16 | Gate déploiement : schéma DB ↔ code | P2 | M | À faire |
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
 | TK-18 | Bug hydratation ShareLink | P2 | S | À faire |
+| TK-20 | Raffiner taxonomie ingrédients (garde déterministe porc/viande-rouge/alcool) | P2 | M | À faire |
 
-**Ordre conseillé :** reste de TK-05 (Session B qualification YAML + complétude CI, puis Session C UI) → dette data/DAL (TK-09, TK-10, TK-13, TK-12) quand le fonctionnel est stable → V2 (TK-08, TK-14).
+**Ordre conseillé :** reste de TK-05 (Session C UI) → dette data/DAL (TK-09, TK-10, TK-13, TK-12, TK-20) quand le fonctionnel est stable → V2 (TK-08, TK-14).

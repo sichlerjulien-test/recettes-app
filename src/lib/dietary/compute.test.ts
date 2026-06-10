@@ -72,7 +72,8 @@ describe('computeDietaryMetadata', () => {
 
   it('doit retourner exclusions_compatibles=[] pour une recette carnée', () => {
     const result = computeDietaryMetadata(BOLOGNAISE, ingredientsMap);
-    expect(result.exclusions_compatibles).toHaveLength(0);
+    expect(result.exclusions_compatibles).not.toContain('vegetarien');
+    expect(result.exclusions_compatibles).not.toContain('vegan');
   });
 
   it('doit retourner exclusions_compatibles=[] pour une recette agneau', () => {
@@ -86,7 +87,8 @@ describe('computeDietaryMetadata', () => {
       ],
     };
     const result = computeDietaryMetadata(recette, ingredientsMap);
-    expect(result.exclusions_compatibles).toHaveLength(0);
+    expect(result.exclusions_compatibles).not.toContain('vegetarien');
+    expect(result.exclusions_compatibles).not.toContain('vegan');
   });
 
   it('doit retourner exclusions_compatibles=[] pour une recette fruits-de-mer', () => {
@@ -100,7 +102,24 @@ describe('computeDietaryMetadata', () => {
       ],
     };
     const result = computeDietaryMetadata(recette, ingredientsMap);
-    expect(result.exclusions_compatibles).toHaveLength(0);
+    expect(result.exclusions_compatibles).not.toContain('vegetarien');
+    expect(result.exclusions_compatibles).not.toContain('vegan');
+  });
+
+  it('doit exclure un tag atomique quand un ingrédient non-optionnel le porte', () => {
+    const recette: RecetteSansCalculs = {
+      ...BASE,
+      id: 'test-poisson',
+      nom: 'Poisson test',
+      ingredient_principal: 'poisson',
+      ingredients: [
+        { ingredient_id: 'saumon-frais', quantite_base: 400, unite: 'g', optionnel: false, groupe: undefined },
+        { ingredient_id: 'tomate', quantite_base: 200, unite: 'g', optionnel: false, groupe: undefined },
+      ],
+    };
+    const result = computeDietaryMetadata(recette, ingredientsMap);
+    expect(result.exclusions_compatibles).not.toContain('sans-poisson');
+    expect(result.exclusions_compatibles).toContain('sans-porc');
   });
 
   it('doit retourner exclusions_compatibles incluant vegetarien pour une recette tofu', () => {

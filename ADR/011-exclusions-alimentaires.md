@@ -283,19 +283,27 @@ Aucune modification dans `lib/allergens/`. Périmètre :
 
 ### 9 — Validation CI de complétude des `exclusion_tags` et garde allergen-guard sur les YAML ingrédients
 
-**Règle de complétude au build :** le validateur YAML existant embarque une règle de
-complétude sur `exclusion_tags` :
+**Règle de complétude au build :** le catalogue ne possède qu'une seule catégorie
+protéinée (`viandes-poissons`). Une règle `categorie -> tag` ne peut pas distinguer
+porc, viande rouge, poisson, fruits de mer ou alcool. La complétude au build
+s'appuie donc uniquement sur le signal allergène EU14, déterministe et déjà curé :
 
-> Tout ingrédient dont la catégorie appartient à `CATEGORIES_PORC` (constante dans le
-> script de validation, ex : `'charcuterie'`, `'viandes-porcines'`, `'porcin'`) **doit**
-> porter `sans-porc` dans ses `exclusion_tags`.
+- Tout ingrédient portant l'allergène `poissons` doit porter `sans-poisson`.
+- Tout ingrédient portant l'allergène `crustaces` ou `mollusques` doit porter
+  `sans-fruits-de-mer`.
 
 La violation est une **erreur de build**, pas un warning — même traitement qu'un
-allergène manquant dans seed-allergenes. Elle ferme la fenêtre d'un ingrédient porcin
-silencieusement non-tagué, sans reposer sur l'œil du relecteur.
+allergène manquant dans seed-allergenes. Elle couvre aussi les ingrédients hors
+`viandes-poissons` qu'une règle catégorielle raterait, par exemple une sauce de
+poisson rangée en `condiments-epices`.
 
-Le gate est déclaratif : si `CATEGORIES_PORC` est étendue, la règle couvre
-automatiquement les nouveaux ingrédients sans PR de suivi.
+**Trou résiduel documenté.** `sans-porc`, `sans-viande-rouge` et `sans-alcool`
+n'ont aucun signal structuré équivalent (ni allergène EU14, ni catégorie propre).
+Leur qualification reste manuelle, gardée par allergen-guard sur `data/ingredients/`
+pour les tags à coût social élevé. Lever ce trou exige de raffiner la taxonomie
+(scinder `viandes-poissons`, ajouter une catégorie alcool), ce qui touche le CHECK
+SQL initial et `IngredientCategorySchema` ; c'est hors périmètre TK-05 et ouvert en
+ticket dédié, cousin du Trou A (TK-13).
 
 **Garde allergen-guard sur le YAML ingrédients :** allergen-guard est déclenché sur
 toute PR qui modifie `data/ingredients/` **et** touche un tag à coût social élevé
@@ -523,3 +531,18 @@ Cette décision sera réévaluée si :
   `participants.regimes` -> `participants.exclusions`, ajout du CHECK
   `participants_exclusions_valid`, suppression du mapping DAL app<->DB.
   Prod reste une application humaine séparée conformément à ADR-008.
+- Phase 2B (qualification catalogue + garde build) — 2026-06-10 :
+  - `scripts/ingredient-exclusion-completeness.ts` : règle de complétude
+    `poissons → sans-poisson`, `crustaces|mollusques → sans-fruits-de-mer`
+    branché sur `npm run validate` (erreur de build, pas warning).
+  - Catalogue `data/ingredients/` qualifié : 11 fichiers YAML mis à jour —
+    `sans-porc` (lardon-fume, jambon-blanc, guanciale-ou-lardon),
+    `sans-viande-rouge` (boeuf-bourguignon, boeuf-hache, boeuf-tartare,
+    steak-hache-boeuf, bouillon-boeuf),
+    `sans-alcool` (biere-blonde, vin-blanc-sec, vin-rouge-cuisine).
+    Les tags poisson/fruits-de-mer étaient déjà présents.
+  - Tests discriminants sur catalogue réel (`tests/dietary/catalog-exclusions.test.ts`) :
+    quiche-lorraine (lardon-fume) ∉ `sans-porc` ;
+    poke-bowl-saumon (saumon-frais) ∉ `sans-poisson`.
+  - Trou résiduel documenté (§9) : porc/viande-rouge/alcool restent à qualification
+    manuelle, gardés par allergen-guard. Ticket TK-20 ouvert pour raffiner la taxonomie.

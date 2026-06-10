@@ -9,3 +9,5 @@ allergenes: []
 contient_trace:
   - celeri
 substituts: []
+exclusion_tags:
+  - sans-viande-rouge

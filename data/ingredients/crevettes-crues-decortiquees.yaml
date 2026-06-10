@@ -9,3 +9,5 @@ allergenes:
   - crustaces
 contient_trace: []
 substituts: []
+exclusion_tags:
+  - sans-fruits-de-mer

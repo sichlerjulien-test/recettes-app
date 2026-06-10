@@ -11,3 +11,5 @@ allergenes:
 contient_trace:
   - soja
 substituts: []
+exclusion_tags:
+  - sans-poisson
