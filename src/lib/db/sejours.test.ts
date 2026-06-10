@@ -69,7 +69,7 @@ const SEJOUR_INPUT: SejourDALInput = {
 const PARTICIPANT_INPUT: ParticipantDALInput = {
   nom: 'Alex',
   allergies: [],
-  regimes: [],
+  exclusions: [],
   aime: [],
   n_aime_pas: [],
 };
@@ -88,6 +88,20 @@ const SEJOUR_DB_ROW = {
     temps_disponible: 'standard',
   },
   cree_le: '2026-04-28T00:00:00.000Z',
+};
+
+const SEJOUR_DB_ROW_WITH_PARTICIPANT = {
+  ...SEJOUR_DB_ROW,
+  participants: [
+    {
+      id: 'participant-uuid-123',
+      nom: 'Alex',
+      allergies: [],
+      exclusions: ['vegetarien'],
+      aime: [],
+      n_aime_pas: [],
+    },
+  ],
 };
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
@@ -226,6 +240,21 @@ describe('sejours DAL', () => {
       expect(result.ok).toBe(false);
       if (!result.ok) {
         expect(result.error.kind).toBe('row_validation_failed');
+      }
+    });
+
+    it('lit participant.exclusions directement', async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        asMockClient(createMockSupabase({
+          sejours: [{ data: SEJOUR_DB_ROW_WITH_PARTICIPANT, error: null }],
+        })),
+      );
+
+      const result = await getSejourById('sejour-uuid-123');
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.sejour.participants[0]?.exclusions).toEqual(['vegetarien']);
       }
     });
   });

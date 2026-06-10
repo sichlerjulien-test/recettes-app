@@ -391,16 +391,16 @@ Ce qui change entre allergen et exclusion :
 - **Suppression de `est_vegetarien`/`est_vegan` breaking.** Tout code qui lit ces
   champs directement doit migrer vers `exclusions_compatibles.includes(...)`.
   Le gate TypeScript (ADR-010) attrapera les oublis à la compilation.
-- **Suppression de `regimes` sur Participant breaking.** À migrer vers `exclusions`.
+- **Suppression de `regimes` sur Participant breaking.** Migré vers `exclusions`
+  par TK-19.
   **Attention : le gate `tsc --noEmit` ne couvre pas `contraintes_utilisees.regimes`
   en base.** La route `createPlanning` persiste `contraintes_utilisees` comme blob
   JSON ; `tsc` ne voit pas la forme des rows Supabase (frontière `any`). Si un schéma
   Zod valide `contraintes_utilisees` en lecture et qu'il attend `regimes`, ça pète à
   l'exécution sur les plannings existants, pas à la compilation.
-  **Décision à prendre avant Phase 2 :** (a) migrer le chemin de lecture pour ne plus
-  accéder à `regimes` sur les rows existants, ou (b) rendre le schéma de lecture
-  tolérant à l'absence du champ (`z.array(...).optional()`). Sans décision explicite,
-  Phase 2 ne peut pas merger.
+  **Décision appliquée :** la colonne participant est renommée en `exclusions` ; le
+  seul accès legacy restant cible les vieux blobs JSONB `contraintes_utilisees`, qui
+  sont normalisés à la lecture et ne sont pas migrés.
 
 ### Neutres
 
@@ -505,3 +505,21 @@ Cette décision sera réévaluée si :
   non-objectifs incluaient "ADR dédié aux exclusions alimentaires"
 - BACKLOG.md TK-05 — Critères d'acceptation : pool_empty si pool vide, forteresse
   inchangée après Phase 2
+
+## Historique d'implémentation
+
+- Phase 1 mergée le 2026-06-09 via PR #21.
+- Phase 2A mergée le 2026-06-10 via PR #22.
+- Décision Étape 0 gravée : les colonnes DB `regimes`, `est_vegetarien` et
+  `est_vegan` sont conservées ; le mapping app<->DB se fait au DAL ; la lecture
+  de `contraintes_utilisees` est normalisée (`regimes` -> `exclusions`) ; zéro
+  migration SQL en 2A. Motif : éviter une dérive de schéma classe TK-15/16.
+- Correction post-PR #22 : le read-path des vieux blobs JSONB
+  `contraintes_utilisees.regimes` est normalisé en `exclusions`, avec tests
+  discriminants. Cette compatibilité reste nécessaire tant que les archives ne sont
+  pas migrées.
+- TK-19 validé sur dev le 2026-06-10 : nouvelle migration
+  `007-rename-regimes-to-exclusions.sql`, renommage
+  `participants.regimes` -> `participants.exclusions`, ajout du CHECK
+  `participants_exclusions_valid`, suppression du mapping DAL app<->DB.
+  Prod reste une application humaine séparée conformément à ADR-008.

@@ -3,7 +3,7 @@ import type { Recette } from '../types/domain';
 import { ingredientsMap } from '../../../tests/fixtures/ingredients';
 import { computeRecipeMetadata } from './compute';
 
-type RecetteSansCalculs = Omit<Recette, 'allergenes_calcules' | 'est_vegetarien' | 'est_vegan'>;
+type RecetteSansCalculs = Omit<Recette, 'allergenes_calcules' | 'exclusions_compatibles'>;
 
 // Recettes construites à la main pour les tests unitaires de computeRecipeMetadata.
 // Ne pas importer depuis tests/fixtures/recettes — les fixtures utilisent computeRecipeMetadata
@@ -61,10 +61,10 @@ const CARBONARA_SANS_PARMESAN: RecetteSansCalculs = {
   ],
 };
 
-const SALADE_VEGAN: RecetteSansCalculs = {
+const SALADE_SANS_ALLERGENE: RecetteSansCalculs = {
   ...BASE,
-  id: 'test-salade-vegan',
-  nom: 'Salade vegan test',
+  id: 'test-salade-legumes',
+  nom: 'Salade légumes test',
   ingredient_principal: 'legumes',
   ingredients: [
     { ingredient_id: 'tomate',  quantite_base: 600, unite: 'g', optionnel: false, groupe: undefined },
@@ -136,7 +136,7 @@ describe('computeRecipeMetadata', () => {
   });
 
   it("doit retourner un tableau vide quand aucun ingredient n'a d'allergene", () => {
-    const result = computeRecipeMetadata(SALADE_VEGAN, ingredientsMap);
+    const result = computeRecipeMetadata(SALADE_SANS_ALLERGENE, ingredientsMap);
     expect(result.allergenes_calcules).toStrictEqual([]);
   });
 
@@ -155,28 +155,9 @@ describe('computeRecipeMetadata', () => {
     expect(result.allergenes_calcules).toStrictEqual(sorted);
   });
 
-  it('doit retourner est_vegan=true et est_vegetarien=true pour une recette vegan', () => {
-    const result = computeRecipeMetadata(SALADE_VEGAN, ingredientsMap);
-    expect(result.est_vegan).toBe(true);
-    expect(result.est_vegetarien).toBe(true);
-  });
-
-  it('doit retourner est_vegetarien=true et est_vegan=false pour une recette avec oeufs', () => {
-    // ingredient_principal='oeufs' -> non-vegan (MAIN_INGREDIENTS_NON_VEGAN), mais vegetarien
-    const result = computeRecipeMetadata(OMELETTE, ingredientsMap);
-    expect(result.est_vegetarien).toBe(true);
-    expect(result.est_vegan).toBe(false);
-  });
-
-  it('doit retourner est_vegetarien=false et est_vegan=false pour une recette carnee', () => {
-    const result = computeRecipeMetadata(BOLOGNAISE, ingredientsMap);
-    expect(result.est_vegetarien).toBe(false);
-    expect(result.est_vegan).toBe(false);
-  });
-
   it("doit lancer une erreur avec l'id manquant quand un ingredient_id est inexistant", () => {
     const recette: RecetteSansCalculs = {
-      ...SALADE_VEGAN,
+      ...SALADE_SANS_ALLERGENE,
       id: 'test-ingredient-manquant',
       ingredients: [
         { ingredient_id: 'ingredient-inexistant-xyz', quantite_base: 100, unite: 'g', optionnel: false, groupe: undefined },
@@ -184,51 +165,6 @@ describe('computeRecipeMetadata', () => {
     };
     expect(() => computeRecipeMetadata(recette, ingredientsMap))
       .toThrow('ingredient-inexistant-xyz');
-  });
-
-  it('doit retourner est_vegetarien=false pour une recette agneau', () => {
-    const recette: RecetteSansCalculs = {
-      ...BASE,
-      id: 'test-agneau',
-      nom: 'Gigot test',
-      ingredient_principal: 'agneau',
-      ingredients: [
-        { ingredient_id: 'tomate', quantite_base: 200, unite: 'g', optionnel: false, groupe: undefined },
-      ],
-    };
-    const result = computeRecipeMetadata(recette, ingredientsMap);
-    expect(result.est_vegetarien).toBe(false);
-    expect(result.est_vegan).toBe(false);
-  });
-
-  it('doit retourner est_vegetarien=false pour une recette fruits-de-mer', () => {
-    const recette: RecetteSansCalculs = {
-      ...BASE,
-      id: 'test-fruits-de-mer',
-      nom: 'Paella fruits de mer test',
-      ingredient_principal: 'fruits-de-mer',
-      ingredients: [
-        { ingredient_id: 'tomate', quantite_base: 200, unite: 'g', optionnel: false, groupe: undefined },
-      ],
-    };
-    const result = computeRecipeMetadata(recette, ingredientsMap);
-    expect(result.est_vegetarien).toBe(false);
-    expect(result.est_vegan).toBe(false);
-  });
-
-  it('doit retourner est_vegetarien=true pour une recette tofu', () => {
-    const recette: RecetteSansCalculs = {
-      ...BASE,
-      id: 'test-tofu',
-      nom: 'Tofu sauté test',
-      ingredient_principal: 'tofu',
-      ingredients: [
-        { ingredient_id: 'tomate', quantite_base: 200, unite: 'g', optionnel: false, groupe: undefined },
-        { ingredient_id: 'carotte', quantite_base: 150, unite: 'g', optionnel: false, groupe: undefined },
-      ],
-    };
-    const result = computeRecipeMetadata(recette, ingredientsMap);
-    expect(result.est_vegetarien).toBe(true);
   });
 
   it("doit fonctionner sans erreur ni mutation si l'input est gele via Object.freeze", () => {

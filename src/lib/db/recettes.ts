@@ -74,8 +74,10 @@ function mapRecetteRow(item: unknown): unknown {
     etapes: row['etapes'],
     tags_libres: row['tags_libres'],
     allergenes_calcules: row['allergenes_calcules'],
-    est_vegetarien: row['est_vegetarien'],
-    est_vegan: row['est_vegan'],
+    exclusions_compatibles: [
+      ...(row['est_vegetarien'] ? (['vegetarien'] as const) : []),
+      ...(row['est_vegan'] ? (['vegan'] as const) : []),
+    ],
     ingredients,
   };
 }

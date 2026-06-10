@@ -3,9 +3,9 @@ import type { PlanningConstraints } from '@/lib/llm/generate-planning';
 import type { AllergenViolation, Participant, Planning } from '@/lib/types/domain';
 import { EU14_ALLERGENS } from '../../../data/seed-allergenes';
 import { filterRecipes } from '@/lib/allergens/filter';
-import { filterByDietary } from '@/lib/dietary/filter';
+import { filterByExclusions } from '@/lib/dietary/filter';
 import { validatePlanning } from '@/lib/allergens/validator';
-import { validateDietary } from '@/lib/dietary/validator';
+import { validateExclusions } from '@/lib/dietary/validator';
 import {
   participantAllergiesMultiples,
   participantCoeliaque,
@@ -45,7 +45,7 @@ function buildPlanning(recetteIds: string[]): Planning {
       portions: 6,
     })),
     genere_le: '2026-04-21T00:00:00Z',
-    contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+    contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
   };
 }
 
@@ -84,7 +84,7 @@ function runProfile(
       `Profil ${label}: aucune recette du catalogue ne porte les allergènes [${[...allergenSet]}] — test trivial, non discriminant`,
     ).toBeGreaterThan(0);
 
-    const filteredOnce = filterByDietary(filterRecipes(catalogue, constraints), constraints);
+    const filteredOnce = filterByExclusions(filterRecipes(catalogue, constraints), constraints);
     for (const id of contaminatedIds) {
       expect(
         filteredOnce.some((r) => r.id === id),
@@ -96,7 +96,7 @@ function runProfile(
   let skippedIterations = 0;
 
   for (let i = 0; i < iterations; i++) {
-    const filtered = filterByDietary(filterRecipes(catalogue, constraints), constraints);
+    const filtered = filterByExclusions(filterRecipes(catalogue, constraints), constraints);
     if (filtered.length === 0) {
       skippedIterations++;
       continue;
@@ -107,7 +107,7 @@ function runProfile(
 
     const planning = buildPlanning(selected);
     const allergenResult = validatePlanning(planning, recettesMap, participants);
-    const dietaryViolations = validateDietary(planning, recettesMap, participants);
+    const dietaryViolations = validateExclusions(planning, recettesMap, participants);
 
     // Ce test vérifie uniquement la sécurité allergènes/régimes après filtrage.
     // Les violations structurelles (slots_mismatch, ingredient_consecutif) ne sont
@@ -139,7 +139,7 @@ describe('allergen-safety (1100 iterations)', () => {
     runProfile(
       'coeliaque',
       [participantCoeliaque],
-      { allergenes_groupe: ['gluten'], regimes_groupe: [], equipement_disponible: ALL_EQUIPMENT },
+      { allergenes_groupe: ['gluten'], exclusions_groupe: [], equipement_disponible: ALL_EQUIPMENT },
       0x1A2B3C4D,
       100,
     );
@@ -149,7 +149,7 @@ describe('allergen-safety (1100 iterations)', () => {
     runProfile(
       'vegan',
       [participantVegan],
-      { allergenes_groupe: [], regimes_groupe: ['vegan'], equipement_disponible: ALL_EQUIPMENT },
+      { allergenes_groupe: [], exclusions_groupe: ['vegan'], equipement_disponible: ALL_EQUIPMENT },
       0x2B3C4D5E,
       100,
     );
@@ -159,7 +159,7 @@ describe('allergen-safety (1100 iterations)', () => {
     runProfile(
       'coeliaque+vegan',
       [participantCoeliaqueVegan],
-      { allergenes_groupe: ['gluten'], regimes_groupe: ['vegan'], equipement_disponible: ALL_EQUIPMENT },
+      { allergenes_groupe: ['gluten'], exclusions_groupe: ['vegan'], equipement_disponible: ALL_EQUIPMENT },
       0x3C4D5E6F,
       100,
     );
@@ -171,7 +171,7 @@ describe('allergen-safety (1100 iterations)', () => {
       [participantAllergiesMultiples],
       {
         allergenes_groupe: participantAllergiesMultiples.allergies,
-        regimes_groupe: participantAllergiesMultiples.regimes,
+        exclusions_groupe: participantAllergiesMultiples.exclusions,
         equipement_disponible: ALL_EQUIPMENT,
       },
       0x4D5E6F70,
@@ -190,14 +190,14 @@ describe('allergen-safety (1100 iterations)', () => {
     const allergenes = [
       ...new Set(participants.flatMap((p) => p.allergies)),
     ] as PlanningConstraints['allergenes_groupe'];
-    const regimes = [
-      ...new Set(participants.flatMap((p) => p.regimes)),
-    ] as PlanningConstraints['regimes_groupe'];
+    const exclusions = [
+      ...new Set(participants.flatMap((p) => p.exclusions)),
+    ] as PlanningConstraints['exclusions_groupe'];
 
     runProfile(
       'groupe-mixte',
       participants,
-      { allergenes_groupe: allergenes, regimes_groupe: regimes, equipement_disponible: ALL_EQUIPMENT },
+      { allergenes_groupe: allergenes, exclusions_groupe: exclusions, equipement_disponible: ALL_EQUIPMENT },
       0x5E6F7081,
       100,
     );
@@ -209,7 +209,7 @@ describe('allergen-safety (1100 iterations)', () => {
       [participantVegetarienAllergique],
       {
         allergenes_groupe: participantVegetarienAllergique.allergies,
-        regimes_groupe: participantVegetarienAllergique.regimes,
+        exclusions_groupe: participantVegetarienAllergique.exclusions,
         equipement_disponible: ALL_EQUIPMENT,
       },
       0x6F708192,
@@ -225,7 +225,7 @@ describe('allergen-safety (1100 iterations)', () => {
       [participantLaitOeufs],
       {
         allergenes_groupe: ['lait', 'oeufs'],
-        regimes_groupe: [],
+        exclusions_groupe: [],
         equipement_disponible: ALL_EQUIPMENT,
       },
       0x7F809192,
@@ -239,7 +239,7 @@ describe('allergen-safety (1100 iterations)', () => {
       [participantHauteCardinalite],
       {
         allergenes_groupe: ['gluten', 'lait', 'oeufs', 'arachides', 'crustaces'],
-        regimes_groupe: [],
+        exclusions_groupe: [],
         equipement_disponible: ALL_EQUIPMENT,
       },
       0x8091A2B3,
@@ -250,14 +250,14 @@ describe('allergen-safety (1100 iterations)', () => {
   it('profil gluten+arachides: 100 plannings filtrés sont tous valides', () => {
     const participant: Participant = {
       id: 'p-gluten-arachides', nom: 'Test',
-      allergies: ['gluten', 'arachides'], regimes: [], aime: [], n_aime_pas: [],
+      allergies: ['gluten', 'arachides'], exclusions: [], aime: [], n_aime_pas: [],
     };
     runProfile(
       'gluten+arachides',
       [participant],
       {
         allergenes_groupe: ['gluten', 'arachides'],
-        regimes_groupe: [],
+        exclusions_groupe: [],
         equipement_disponible: ALL_EQUIPMENT,
       },
       0x91A2B3C4,
@@ -268,14 +268,14 @@ describe('allergen-safety (1100 iterations)', () => {
   it('profil poissons+crustaces: 100 plannings filtrés sont tous valides', () => {
     const participant: Participant = {
       id: 'p-poissons-crustaces', nom: 'Test',
-      allergies: ['poissons', 'crustaces'], regimes: [], aime: [], n_aime_pas: [],
+      allergies: ['poissons', 'crustaces'], exclusions: [], aime: [], n_aime_pas: [],
     };
     runProfile(
       'poissons+crustaces',
       [participant],
       {
         allergenes_groupe: ['poissons', 'crustaces'],
-        regimes_groupe: [],
+        exclusions_groupe: [],
         equipement_disponible: ALL_EQUIPMENT,
       },
       0xA2B3C4D5,
@@ -291,7 +291,7 @@ describe('allergen-safety (1100 iterations)', () => {
       [participantVegetarienLait],
       {
         allergenes_groupe: ['lait'],
-        regimes_groupe: ['vegetarien'],
+        exclusions_groupe: ['vegetarien'],
         equipement_disponible: ALL_EQUIPMENT,
       },
       0xB3C4D5E6,
@@ -303,10 +303,10 @@ describe('allergen-safety (1100 iterations)', () => {
   // Un planning qui viole l'une OU l'autre contrainte doit échouer indépendamment.
 
   it('test discriminant coeliaque+vegan : violation gluten OU non-vegan déclenche chacune un échec', () => {
-    // Cas 1 : recette non-vegan (oeufs) → violation régime 'vegan' (validateDietary)
+    // Cas 1 : recette non-vegan (oeufs) → violation exclusion 'vegan' (validateExclusions)
     const planningNonVegan = buildPlanning(['omelette-legumes']);
-    const dietaryViolationsNonVegan = validateDietary(planningNonVegan, recettesMap, [participantCoeliaqueVegan]);
-    expect(dietaryViolationsNonVegan.some((v) => v.kind === 'regime')).toBe(true);
+    const dietaryViolationsNonVegan = validateExclusions(planningNonVegan, recettesMap, [participantCoeliaqueVegan]);
+    expect(dietaryViolationsNonVegan.some((v) => v.kind === 'exclusion')).toBe(true);
 
     // Cas 2 : recette avec gluten → violation allergène 'gluten' (validatePlanning)
     const planningGluten = buildPlanning(['pates-bolognaise']);
@@ -360,7 +360,7 @@ describe('allergen-safety (1100 iterations)', () => {
       allergenes_groupe: [...EU14_ALLERGENS],
       equipement_disponible: [],
     });
-    const filtered = filterByDietary(allergenFiltered, { regimes_groupe: ['vegan'] });
+    const filtered = filterByExclusions(allergenFiltered, { exclusions_groupe: ['vegan'] });
     expect(filtered.length).toBe(0);
     // Contrat documenté : la couche appelante DOIT détecter ce cas (filtered.length === 0)
     // et remonter une erreur explicite à l'utilisateur. Jamais continuer silencieusement.

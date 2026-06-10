@@ -37,7 +37,7 @@ const VALID_BODY = {
     temps_disponible: 'standard',
   },
   participants: [
-    { nom: 'Alice', allergies: [], regimes: [], aime: [], n_aime_pas: [] },
+    { nom: 'Alice', allergies: [], exclusions: [], aime: [], n_aime_pas: [] },
   ],
 };
 

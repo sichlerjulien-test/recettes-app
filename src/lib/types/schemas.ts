@@ -19,6 +19,7 @@ import { DIETARY_RESTRICTIONS } from '../../../data/seed-dietary';
 
 export const AllergenSchema = z.enum(EU14_ALLERGENS);
 export const DietaryRestrictionSchema = z.enum(DIETARY_RESTRICTIONS);
+export const ExclusionTagSchema = z.enum(DIETARY_RESTRICTIONS);
 
 export const IngredientCategorySchema = z.enum([
   'fruits-legumes',
@@ -71,6 +72,44 @@ export const CookingLevelSchema = z.enum(['facile', 'normal']);
 
 export const TimeAvailableSchema = z.enum(['rapide', 'standard']);
 
+type ExclusionTag = typeof DIETARY_RESTRICTIONS[number];
+
+const LEGACY_CONTRAINTES_REGIME_TO_EXCLUSION: Record<string, ExclusionTag> = {
+  vegetarien: 'vegetarien',
+  vegan: 'vegan',
+};
+
+function normalizeLegacyContraintesRegimes(value: unknown, context: string): unknown[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.map((regime) => {
+    if (typeof regime === 'string' && regime in LEGACY_CONTRAINTES_REGIME_TO_EXCLUSION) {
+      return LEGACY_CONTRAINTES_REGIME_TO_EXCLUSION[regime];
+    }
+
+    console.warn(
+      `[schemas] ${context}: valeur legacy contraintes_utilisees inconnue, validation conserve l'erreur`,
+      regime,
+    );
+    return regime;
+  });
+}
+
+function normalizeLegacyContraintesRegimesToExclusions(input: unknown, context: string): unknown {
+  if (typeof input !== 'object' || input === null || Array.isArray(input)) return input;
+
+  const row = input as Record<string, unknown>;
+
+  if ('exclusions' in row && row['exclusions'] !== undefined) {
+    return row;
+  }
+
+  return {
+    ...row,
+    exclusions: normalizeLegacyContraintesRegimes(row['regimes'], context), // Clé JSONB legacy de plannings.contraintes_utilisees, distincte de la colonne participants.exclusions.
+  };
+}
+
 // Slug : minuscules, chiffres, tirets uniquement
 const SlugSchema = z.string().regex(
   /^[a-z0-9]+(-[a-z0-9]+)*$/,
@@ -92,6 +131,7 @@ export const IngredientSchema = z.object({
   allergenes: z.array(AllergenSchema).default([]),
   contient_trace: z.array(AllergenSchema).default([]),
   substituts: z.array(SlugSchema).default([]),
+  exclusion_tags: z.array(ExclusionTagSchema).default([]),
   saisonnalite: z.array(z.number().int().min(1).max(12)).optional(),
   notes: z.string().optional(),
 });
@@ -140,22 +180,24 @@ export const RecetteInputSchema = z.object({
  */
 export const RecetteSchema = RecetteInputSchema.extend({
   allergenes_calcules: z.array(AllergenSchema),
-  est_vegetarien: z.boolean(),
-  est_vegan: z.boolean(),
+  exclusions_compatibles: z.array(ExclusionTagSchema),
 });
 
 // ============================================================================
 // PARTICIPANT & SEJOUR
 // ============================================================================
 
-export const ParticipantSchema = z.object({
-  id: z.string(),
-  nom: z.string().min(1).max(50),
-  allergies: z.array(AllergenSchema).default([]),
-  regimes: z.array(DietaryRestrictionSchema).default([]),
-  aime: z.array(z.string()).default([]),
-  n_aime_pas: z.array(z.string()).default([]),
-});
+export const ParticipantSchema = z.preprocess(
+  (input) => input,
+  z.object({
+    id: z.string(),
+    nom: z.string().min(1).max(50),
+    allergies: z.array(AllergenSchema).default([]),
+    exclusions: z.array(ExclusionTagSchema).default([]),
+    aime: z.array(z.string()).default([]),
+    n_aime_pas: z.array(z.string()).default([]),
+  }),
+);
 
 export const SejourParametresSchema = z.object({
   niveau_cuisine: CookingLevelSchema,
@@ -214,12 +256,15 @@ export const PlanningSchema = z.object({
   sejour_id: z.string(),
   entries: z.array(PlanningEntryFullSchema),
   genere_le: z.string(),
-  /** Trace des contraintes utilisées pour la génération (audit) */
-  contraintes_utilisees: z.object({
-    allergenes: z.array(AllergenSchema),
-    regimes: z.array(DietaryRestrictionSchema),
-    equipement: z.array(EquipmentSchema),
-  }),
+  /** Trace des contraintes utilisées pour la génération (audit). */
+  contraintes_utilisees: z.preprocess(
+    (input) => normalizeLegacyContraintesRegimesToExclusions(input, 'contraintes_utilisees'),
+    z.object({
+      allergenes: z.array(AllergenSchema),
+      exclusions: z.array(ExclusionTagSchema),
+      equipement: z.array(EquipmentSchema),
+    }),
+  ),
 });
 
 // ============================================================================
@@ -258,12 +303,12 @@ export const AllergenViolationSchema = z.object({
   participant_nom: z.union([z.string(), z.undefined()]),
 });
 
-/** Violation liée à un régime alimentaire déclaré par un participant. */
-export const RegimeViolationSchema = z.object({
-  kind: z.literal('regime'),
+/** Violation liée à une exclusion alimentaire déclarée par un participant. */
+export const ExclusionViolationSchema = z.object({
+  kind: z.literal('exclusion'),
   recette_id: z.string(),
   recette_nom: z.string(),
-  regime: DietaryRestrictionSchema,
+  exclusion: ExclusionTagSchema,
   participant_id: z.union([z.string(), z.undefined()]),
   participant_nom: z.union([z.string(), z.undefined()]),
 });
@@ -297,7 +342,7 @@ export const IngredientConsecutifViolationSchema = z.object({
 
 export const ValidationViolationSchema = z.discriminatedUnion('kind', [
   AllergenViolationSchema,
-  RegimeViolationSchema,
+  ExclusionViolationSchema,
   RecetteInconnueViolationSchema,
   SlotsMismatchViolationSchema,
   RecetteDupliqueeViolationSchema,
@@ -407,7 +452,7 @@ export const CreateSejourBodySchema = z.object({
   participants: z.array(z.object({
     nom: z.string().min(1).max(50),
     allergies: z.array(AllergenSchema).default([]),
-    regimes: z.array(DietaryRestrictionSchema).default([]),
+    exclusions: z.array(ExclusionTagSchema).default([]),
     aime: z.array(z.string()).default([]),
     n_aime_pas: z.array(z.string()).default([]),
   })).min(1).max(12),

@@ -1,46 +1,37 @@
-import type { Participant, Planning, Recette, RegimeViolation } from '../types/domain';
+import type { ExclusionViolation, Participant, Planning, Recette } from '../types/domain';
 
 /**
- * Valide les régimes alimentaires d'un planning contre les participants.
+ * Valide les exclusions alimentaires d'un planning contre les participants.
  *
  * Opère sur un planning déjà validé par validatePlanning (allergens/validator.ts).
  * Les recettes inconnues sont ignorées ici — elles sont signalées par validatePlanning.
  *
- * Les violations régimes ne sont PAS déduplicées par participant (3 vegans = 3 violations).
+ * Les violations ne sont PAS déduplicées par participant (3 vegans = 3 violations).
  *
  * @param planning       - Le planning à valider
  * @param recettesMap    - Index de toutes les recettes connues, clé = recette_id
  * @param participants   - Liste des participants du séjour
- * @returns Liste (potentiellement vide) de violations de régime
+ * @returns Liste (potentiellement vide) de violations d'exclusion
  */
-export function validateDietary(
+export function validateExclusions(
   planning: Planning,
   recettesMap: Map<string, Recette>,
   participants: readonly Participant[],
-): RegimeViolation[] {
-  const violations: RegimeViolation[] = [];
+): ExclusionViolation[] {
+  const violations: ExclusionViolation[] = [];
 
   for (const entry of planning.entries) {
     const recette = recettesMap.get(entry.recette_id);
     if (recette === undefined) continue;
 
     for (const participant of participants) {
-      for (const regime of participant.regimes) {
-        if (regime === 'vegan' && !recette.est_vegan) {
+      for (const exclusion of participant.exclusions) {
+        if (!recette.exclusions_compatibles.includes(exclusion)) {
           violations.push({
-            kind: 'regime',
+            kind: 'exclusion',
             recette_id: recette.id,
             recette_nom: recette.nom,
-            regime: 'vegan',
-            participant_id: participant.id,
-            participant_nom: participant.nom,
-          });
-        } else if (regime === 'vegetarien' && !recette.est_vegetarien) {
-          violations.push({
-            kind: 'regime',
-            recette_id: recette.id,
-            recette_nom: recette.nom,
-            regime: 'vegetarien',
+            exclusion,
             participant_id: participant.id,
             participant_nom: participant.nom,
           });

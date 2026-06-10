@@ -25,7 +25,7 @@ const VALID_BODY = {
     temps_disponible: 'standard',
   },
   participants: [
-    { nom: 'Alice', allergies: [], regimes: [], aime: [], n_aime_pas: [] },
+    { nom: 'Alice', allergies: [], exclusions: [], aime: [], n_aime_pas: [] },
   ],
 };
 
@@ -61,7 +61,7 @@ describe('CreateSejourBodySchema (schéma partagé POST + PATCH)', () => {
 
   it('refuse plus de 12 participants', () => {
     const tooMany = Array.from({ length: 13 }, (_, i) => ({
-      nom: `P${i}`, allergies: [], regimes: [], aime: [], n_aime_pas: [],
+      nom: `P${i}`, allergies: [], exclusions: [], aime: [], n_aime_pas: [],
     }));
     const result = CreateSejourBodySchema.safeParse({ ...VALID_BODY, participants: tooMany });
     expect(result.success).toBe(false);

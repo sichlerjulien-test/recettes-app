@@ -21,7 +21,7 @@ function makePlanning(recetteIds: string[]): Planning {
       portions: 4,
     })),
     genere_le: '2026-04-21T00:00:00Z',
-    contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+    contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
   };
 }
 
@@ -104,23 +104,23 @@ describe('validatePlanning', () => {
     expect(unknownViolations).toHaveLength(1);
   });
 
-  it('doit retourner valid=true pour un participant vegan sans violations allergene', () => {
+  it('doit retourner valid=true pour un participant sans allergene commun avec la recette', () => {
     // validatePlanning ne valide plus les régimes — seules les allergies comptent ici
-    const planning = makePlanning(['salade-tomate-basilic']); // vegan, sans allergène commun
+    const planning = makePlanning(['salade-tomate-basilic']); // sans allergène commun
     const result = validatePlanning(planning, recettesMap, [participantVegan]);
     expect(result.valid).toBe(true);
     expect(result.violations).toHaveLength(0);
   });
 
-  it('doit emettre allergen(gluten) pour un participant coeliaque-vegan sur une recette avec gluten', () => {
-    // validatePlanning ne valide que les allergènes — le régime vegan est validé par validateDietary
+  it('doit emettre allergen(gluten) pour un participant coeliaque sur une recette avec gluten', () => {
+    // validatePlanning ne valide que les allergènes — les exclusions alimentaires sont validées par validateExclusions
     const planning = makePlanning(['pates-bolognaise']); // gluten
     const result = validatePlanning(planning, recettesMap, [participantCoeliaqueVegan]);
     expect(result.valid).toBe(false);
     const kinds = result.violations.map((v) => v.kind);
     expect(kinds).toContain('allergen');
-    // pas de regime ici — c'est validateDietary qui l'émet
-    expect(kinds).not.toContain('regime');
+    // pas d'exclusion ici — c'est validateExclusions qui l'émet
+    expect(kinds).not.toContain('exclusion');
   });
 
   it('doit retourner valid=true pour un planning vide', () => {

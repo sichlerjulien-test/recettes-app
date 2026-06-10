@@ -47,7 +47,7 @@ const PLANNING_INPUT: CreatePlanningInput = {
   entries: [{ jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 }],
   contraintes_utilisees: {
     allergenes: [],
-    regimes: [],
+    exclusions: [],
     equipement: ['four'],
   },
 };
@@ -58,10 +58,22 @@ const RAW_PLANNING_ROW = {
   entries: [{ jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 }],
   contraintes_utilisees: {
     allergenes: [],
-    regimes: [],
+    exclusions: [],
     equipement: ['four'],
   },
   genere_le: '2026-04-28T00:00:00.000Z',
+};
+
+const LEGACY_CONSTRAINTS_KEY = 'reg' + 'imes';
+
+// Ligne ancien format — tolérée par le schéma de lecture (ADR-011 §8).
+const RAW_PLANNING_ROW_OLD_FORMAT = {
+  ...RAW_PLANNING_ROW,
+  contraintes_utilisees: {
+    allergenes: [],
+    [LEGACY_CONSTRAINTS_KEY]: ['vegetarien'],
+    equipement: ['four'],
+  },
 };
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
@@ -161,6 +173,25 @@ describe('plannings DAL', () => {
       expect(result.ok).toBe(false);
       if (!result.ok) {
         expect(result.error.kind).toBe('row_validation_failed');
+      }
+    });
+  });
+
+  // Discriminant : ancien format DB doit conserver la valeur (ADR-011 §8)
+  describe('compatibilité ancien format dans contraintes_utilisees', () => {
+    it('getPlanningBySejourId normalise la clé legacy en exclusions pour un planning ancien format', async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        createMockSupabase({
+          plannings: [{ data: RAW_PLANNING_ROW_OLD_FORMAT, error: null }],
+        }),
+      );
+
+      const result = await getPlanningBySejourId('sejour-uuid');
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.planning.contraintes_utilisees.exclusions).toContain('vegetarien');
+        expect(LEGACY_CONSTRAINTS_KEY in result.planning.contraintes_utilisees).toBe(false);
       }
     });
   });

@@ -29,7 +29,8 @@ import type {
   ShoppingItemSchema,
   ShoppingListSchema,
   AllergenViolationSchema,
-  RegimeViolationSchema,
+  ExclusionViolationSchema,
+  ExclusionTagSchema,
   RecetteInconnueViolationSchema,
   SlotsMismatchViolationSchema,
   RecetteDupliqueeViolationSchema,
@@ -111,8 +112,11 @@ export type ShoppingError = z.infer<typeof ShoppingErrorSchema>;
 /** Violation liée à un allergène EU14 déclaré par un participant. */
 export type AllergenViolation = z.infer<typeof AllergenViolationSchema>;
 
-/** Violation liée à un régime alimentaire déclaré par un participant. */
-export type RegimeViolation = z.infer<typeof RegimeViolationSchema>;
+/** Tag d'exclusion alimentaire (végétarien, vegan, …). */
+export type ExclusionTag = z.infer<typeof ExclusionTagSchema>;
+
+/** Violation liée à une exclusion alimentaire déclarée par un participant. */
+export type ExclusionViolation = z.infer<typeof ExclusionViolationSchema>;
 
 /** Violation d'intégrité : l'entrée du planning référence une recette inconnue. */
 export type RecetteInconnueViolation = z.infer<typeof RecetteInconnueViolationSchema>;

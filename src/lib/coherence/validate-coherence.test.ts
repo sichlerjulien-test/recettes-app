@@ -14,7 +14,7 @@ function makePlanning(recetteIds: string[]): Planning {
       portions: 4,
     })),
     genere_le: '2026-04-21T00:00:00Z',
-    contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+    contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
   };
 }
 
@@ -58,7 +58,7 @@ describe('validateCoherence', () => {
       sejour_id: 'sejour-test',
       entries: [{ jour: 2, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 }],
       genere_le: '2026-04-21T00:00:00Z',
-      contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     };
     const expectedSlots = [{ jour: 1, repas: 'midi' as const }];
     const violations = validateCoherence(planning, recettesMap, expectedSlots);
@@ -82,7 +82,7 @@ describe('validateCoherence', () => {
         { jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
-      contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     };
     const violations = validateCoherence(planning, recettesMap, slotsFrom(planning));
     const dup = violations.find((v) => v.kind === 'recette_dupliquee');
@@ -102,7 +102,7 @@ describe('validateCoherence', () => {
         { jour: 2, repas: 'midi',           recette_id: 'salade-tomate-basilic', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
-      contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     };
     const violations = validateCoherence(planning, recettesMap, slotsFrom(planning));
     const dups = violations.filter((v) => v.kind === 'recette_dupliquee');
@@ -118,7 +118,7 @@ describe('validateCoherence', () => {
         { jour: 1, repas: 'soir', recette_id: 'recette-fantome', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
-      contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     };
     const violations = validateCoherence(planning, recettesMap, slotsFrom(planning));
     expect(violations.some((v) => v.kind === 'recette_dupliquee')).toBe(true);
@@ -145,7 +145,7 @@ describe('validateCoherence', () => {
         { jour: 1, repas: 'soir',           recette_id: 'omelette-legumes',  portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
-      contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     };
     const expectedSlots = planning.entries.map((e) => ({ jour: e.jour, repas: e.repas }));
     const violations = validateCoherence(planning, recettesMap, expectedSlots);
@@ -168,7 +168,7 @@ describe('validateCoherence', () => {
         { jour: 2, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch',  portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
-      contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     };
     const expectedSlots = planning.entries.map((e) => ({ jour: e.jour, repas: e.repas }));
     const violations = validateCoherence(planning, recettesMap, expectedSlots);
@@ -185,7 +185,7 @@ describe('validateCoherence', () => {
         { jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
-      contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     };
     const violations = validateCoherence(planning, recettesMap, slotsFrom(planning));
     expect(violations.filter((v) => v.kind === 'ingredient_principal_consecutif')).toHaveLength(0);
@@ -202,7 +202,7 @@ describe('validateCoherence', () => {
         { jour: 1, repas: 'soir', recette_id: 'fantome-b', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
-      contraintes_utilisees: { allergenes: [], regimes: [], equipement: [] },
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     };
     const expectedSlots = [{ jour: 1, repas: 'midi' as const }, { jour: 1, repas: 'soir' as const }];
     const violations = validateCoherence(planning, recettesMap, expectedSlots);
