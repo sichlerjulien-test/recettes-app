@@ -74,28 +74,28 @@ export const TimeAvailableSchema = z.enum(['rapide', 'standard']);
 
 type ExclusionTag = typeof DIETARY_RESTRICTIONS[number];
 
-const LEGACY_REGIME_TO_EXCLUSION: Record<string, ExclusionTag> = {
+const LEGACY_CONTRAINTES_REGIME_TO_EXCLUSION: Record<string, ExclusionTag> = {
   vegetarien: 'vegetarien',
   vegan: 'vegan',
 };
 
-function normalizeLegacyRegimes(value: unknown, context: string): unknown[] {
+function normalizeLegacyContraintesRegimes(value: unknown, context: string): unknown[] {
   if (!Array.isArray(value)) return [];
 
   return value.map((regime) => {
-    if (typeof regime === 'string' && regime in LEGACY_REGIME_TO_EXCLUSION) {
-      return LEGACY_REGIME_TO_EXCLUSION[regime];
+    if (typeof regime === 'string' && regime in LEGACY_CONTRAINTES_REGIME_TO_EXCLUSION) {
+      return LEGACY_CONTRAINTES_REGIME_TO_EXCLUSION[regime];
     }
 
     console.warn(
-      `[schemas] ${context}: valeur legacy regimes inconnue, validation conserve l'erreur`,
+      `[schemas] ${context}: valeur legacy contraintes_utilisees inconnue, validation conserve l'erreur`,
       regime,
     );
     return regime;
   });
 }
 
-function normalizeRegimesToExclusions(input: unknown, context: string): unknown {
+function normalizeLegacyContraintesRegimesToExclusions(input: unknown, context: string): unknown {
   if (typeof input !== 'object' || input === null || Array.isArray(input)) return input;
 
   const row = input as Record<string, unknown>;
@@ -106,7 +106,7 @@ function normalizeRegimesToExclusions(input: unknown, context: string): unknown 
 
   return {
     ...row,
-    exclusions: normalizeLegacyRegimes(row['regimes'], context),
+    exclusions: normalizeLegacyContraintesRegimes(row['regimes'], context), // Clé JSONB legacy de plannings.contraintes_utilisees, distincte de la colonne participants.exclusions.
   };
 }
 
@@ -188,7 +188,7 @@ export const RecetteSchema = RecetteInputSchema.extend({
 // ============================================================================
 
 export const ParticipantSchema = z.preprocess(
-  (input) => normalizeRegimesToExclusions(input, 'participant'),
+  (input) => input,
   z.object({
     id: z.string(),
     nom: z.string().min(1).max(50),
@@ -256,10 +256,9 @@ export const PlanningSchema = z.object({
   sejour_id: z.string(),
   entries: z.array(PlanningEntryFullSchema),
   genere_le: z.string(),
-  /** Trace des contraintes utilisées pour la génération (audit).
-   * Les anciennes lignes `regimes` sont normalisées en `exclusions` à la lecture. */
+  /** Trace des contraintes utilisées pour la génération (audit). */
   contraintes_utilisees: z.preprocess(
-    (input) => normalizeRegimesToExclusions(input, 'contraintes_utilisees'),
+    (input) => normalizeLegacyContraintesRegimesToExclusions(input, 'contraintes_utilisees'),
     z.object({
       allergenes: z.array(AllergenSchema),
       exclusions: z.array(ExclusionTagSchema),

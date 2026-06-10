@@ -65,27 +65,27 @@ Le "zéro fantôme" persiste à l'affichage quand on modifie une quantité sur s
 
 ## P1 — Important, juste après le P0
 
-### TK-05 — Exclusions alimentaires (distinctes des allergènes)  ·  M
-
-> **Pré-requis archi (avant implémentation) :** extraire la classification
-> végétarien/végétalien hors de `src/lib/allergens/`. L'audit QA de TK-07 l'a confirmé :
-> `compute.ts` du module sanctuarisé porte aujourd'hui la classification végé
-> (`compute.test.ts` couvre "végétarien/vegan"). C'est un mélange de concepts —
-> l'exclusion alimentaire est distincte de l'allergène (CLAUDE_PROJECT.md §4), et le module
-> allergènes doit rester une forteresse mono-responsabilité. allergen-guard a effleuré ce
-> smell. Implémenter TK-05 en l'état viendrait empiler une responsabilité d'exclusion sur le
-> module le plus sacré du projet. Sortir la classification d'abord, puis bâtir l'exclusion
-> sur le mécanisme de filtrage commun, **hors forteresse**.
+### TK-05 — Exclusions alimentaires (distinctes des allergènes)  ·  M  ·  Phase 1 ✅ / Phase 2 ✅ / TK-19 dev validé
 
 **Origine :** feedback 6 · point B validé.
 
 Un participant doit pouvoir exclure viande rouge, porc, etc. sans que ce soit traité comme un allergène EU14.
 
-Sous-tâches :
-- Concept "exclusions" séparé des allergènes (NE PAS étendre la liste EU14).
-- Liste prédéfinie (viande rouge, porc, poisson, fruits de mer, alcool, + à définir). Pas de saisie libre (casserait le filtre déterministe).
-- Passe par le même mécanisme technique de filtrage, conceptuellement distinct.
-- Rédiger un ADR dédié.
+#### Phase 1 — Extraction `lib/dietary/`  ·  ✅ Mergée (PR #21, commit 1c7adf8)
+
+La classification végétarien/végétalien a été extraite hors de `src/lib/allergens/` vers
+`src/lib/dietary/`. La forteresse allergènes est désormais mono-responsabilité. C'était le
+pré-requis archi nécessaire avant toute implémentation des exclusions.
+
+#### TK-19 — Migration colonne participants.exclusions + CHECK vocabulaire  ·  🟡 Prod humaine restante
+
+Décision read-path tranchée : la colonne DB `participants.regimes` est renommée en
+`participants.exclusions` par migration dédiée, avec `CHECK` sur le vocabulaire
+`EXCLUSION_TAGS`. Les vieux blobs JSONB `contraintes_utilisees.regimes` restent lus via
+normalisation legacy ; ils ne sont pas migrés.
+
+Statut : dev validé (migration, re-seed, smoke, gate ADR-010 et test discriminant CHECK
+verts). Prod reste une étape humaine séparée ; retirer TK-19 quand elle est appliquée.
 
 **Critères d'acceptation :** l'ami sujet à la goutte peut exclure la viande rouge ; le planning n'en contient aucune ; la forteresse allergènes reste inchangée.
 
@@ -283,7 +283,7 @@ avec un trou.
 | TK-02 | Refonte modèle d'unités d'achat | P0 | L (réel S) | Fait |
 | TK-03 | Édition séjour + flow génération | P0 | L | Fait |
 | TK-04 | Bug inputs number iPhone | P0 | S | Fait |
-| TK-05 | Exclusions alimentaires | P1 | M | À faire |
+| TK-05 | Exclusions alimentaires | P1 | M | Phase 1 ✅ / Phase 2 ✅ / TK-19 prod |
 | TK-06 | CI workflows | P2 | M | Fait |
 | TK-07 | Scission Supabase dev/prod | P2 | M | Fait |
 | TK-08 | Réutilisation ingrédients | V2 | — | À faire |
@@ -298,5 +298,4 @@ avec un trou.
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
 | TK-18 | Bug hydratation ShareLink | P2 | S | À faire |
 
-**Ordre conseillé :** TK-05 (P1, après son pré-requis archi) → reste de la dette data/DAL (TK-09, TK-10, TK-13, TK-12) quand le fonctionnel est stable → V2 (TK-08, TK-14).
-
+**Ordre conseillé :** application prod humaine TK-19 → reste de la dette data/DAL (TK-09, TK-10, TK-13, TK-12) quand le fonctionnel est stable → V2 (TK-08, TK-14).
