@@ -65,7 +65,7 @@ Le "zéro fantôme" persiste à l'affichage quand on modifie une quantité sur s
 
 ## P1 — Important, juste après le P0
 
-### TK-05 — Exclusions alimentaires (distinctes des allergènes)  ·  M  ·  Phase 1 ✅ / Phase 2 ✅ / TK-19 dev validé
+### TK-05 — Exclusions alimentaires (distinctes des allergènes)  ·  M  ·  Ouvert — Phase 2A plomberie + schéma faits
 
 **Origine :** feedback 6 · point B validé.
 
@@ -77,15 +77,21 @@ La classification végétarien/végétalien a été extraite hors de `src/lib/al
 `src/lib/dietary/`. La forteresse allergènes est désormais mono-responsabilité. C'était le
 pré-requis archi nécessaire avant toute implémentation des exclusions.
 
-#### TK-19 — Migration colonne participants.exclusions + CHECK vocabulaire  ·  🟡 Prod humaine restante
+#### Phase 2A — Plomberie + schéma  ·  ✅ Fait
 
-Décision read-path tranchée : la colonne DB `participants.regimes` est renommée en
-`participants.exclusions` par migration dédiée, avec `CHECK` sur le vocabulaire
-`EXCLUSION_TAGS`. Les vieux blobs JSONB `contraintes_utilisees.regimes` restent lus via
-normalisation legacy ; ils ne sont pas migrés.
+La colonne DB `participants.regimes` a été renommée en `participants.exclusions`, avec
+`CHECK` sur le vocabulaire `EXCLUSION_TAGS`. Les vieux blobs JSONB
+`contraintes_utilisees.regimes` restent lus via normalisation legacy ; ils ne sont pas
+migrés.
 
-Statut : dev validé (migration, re-seed, smoke, gate ADR-010 et test discriminant CHECK
-verts). Prod reste une étape humaine séparée ; retirer TK-19 quand elle est appliquée.
+#### Reste à livrer
+
+- Session B : qualification YAML + règle de complétude CI.
+- Session C : UI.
+
+Statut : ouvert. Tant que les sessions B/C ne sont pas livrées, seuls `vegetarien` et
+`vegan` filtrent réellement ; les tags atomiques existent dans le schéma mais restent
+inertes fonctionnellement.
 
 **Critères d'acceptation :** l'ami sujet à la goutte peut exclure la viande rouge ; le planning n'en contient aucune ; la forteresse allergènes reste inchangée.
 
@@ -283,7 +289,7 @@ avec un trou.
 | TK-02 | Refonte modèle d'unités d'achat | P0 | L (réel S) | Fait |
 | TK-03 | Édition séjour + flow génération | P0 | L | Fait |
 | TK-04 | Bug inputs number iPhone | P0 | S | Fait |
-| TK-05 | Exclusions alimentaires | P1 | M | Phase 1 ✅ / Phase 2 ✅ / TK-19 prod |
+| TK-05 | Exclusions alimentaires | P1 | M | Ouvert — Phase 2A plomberie + schéma faits ; B/C à faire |
 | TK-06 | CI workflows | P2 | M | Fait |
 | TK-07 | Scission Supabase dev/prod | P2 | M | Fait |
 | TK-08 | Réutilisation ingrédients | V2 | — | À faire |
@@ -298,4 +304,4 @@ avec un trou.
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
 | TK-18 | Bug hydratation ShareLink | P2 | S | À faire |
 
-**Ordre conseillé :** application prod humaine TK-19 → reste de la dette data/DAL (TK-09, TK-10, TK-13, TK-12) quand le fonctionnel est stable → V2 (TK-08, TK-14).
+**Ordre conseillé :** reste de TK-05 (Session B qualification YAML + complétude CI, puis Session C UI) → dette data/DAL (TK-09, TK-10, TK-13, TK-12) quand le fonctionnel est stable → V2 (TK-08, TK-14).
