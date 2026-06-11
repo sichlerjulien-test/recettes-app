@@ -74,10 +74,9 @@ function mapRecetteRow(item: unknown): unknown {
     etapes: row['etapes'],
     tags_libres: row['tags_libres'],
     allergenes_calcules: row['allergenes_calcules'],
-    exclusions_compatibles: [
-      ...(row['est_vegetarien'] ? (['vegetarien'] as const) : []),
-      ...(row['est_vegan'] ? (['vegan'] as const) : []),
-    ],
+    exclusions_compatibles: Array.isArray(row['exclusions_compatibles'])
+      ? row['exclusions_compatibles']
+      : [],
     ingredients,
   };
 }

@@ -94,6 +94,7 @@ type RecetteRow = {
   allergenes_calcules: string[];
   est_vegetarien: boolean;
   est_vegan: boolean;
+  exclusions_compatibles: string[];
   created_at: string;
   updated_at: string;
 };
@@ -338,6 +339,7 @@ async function main(): Promise<void> {
       allergenes_calcules: [...allergenMeta.allergenes_calcules],
       est_vegetarien,
       est_vegan,
+      exclusions_compatibles: [...dietaryMeta.exclusions_compatibles],
     });
   }
 

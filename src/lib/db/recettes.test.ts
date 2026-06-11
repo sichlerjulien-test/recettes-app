@@ -58,6 +58,10 @@ const RAW_RECETTE_ROW = {
   allergenes_calcules: [],
   est_vegetarien: true,
   est_vegan: true,
+  exclusions_compatibles: [
+    'sans-viande-rouge', 'sans-porc', 'sans-poisson', 'sans-fruits-de-mer', 'sans-alcool',
+    'vegetarien', 'vegan',
+  ],
   recette_ingredients: [
     { ingredient_id: 'tomate', quantite_base: 600, unite: 'g', optionnel: false, groupe: null, position: 1 },
     { ingredient_id: 'oignon', quantite_base: 100, unite: 'g', optionnel: false, groupe: null, position: 2 },
@@ -162,6 +166,73 @@ describe('recettes DAL', () => {
         expect(result.recettes.size).toBe(1);
         expect(result.recettes.has('salade-tomate-basilic')).toBe(true);
         expect(result.recettes.get('salade-tomate-basilic')?.nom).toBe('Salade tomate basilic');
+      }
+    });
+  });
+
+  // ─── Régression P0 : lecture verbatim de exclusions_compatibles ──────────────
+  // Avant le fix, mapRecetteRow reconstruisait exclusions_compatibles depuis
+  // est_vegetarien/est_vegan uniquement → les 5 tags atomiques étaient perdus.
+  // Sélectionner 'sans-porc' seul vidait le pool à tort.
+
+  describe('exclusions_compatibles — lecture verbatim depuis la colonne DB', () => {
+    it('lit les 7 tags depuis la colonne DB, pas seulement vegetarien/vegan', async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        createMockSupabase({ recettes: [{ data: [RAW_RECETTE_ROW], error: null }] }),
+      );
+
+      const result = await getAllRecettes();
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        const recette = result.recettes[0]!;
+        expect(recette.exclusions_compatibles).toContain('sans-porc');
+        expect(recette.exclusions_compatibles).toContain('sans-viande-rouge');
+        expect(recette.exclusions_compatibles).toContain('sans-poisson');
+        expect(recette.exclusions_compatibles).toContain('sans-fruits-de-mer');
+        expect(recette.exclusions_compatibles).toContain('sans-alcool');
+        expect(recette.exclusions_compatibles).toContain('vegetarien');
+        expect(recette.exclusions_compatibles).toContain('vegan');
+      }
+    });
+
+    it("sans-porc seul : pool avec recette compatible n'est pas vide (régression P0)", async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        createMockSupabase({ recettes: [{ data: [RAW_RECETTE_ROW], error: null }] }),
+      );
+
+      const result = await getAllRecettes();
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        const pool = result.recettes.filter((r) => r.exclusions_compatibles.includes('sans-porc'));
+        expect(pool.length, 'le pool sans-porc ne doit pas être vide').toBeGreaterThan(0);
+      }
+    });
+
+    it('row avec est_vegan=true mais exclusions_compatibles=[vegetarien,vegan] ne contient pas les tags atomiques', async () => {
+      // Ce test documente le bug P0 résolu : l'ancienne reconstruction depuis les
+      // booléens produisait seulement ['vegetarien', 'vegan'], sans les tags atomiques.
+      // Désormais, seule la colonne DB fait foi.
+      const rowSansTags = {
+        ...RAW_RECETTE_ROW,
+        exclusions_compatibles: ['vegetarien', 'vegan'],
+      };
+
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        createMockSupabase({ recettes: [{ data: [rowSansTags], error: null }] }),
+      );
+
+      const result = await getAllRecettes();
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        const recette = result.recettes[0]!;
+        // La valeur vient de la colonne DB, pas reconstruite depuis les booléens.
+        expect(recette.exclusions_compatibles).not.toContain('sans-porc');
+        expect(recette.exclusions_compatibles).not.toContain('sans-alcool');
+        expect(recette.exclusions_compatibles).toContain('vegetarien');
+        expect(recette.exclusions_compatibles).toContain('vegan');
       }
     });
   });
