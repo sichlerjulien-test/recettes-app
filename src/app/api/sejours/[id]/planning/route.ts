@@ -97,10 +97,11 @@ export async function POST(
   if (!planningResult.ok) {
     switch (planningResult.error.kind) {
       case 'pool_empty': {
-        const message = planningResult.error.cause === 'allergen'
+        const { cause } = planningResult.error;
+        const message = cause === 'allergen'
           ? 'Aucune recette ne correspond aux allergies déclarées. Vérifiez les allergies des participants.'
           : 'Aucune recette ne correspond à ces exclusions alimentaires. Essayez d\'en retirer une.';
-        return jsonError(422, 'pool_empty', message);
+        return jsonError(422, 'pool_empty', message, { cause });
       }
       case 'validation_failed_after_retries':
         return jsonError(

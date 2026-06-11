@@ -276,6 +276,30 @@ Sous-tâches :
 
 **Critères :** pas de mismatch d'hydratation sur `/sejour` ; URL de partage absolue, identique SSR et client.
 
+### TK-21 — Violations séparées post-retry : allergènes ≠ exclusions  ·  S
+**Origine :** revue TK-05 2C (architect/qa-engineer), ADR-011 §7.
+
+`validation_failed_after_retries` agrège toutes les violations dans `lastViolations` au lieu de
+distinguer `last_security_violations` (allergènes EU14, criticité P0) et `last_exclusion_violations`
+(préférences alimentaires, criticité P1). La séparation garantie par ADR-011 §7 est cassée sur le
+chemin rare post-retry : un log de debug indistinguable rend l'analyse d'incident difficile.
+
+**Critères :** `validation_failed_after_retries` expose deux champs séparés ; tests discriminants.
+
+> Chemin rare (post-retry), non-bloquant TK-05 2C. À traiter avant toute extension du validateur.
+
+### TK-22 — Nettoyage zombies vocabulaire : DietaryRestrictionSchema / REGIME_LABELS / toggleRegime  ·  S
+**Origine :** revue TK-05 2C (qa-engineer).
+
+Résidus de l'ancien vocabulaire "régimes" non supprimés lors du renommage en "exclusions" :
+`DietaryRestrictionSchema`, `REGIME_LABELS`, `toggleRegime` (et éventuellement des references
+dans les tests). Ces symboles créent une confusion nomenclature et augmentent le risque de
+régression silencieuse si une référence pointe vers l'ancien vocabulaire.
+
+**Critères :** `grep -r "toggleRegime\|REGIME_LABELS\|DietaryRestrictionSchema"` retourne zéro hit.
+
+> Purement cosmétique/dette nomenclature. Aucun risque de régression comportementale.
+
 ---
 
 ## V2 — Hors MVP (noté pour mémoire)
@@ -330,5 +354,7 @@ avec un trou.
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
 | TK-18 | Bug hydratation ShareLink | P2 | S | À faire |
 | TK-20 | Raffiner taxonomie ingrédients (garde déterministe porc/viande-rouge/alcool) | P2 | M | À faire |
+| TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | À faire |
+| TK-22 | Nettoyage zombies vocabulaire DietaryRestrictionSchema / REGIME_LABELS | P2 | S | À faire |
 
 **Ordre conseillé :** dette data/DAL (TK-09, TK-10, TK-13, TK-12, TK-20) quand le fonctionnel est stable → V2 (TK-08, TK-14).

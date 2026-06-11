@@ -16,7 +16,6 @@ const MAIN_INGREDIENTS_NON_VEGETARIEN = new Set<MainIngredient>([
   'poisson', 'fruits-de-mer',
 ]);
 
-const CATEGORIES_NON_VEGAN = new Set(['viandes-poissons', 'cremerie-oeufs'] as const);
 
 const MAIN_INGREDIENTS_NON_VEGAN = new Set<MainIngredient>(['oeufs', 'fromage']);
 
@@ -24,7 +23,8 @@ export function computeDietaryMetadata(
   recette: RecetteSansCalculs,
   ingredientsMap: Map<string, Ingredient>,
 ): { exclusions_compatibles: ExclusionTag[] } {
-  let hasNonVeganCategory = false;
+  let hasMeatOrFishIngredient = false;
+  let hasDairyOrEggIngredient = false;
   const blockedAtomicTags = new Set<ExclusionTag>();
 
   for (const ri of recette.ingredients) {
@@ -33,8 +33,11 @@ export function computeDietaryMetadata(
     const ingredient = ingredientsMap.get(ri.ingredient_id);
     if (ingredient === undefined) continue;
 
-    if (CATEGORIES_NON_VEGAN.has(ingredient.categorie as 'viandes-poissons' | 'cremerie-oeufs')) {
-      hasNonVeganCategory = true;
+    if (ingredient.categorie === 'viandes-poissons') {
+      hasMeatOrFishIngredient = true;
+    }
+    if (ingredient.categorie === 'cremerie-oeufs') {
+      hasDairyOrEggIngredient = true;
     }
 
     for (const tag of ingredient.exclusion_tags) {
@@ -42,11 +45,13 @@ export function computeDietaryMetadata(
     }
   }
 
-  const est_vegetarien = !MAIN_INGREDIENTS_NON_VEGETARIEN.has(recette.ingredient_principal);
+  const est_vegetarien =
+    !MAIN_INGREDIENTS_NON_VEGETARIEN.has(recette.ingredient_principal) &&
+    !hasMeatOrFishIngredient;
 
   const est_vegan =
     est_vegetarien &&
-    !hasNonVeganCategory &&
+    !hasDairyOrEggIngredient &&
     !MAIN_INGREDIENTS_NON_VEGAN.has(recette.ingredient_principal);
 
   const exclusions_compatibles: ExclusionTag[] = [

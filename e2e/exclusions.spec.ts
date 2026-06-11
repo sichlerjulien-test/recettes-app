@@ -132,6 +132,7 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
           error: {
             kind: 'pool_empty',
             message: "Aucune recette ne correspond à ces exclusions alimentaires. Essayez d'en retirer une.",
+            details: { cause: 'exclusion' },
           },
         }),
       })
@@ -141,11 +142,16 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
     await page.getByLabel('Nom').first().fill('Alice')
     await page.getByRole('button', { name: 'Vegan' }).first().click()
 
+    const planningResponsePromise = page.waitForResponse(`**/api/sejours/${UUID_SEJOUR_POOL_EMPTY_EXCL}/planning`)
     await page.getByRole('button', { name: /Créer et générer/ }).click()
 
     // Le flow pool_empty est réellement exercé : l'endpoint planning a été appelé
-    await page.waitForRequest(`**/api/sejours/${UUID_SEJOUR_POOL_EMPTY_EXCL}/planning`, { timeout: 5000 })
+    const planningResponse = await planningResponsePromise
     expect(planningCalled).toHaveLength(1)
+
+    // cause stable — ne dépend pas du libellé traduit
+    const responseBody = await planningResponse.json() as { error?: { details?: { cause?: string } } }
+    expect(responseBody.error?.details?.cause).toBe('exclusion')
 
     // Libellé correct : message exclusion, jamais "allergén" ou "retirer un allergène"
     const errorToast = page.getByText(/Aucune recette ne correspond à ces exclusions/)
@@ -182,6 +188,7 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
           error: {
             kind: 'pool_empty',
             message: 'Aucune recette ne correspond aux allergies déclarées. Vérifiez les allergies des participants.',
+            details: { cause: 'allergen' },
           },
         }),
       })
@@ -190,11 +197,16 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
     await page.goto('/nouveau-sejour')
     await page.getByLabel('Nom').first().fill('Alice')
 
+    const planningResponsePromise = page.waitForResponse(`**/api/sejours/${UUID_SEJOUR_POOL_EMPTY_ALRG}/planning`)
     await page.getByRole('button', { name: /Créer et générer/ }).click()
 
     // Le flow pool_empty est réellement exercé
-    await page.waitForRequest(`**/api/sejours/${UUID_SEJOUR_POOL_EMPTY_ALRG}/planning`, { timeout: 5000 })
+    const planningResponse = await planningResponsePromise
     expect(planningCalled).toHaveLength(1)
+
+    // cause stable — ne dépend pas du libellé traduit
+    const responseBody = await planningResponse.json() as { error?: { details?: { cause?: string } } }
+    expect(responseBody.error?.details?.cause).toBe('allergen')
 
     // Message allergène : "Vérifiez les allergies" — jamais "retirer un allergène"
     const errorToast = page.getByText(/Vérifiez les allergies des participants/)
