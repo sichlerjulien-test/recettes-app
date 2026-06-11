@@ -85,6 +85,27 @@ const KNOWN_VEGAN_RECIPES = [
   'pates-tomate-basilic', // légumes, zéro produit animal
 ] as const;
 
+// ─── Régression croque-monsieur-salade (TK-05 bug) ──────────────────────────
+// jambon-blanc était en frais-traiteur → croque-monsieur passait en végétarien.
+// Après correction de la catégorie vers viandes-poissons, les deux propriétés
+// doivent être absentes.
+
+describe('régression croque-monsieur-salade', () => {
+  it("n'est pas végétarien (contient jambon-blanc)", () => {
+    const recette = loadRecipe('croque-monsieur-salade');
+    const map = ingredientsMapFor(recette);
+    const { exclusions_compatibles } = computeDietaryMetadata(recette, map);
+    expect(exclusions_compatibles).not.toContain('vegetarien');
+  });
+
+  it("n'est pas compatible sans-porc (contient jambon-blanc)", () => {
+    const recette = loadRecipe('croque-monsieur-salade');
+    const map = ingredientsMapFor(recette);
+    const { exclusions_compatibles } = computeDietaryMetadata(recette, map);
+    expect(exclusions_compatibles).not.toContain('sans-porc');
+  });
+});
+
 // ─── Anciens tests (conservés) ───────────────────────────────────────────────
 
 describe('exclusions_compatibles — catalogue réel', () => {
