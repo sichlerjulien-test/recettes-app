@@ -19,6 +19,31 @@ existant, 001 compris. Une correction = une nouvelle migration.
    sans casser.
 3. Corrigée par une migration suivante, jamais par édition rétroactive.
 
+### Colonne calculée par build-data : utiliser DEFAULT NULL, jamais DEFAULT '{}'
+
+Toute migration ajoutant une colonne dont la valeur est produite par `npm run build-data`
+(ex : `exclusions_compatibles`, `allergenes_calcules`) **doit** utiliser `DEFAULT NULL`
+et rendre la colonne nullable.
+
+Motif : `DEFAULT '{}'` crée une ambiguïté entre "valeur légitime vide" et "non-matérialisé".
+Entre la migration et le premier `build-data`, le filtre lit `{}` et produit un faux
+`pool_empty` pour toute exclusion demandée — la recette n'est pas exclue pour une raison
+légitime, elle n'a simplement pas encore été calculée. `NULL` est sans ambiguïté.
+
+Le runtime **doit** échouer bruyamment sur `NULL` (erreur explicite nommant la recette
+et suggérant `npm run build-data`) — jamais de fallback silencieux vers `[]`. Après un
+`build-data` complet, toutes les lignes ont une valeur non-NULL (y compris `[]` pour les
+recettes sans aucune exclusion compatible).
+
+Gabarit pour ce type de colonne :
+
+```sql
+ALTER TABLE recettes
+  ADD COLUMN IF NOT EXISTS ma_colonne_calculee text[] DEFAULT NULL;
+-- Pas de NOT NULL : la sentinelle NULL signale que build-data n'a pas encore tourné.
+-- Après build-data, toutes les lignes portent une valeur non-NULL.
+```
+
 ## Appliquer (sens unique dev → prod)
 
 1. **dev d'abord.** SQL Editor dev → coller → Run → zéro erreur.

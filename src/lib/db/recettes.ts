@@ -4,6 +4,7 @@ import { getSupabaseClient } from './supabase';
 import { RecetteSchema } from '../types/schemas';
 import type { Recette } from '../types/domain';
 import type { DbError } from '../types/domain';
+import { requireExclusionsCompatibles } from './recette-row-helpers';
 
 type RecettesResult =
   | { ok: true; recettes: Recette[] }
@@ -74,9 +75,7 @@ function mapRecetteRow(item: unknown): unknown {
     etapes: row['etapes'],
     tags_libres: row['tags_libres'],
     allergenes_calcules: row['allergenes_calcules'],
-    exclusions_compatibles: Array.isArray(row['exclusions_compatibles'])
-      ? row['exclusions_compatibles']
-      : [],
+    exclusions_compatibles: requireExclusionsCompatibles(row['exclusions_compatibles'], row['id']),
     ingredients,
   };
 }

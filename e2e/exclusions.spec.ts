@@ -5,14 +5,14 @@ import { test, expect } from '@playwright/test'
 // These tests prove: (1) UI sends correct exclusions, (2) presets accessible en un tap,
 // (3) pool_empty mène à la page d'édition, (4) défaut vide = pas de bruit UI.
 
-// UUIDs stables pour les mocks — CreateSejourBodySchema exige z.string().uuid()
-const UUID_SEJOUR_1 = '00000000-0000-0000-0000-000000000001'
-const UUID_TOKEN_1  = '00000000-0000-0000-0000-000000000002'
-const UUID_SEJOUR_2 = '00000000-0000-0000-0000-000000000003'
-const UUID_SEJOUR_POOL_EMPTY_EXCL = '00000000-0000-0000-0000-000000000004'
-const UUID_TOKEN_POOL_EMPTY_EXCL  = '00000000-0000-0000-0000-000000000005'
-const UUID_SEJOUR_POOL_EMPTY_ALRG = '00000000-0000-0000-0000-000000000006'
-const UUID_TOKEN_POOL_EMPTY_ALRG  = '00000000-0000-0000-0000-000000000007'
+// UUIDs RFC 4122 valides (version 4, variant 8) — Zod v4 rejette les UUIDs sans version/variant.
+const UUID_SEJOUR_1 = '00000001-0000-4000-8000-000000000001'
+const UUID_TOKEN_1  = '00000001-0000-4000-8000-000000000002'
+const UUID_SEJOUR_2 = '00000002-0000-4000-8000-000000000001'
+const UUID_SEJOUR_POOL_EMPTY_EXCL = '00000003-0000-4000-8000-000000000001'
+const UUID_TOKEN_POOL_EMPTY_EXCL  = '00000003-0000-4000-8000-000000000002'
+const UUID_SEJOUR_POOL_EMPTY_ALRG = '00000004-0000-4000-8000-000000000001'
+const UUID_TOKEN_POOL_EMPTY_ALRG  = '00000004-0000-4000-8000-000000000002'
 
 type SejourPayload = { participants?: Array<{ exclusions: string[] }> }
 
@@ -41,7 +41,8 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
     await page.goto('/nouveau-sejour')
 
     // Participant 1 : Alice — Végétarien en un tap (preset direct, pas d'atomiques)
-    await page.getByLabel('Nom').first().fill('Alice')
+    // exact: true évite le match sur "Nom du séjour (optionnel)" qui apparaît en premier dans le DOM.
+    await page.getByLabel('Nom', { exact: true }).first().fill('Alice')
     const vegetarienBtn = page.getByRole('button', { name: 'Végétarien' }).first()
     await expect(vegetarienBtn).toBeVisible()
     await vegetarienBtn.click()
@@ -51,7 +52,7 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
     await page.getByRole('button', { name: 'Ajouter un participant' }).click()
 
     // Participant 2 : Bob — sans viande rouge en un tap (atomique direct, pas de menu)
-    await page.getByLabel('Nom').nth(1).fill('Bob')
+    await page.getByLabel('Nom', { exact: true }).nth(1).fill('Bob')
     const sansViandeBtn = page.getByRole('button', { name: 'Sans viande rouge' }).nth(1)
     await expect(sansViandeBtn).toBeVisible()
     await sansViandeBtn.click()
@@ -97,7 +98,7 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
     await expect(page.getByRole('button', { name: 'Vegan' }).first()).toHaveClass(/border-gray-200/)
 
     // Remplir le formulaire sans sélectionner d'exclusions
-    await page.getByLabel('Nom').first().fill('Alice')
+    await page.getByLabel('Nom', { exact: true }).first().fill('Alice')
 
     await page.getByRole('button', { name: /Créer et générer/ }).click()
     await page.waitForURL(/\/sejour\//, { timeout: 5000 }).catch(() => {})
@@ -110,9 +111,11 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
   // pool_empty — cause exclusion : message actionnable n'invitant pas à retirer un allergène
   test('pool_empty cause=exclusion → planning appelé, message cause correcte, redirection /edit', async ({ page }) => {
     const planningCalled: string[] = []
+    const sejourPostCaptured: string[] = []
 
     await page.route('**/api/sejours', async (route) => {
       if (route.request().method() === 'POST') {
+        sejourPostCaptured.push(route.request().url())
         await route.fulfill({
           status: 201,
           contentType: 'application/json',
@@ -131,7 +134,7 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
         body: JSON.stringify({
           error: {
             kind: 'pool_empty',
-            message: "Aucune recette ne correspond à ces exclusions alimentaires. Essayez d'en retirer une.",
+            message: "Aucune recette ne correspond à ces exclusions. Essayez d'en retirer une.",
             details: { cause: 'exclusion' },
           },
         }),
@@ -139,14 +142,17 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
     })
 
     await page.goto('/nouveau-sejour')
-    await page.getByLabel('Nom').first().fill('Alice')
+    await page.getByLabel('Nom', { exact: true }).first().fill('Alice')
     await page.getByRole('button', { name: 'Vegan' }).first().click()
 
-    const planningResponsePromise = page.waitForResponse(`**/api/sejours/${UUID_SEJOUR_POOL_EMPTY_EXCL}/planning`)
+    const planningResponsePromise = page.waitForResponse(
+      r => r.url().includes('/planning'),
+    )
     await page.getByRole('button', { name: /Créer et générer/ }).click()
 
-    // Le flow pool_empty est réellement exercé : l'endpoint planning a été appelé
+    // Le flow pool_empty est réellement exercé — planning appelé
     const planningResponse = await planningResponsePromise
+    expect(sejourPostCaptured).toHaveLength(1)
     expect(planningCalled).toHaveLength(1)
 
     // cause stable — ne dépend pas du libellé traduit
@@ -166,9 +172,11 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
   // pool_empty — cause allergène : message n'invitant jamais à retirer un allergène
   test('pool_empty cause=allergen → message distinct, jamais "retirer un allergène"', async ({ page }) => {
     const planningCalled: string[] = []
+    const sejourPostCaptured: string[] = []
 
     await page.route('**/api/sejours', async (route) => {
       if (route.request().method() === 'POST') {
+        sejourPostCaptured.push(route.request().url())
         await route.fulfill({
           status: 201,
           contentType: 'application/json',
@@ -195,12 +203,16 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
     })
 
     await page.goto('/nouveau-sejour')
-    await page.getByLabel('Nom').first().fill('Alice')
+    await page.getByLabel('Nom', { exact: true }).first().fill('Alice')
+    // Déclencher la validation (onTouched) — Tab blur pour activer isValid avant le submit
+    await page.getByLabel('Nom', { exact: true }).first().press('Tab')
 
-    const planningResponsePromise = page.waitForResponse(`**/api/sejours/${UUID_SEJOUR_POOL_EMPTY_ALRG}/planning`)
+    const planningResponsePromise = page.waitForResponse(
+      r => r.url().includes('/planning'),
+    )
     await page.getByRole('button', { name: /Créer et générer/ }).click()
 
-    // Le flow pool_empty est réellement exercé
+    // Le flow pool_empty est réellement exercé — planning appelé
     const planningResponse = await planningResponsePromise
     expect(planningCalled).toHaveLength(1)
 
