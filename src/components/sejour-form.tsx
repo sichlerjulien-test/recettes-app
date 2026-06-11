@@ -13,7 +13,6 @@ import {
   ALLERGEN_LABELS,
   REGIME_LABELS,
   EU14_ALLERGENS,
-  DIETARY_RESTRICTIONS,
 } from "@/lib/ui/labels"
 import type { Allergen, DietaryRestriction } from "@/lib/ui/labels"
 import type { ExclusionTag } from "@/lib/types/domain"
@@ -613,23 +612,50 @@ export function SejourForm({
                         </div>
                       </div>
 
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium text-gray-700">Régimes alimentaires</p>
+                      <div className="space-y-3">
+                        <p className="text-sm font-medium text-gray-700">Préférences alimentaires</p>
                         <div className="flex flex-wrap gap-2">
-                          {DIETARY_RESTRICTIONS.map((regime) => {
-                            const isSelected = participantRegimes.includes(regime)
+                          {(['vegetarien', 'vegan'] as const).map((preset) => {
+                            const isSelected = participantRegimes.includes(preset)
                             return (
-                              <Button
-                                key={regime}
+                              <button
+                                key={preset}
                                 type="button"
-                                variant={isSelected ? "default" : "outline"}
-                                size="sm"
-                                onClick={() => toggleRegime(index, regime)}
+                                onClick={() => toggleRegime(index, preset)}
+                                className={[
+                                  "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+                                  isSelected
+                                    ? "border-gray-400 bg-gray-100 text-gray-800"
+                                    : "border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:bg-gray-50",
+                                ].join(" ")}
                               >
-                                {REGIME_LABELS[regime]}
-                              </Button>
+                                {REGIME_LABELS[preset]}
+                              </button>
                             )
                           })}
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-xs text-gray-400">Ou, plus précisément :</p>
+                          <div className="flex flex-wrap gap-2">
+                            {(['sans-viande-rouge', 'sans-porc', 'sans-poisson', 'sans-fruits-de-mer', 'sans-alcool'] as const).map((atomic) => {
+                              const isSelected = participantRegimes.includes(atomic)
+                              return (
+                                <button
+                                  key={atomic}
+                                  type="button"
+                                  onClick={() => toggleRegime(index, atomic)}
+                                  className={[
+                                    "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                                    isSelected
+                                      ? "border-gray-400 bg-gray-100 text-gray-700"
+                                      : "border-gray-200 bg-white text-gray-400 hover:border-gray-300 hover:bg-gray-50",
+                                  ].join(" ")}
+                                >
+                                  {REGIME_LABELS[atomic]}
+                                </button>
+                              )
+                            })}
+                          </div>
                         </div>
                       </div>
                     </div>

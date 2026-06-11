@@ -12,6 +12,7 @@ export type ApiErrorKind =
   | 'unauthorized'
   | 'not_found'
   | 'business_error'
+  | 'pool_empty'
   | 'db_error'
   | 'llm_unavailable';
 

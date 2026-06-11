@@ -65,7 +65,7 @@ Le "zéro fantôme" persiste à l'affichage quand on modifie une quantité sur s
 
 ## P1 — Important, juste après le P0
 
-### TK-05 — Exclusions alimentaires (distinctes des allergènes)  ·  M  ·  Ouvert — Phase 2A plomberie + schéma faits
+### TK-05 — Exclusions alimentaires (distinctes des allergènes)  ·  M  ·  ✅ Fait
 
 **Origine :** feedback 6 · point B validé.
 
@@ -91,14 +91,13 @@ migrés.
 - Tests catalogue réel : quiche-lorraine (lardons) ∉ `sans-porc` ; poke-bowl saumon ∉ `sans-poisson`.
 - Trou résiduel documenté : porc/viande-rouge/alcool restent à qualification manuelle — ticket TK-20 ouvert.
 
-#### Reste à livrer
+#### Session C — UI  ·  ✅ Fait
 
-- Session C : UI.
+- Picker exclusions dans `sejour-form.tsx` : presets (`Végétarien`, `Vegan`) en un tap + atomiques groupés (`sans-viande-rouge`, `sans-porc`, `sans-poisson`, `sans-fruits-de-mer`, `sans-alcool`) en pills secondaires. Palette neutre (gris) vs allergènes (primary bleu) — distinction visuelle garantie, jamais de rouge/cadenas.
+- `pool_empty` : kind dédié dans l'API (`'pool_empty'`), message actionnable, redirection vers `/edit` pour corriger les exclusions.
+- E2E Playwright (`e2e/exclusions.spec.ts`) : criterion vegetarien (un tap) + sans-viande-rouge prouvé ; défaut vide ; pool_empty ; distinction visuelle.
 
-Statut : ouvert. Session C (UI) reste à livrer. Les tags atomiques (porc, viande-rouge,
-alcool, poisson, fruits-de-mer) filtrent désormais réellement via le catalogue qualifié.
-
-**Critères d'acceptation :** l'ami sujet à la goutte peut exclure la viande rouge ; le planning n'en contient aucune ; la forteresse allergènes reste inchangée.
+**Critères d'acceptation :** l'ami sujet à la goutte peut exclure la viande rouge ; le planning n'en contient aucune ; la forteresse allergènes reste inchangée. ✅
 
 ### TK-11 — Combinaisons allergènes manquantes en test intensif  ·  S/M  ·  ✅ Fait
 **Origine :** allergen-guard (TK-03). Forteresse — P1.
@@ -316,7 +315,7 @@ avec un trou.
 | TK-02 | Refonte modèle d'unités d'achat | P0 | L (réel S) | Fait |
 | TK-03 | Édition séjour + flow génération | P0 | L | Fait |
 | TK-04 | Bug inputs number iPhone | P0 | S | Fait |
-| TK-05 | Exclusions alimentaires | P1 | M | Ouvert — 2A+2B faits ; 2C (UI) reste |
+| TK-05 | Exclusions alimentaires | P1 | M | Fait |
 | TK-06 | CI workflows | P2 | M | Fait |
 | TK-07 | Scission Supabase dev/prod | P2 | M | Fait |
 | TK-08 | Réutilisation ingrédients | V2 | — | À faire |
@@ -332,4 +331,4 @@ avec un trou.
 | TK-18 | Bug hydratation ShareLink | P2 | S | À faire |
 | TK-20 | Raffiner taxonomie ingrédients (garde déterministe porc/viande-rouge/alcool) | P2 | M | À faire |
 
-**Ordre conseillé :** reste de TK-05 (Session C UI) → dette data/DAL (TK-09, TK-10, TK-13, TK-12, TK-20) quand le fonctionnel est stable → V2 (TK-08, TK-14).
+**Ordre conseillé :** dette data/DAL (TK-09, TK-10, TK-13, TK-12, TK-20) quand le fonctionnel est stable → V2 (TK-08, TK-14).

@@ -99,8 +99,8 @@ export async function POST(
       case 'pool_empty':
         return jsonError(
           422,
-          'business_error',
-          'Vos contraintes alimentaires excluent toutes les recettes du catalogue',
+          'pool_empty',
+          'Aucune recette ne correspond à ces exclusions. Essayez d\'en retirer une.',
         );
       case 'validation_failed_after_retries':
         return jsonError(
