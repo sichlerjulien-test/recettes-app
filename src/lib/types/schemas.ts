@@ -392,7 +392,7 @@ export const GeneratePlanningOutputSchema = z.object({
 });
 
 export const LLMErrorSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('pool_empty') }),
+  z.object({ kind: z.literal('pool_empty'), cause: z.enum(['allergen', 'exclusion']) }),
   z.object({
     kind: z.literal('validation_failed_after_retries'),
     lastViolations: z.array(ValidationViolationSchema),

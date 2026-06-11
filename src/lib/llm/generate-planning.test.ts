@@ -177,7 +177,7 @@ describe('generatePlanning', () => {
 
   // Cas pool vide ───────────────────────────────────────────────────────────────
 
-  it('should return error pool_empty when filterRecipes returns []', async () => {
+  it('should return error pool_empty cause=allergen when allergen filter empties the catalogue', async () => {
     const mockClient = createMockClient({ kind: 'success', output: VALID_OUTPUT });
 
     const result = await generatePlanning(
@@ -190,9 +190,38 @@ describe('generatePlanning', () => {
     );
 
     expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error.kind).toBe('pool_empty');
+    if (!result.ok && result.error.kind === 'pool_empty') {
+      expect(result.error.cause).toBe('allergen');
+    } else {
+      expect.fail('expected pool_empty error');
     }
+  });
+
+  it('should return error pool_empty cause=exclusion when exclusion filter empties the allergen-safe pool', async () => {
+    const mockClient = createMockClient({ kind: 'success', output: VALID_OUTPUT });
+    // gratin-dauphinois : pas d'allergène → passe le filtre allergen ; contient lait → pas vegan
+    const nonVeganCatalogue = [allRecettes().find((r) => r.id === 'gratin-dauphinois')!];
+    const veganOnlyConstraints: PlanningConstraints = {
+      ...NO_CONSTRAINTS,
+      exclusions_groupe: ['vegan'],
+    };
+
+    const result = await generatePlanning(
+      mockClient,
+      nonVeganCatalogue,
+      recettesMap,
+      veganOnlyConstraints,
+      [participantSansContrainte],
+      BASE_CONTEXTE,
+    );
+
+    expect(result.ok).toBe(false);
+    if (!result.ok && result.error.kind === 'pool_empty') {
+      expect(result.error.cause).toBe('exclusion');
+    } else {
+      expect.fail('expected pool_empty error');
+    }
+    expect(mockClient.calls).toHaveLength(0);
   });
 
   it('should NOT call LLM when pool is empty', async () => {
@@ -614,8 +643,10 @@ describe('generatePlanning', () => {
     );
 
     expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.error.kind).toBe('pool_empty');
+    if (!result.ok && result.error.kind === 'pool_empty') {
+      expect(result.error.cause).toBe('allergen');
+    } else {
+      expect.fail('expected pool_empty error');
     }
     // Garantie ADR-001 : le LLM n'est JAMAIS appelé si le pool est vide
     expect(mockClient.calls).toHaveLength(0);

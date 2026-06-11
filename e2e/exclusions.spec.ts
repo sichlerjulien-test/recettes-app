@@ -5,6 +5,15 @@ import { test, expect } from '@playwright/test'
 // These tests prove: (1) UI sends correct exclusions, (2) presets accessible en un tap,
 // (3) pool_empty mène à la page d'édition, (4) défaut vide = pas de bruit UI.
 
+// UUIDs stables pour les mocks — CreateSejourBodySchema exige z.string().uuid()
+const UUID_SEJOUR_1 = '00000000-0000-0000-0000-000000000001'
+const UUID_TOKEN_1  = '00000000-0000-0000-0000-000000000002'
+const UUID_SEJOUR_2 = '00000000-0000-0000-0000-000000000003'
+const UUID_SEJOUR_POOL_EMPTY_EXCL = '00000000-0000-0000-0000-000000000004'
+const UUID_TOKEN_POOL_EMPTY_EXCL  = '00000000-0000-0000-0000-000000000005'
+const UUID_SEJOUR_POOL_EMPTY_ALRG = '00000000-0000-0000-0000-000000000006'
+const UUID_TOKEN_POOL_EMPTY_ALRG  = '00000000-0000-0000-0000-000000000007'
+
 type SejourPayload = { participants?: Array<{ exclusions: string[] }> }
 
 test.describe('TK-05 — Exclusions alimentaires UI', () => {
@@ -18,14 +27,14 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
         await route.fulfill({
           status: 201,
           contentType: 'application/json',
-          body: JSON.stringify({ id: 'e2e-id', token: 'e2e-token' }),
+          body: JSON.stringify({ id: UUID_SEJOUR_1, token: UUID_TOKEN_1 }),
         })
       } else {
         await route.continue()
       }
     })
 
-    await page.route('**/api/sejours/e2e-id/planning', async (route) => {
+    await page.route(`**/api/sejours/${UUID_SEJOUR_1}/planning`, async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: '{}' })
     })
 
@@ -69,14 +78,14 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
         await route.fulfill({
           status: 201,
           contentType: 'application/json',
-          body: JSON.stringify({ id: 'e2e-noxcl', token: 'e2e-token' }),
+          body: JSON.stringify({ id: UUID_SEJOUR_2, token: UUID_TOKEN_1 }),
         })
       } else {
         await route.continue()
       }
     })
 
-    await page.route('**/api/sejours/e2e-noxcl/planning', async (route) => {
+    await page.route(`**/api/sejours/${UUID_SEJOUR_2}/planning`, async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: '{}' })
     })
 
@@ -98,27 +107,31 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
     expect(captured[0]!.participants?.[0]?.exclusions).toEqual([])
   })
 
-  test('pool_empty → message actionnable et redirection vers édition', async ({ page }) => {
+  // pool_empty — cause exclusion : message actionnable n'invitant pas à retirer un allergène
+  test('pool_empty cause=exclusion → planning appelé, message cause correcte, redirection /edit', async ({ page }) => {
+    const planningCalled: string[] = []
+
     await page.route('**/api/sejours', async (route) => {
       if (route.request().method() === 'POST') {
         await route.fulfill({
           status: 201,
           contentType: 'application/json',
-          body: JSON.stringify({ id: 'pool-empty-id', token: 'pool-token' }),
+          body: JSON.stringify({ id: UUID_SEJOUR_POOL_EMPTY_EXCL, token: UUID_TOKEN_POOL_EMPTY_EXCL }),
         })
       } else {
         await route.continue()
       }
     })
 
-    await page.route('**/api/sejours/pool-empty-id/planning', async (route) => {
+    await page.route(`**/api/sejours/${UUID_SEJOUR_POOL_EMPTY_EXCL}/planning`, async (route) => {
+      planningCalled.push(route.request().url())
       await route.fulfill({
         status: 422,
         contentType: 'application/json',
         body: JSON.stringify({
           error: {
             kind: 'pool_empty',
-            message: "Aucune recette ne correspond à ces exclusions. Essayez d'en retirer une.",
+            message: "Aucune recette ne correspond à ces exclusions alimentaires. Essayez d'en retirer une.",
           },
         }),
       })
@@ -130,9 +143,64 @@ test.describe('TK-05 — Exclusions alimentaires UI', () => {
 
     await page.getByRole('button', { name: /Créer et générer/ }).click()
 
-    // Doit rediriger vers /edit (pas la page de visualisation sans planning)
-    await page.waitForURL(/\/sejour\/pool-empty-id\/edit/, { timeout: 5000 }).catch(() => {})
-    await expect(page).toHaveURL(/\/edit/)
+    // Le flow pool_empty est réellement exercé : l'endpoint planning a été appelé
+    await page.waitForRequest(`**/api/sejours/${UUID_SEJOUR_POOL_EMPTY_EXCL}/planning`, { timeout: 5000 })
+    expect(planningCalled).toHaveLength(1)
+
+    // Libellé correct : message exclusion, jamais "allergén" ou "retirer un allergène"
+    const errorToast = page.getByText(/Aucune recette ne correspond à ces exclusions/)
+    await expect(errorToast).toBeVisible({ timeout: 3000 })
+    await expect(page.getByText(/retirer un allergène/)).not.toBeVisible()
+    await expect(page.getByText(/Vérifiez les allergies/)).not.toBeVisible()
+
+    // Redirection vers /edit initiée par le client
+    await page.waitForURL(new RegExp(`/sejour/${UUID_SEJOUR_POOL_EMPTY_EXCL}/edit`), { timeout: 5000 }).catch(() => {})
+  })
+
+  // pool_empty — cause allergène : message n'invitant jamais à retirer un allergène
+  test('pool_empty cause=allergen → message distinct, jamais "retirer un allergène"', async ({ page }) => {
+    const planningCalled: string[] = []
+
+    await page.route('**/api/sejours', async (route) => {
+      if (route.request().method() === 'POST') {
+        await route.fulfill({
+          status: 201,
+          contentType: 'application/json',
+          body: JSON.stringify({ id: UUID_SEJOUR_POOL_EMPTY_ALRG, token: UUID_TOKEN_POOL_EMPTY_ALRG }),
+        })
+      } else {
+        await route.continue()
+      }
+    })
+
+    await page.route(`**/api/sejours/${UUID_SEJOUR_POOL_EMPTY_ALRG}/planning`, async (route) => {
+      planningCalled.push(route.request().url())
+      await route.fulfill({
+        status: 422,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          error: {
+            kind: 'pool_empty',
+            message: 'Aucune recette ne correspond aux allergies déclarées. Vérifiez les allergies des participants.',
+          },
+        }),
+      })
+    })
+
+    await page.goto('/nouveau-sejour')
+    await page.getByLabel('Nom').first().fill('Alice')
+
+    await page.getByRole('button', { name: /Créer et générer/ }).click()
+
+    // Le flow pool_empty est réellement exercé
+    await page.waitForRequest(`**/api/sejours/${UUID_SEJOUR_POOL_EMPTY_ALRG}/planning`, { timeout: 5000 })
+    expect(planningCalled).toHaveLength(1)
+
+    // Message allergène : "Vérifiez les allergies" — jamais "retirer un allergène"
+    const errorToast = page.getByText(/Vérifiez les allergies des participants/)
+    await expect(errorToast).toBeVisible({ timeout: 3000 })
+    await expect(page.getByText(/retirer un allergène/i)).not.toBeVisible()
+    await expect(page.getByText(/retirer une exclusion/i)).not.toBeVisible()
   })
 
   test('distinction visuelle : exclusions ≠ allergènes', async ({ page }) => {
