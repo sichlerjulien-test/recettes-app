@@ -56,6 +56,22 @@ export const TRIAGE_ALCOOL = new Set([
   'vin-rouge-cuisine',
 ]);
 
+// ─── Invariant croisé tag→catégorie ──────────────────────────────────────────
+// Tout ingrédient portant au moins un de ces tags DOIT être en viandes-poissons.
+// sans-alcool est délibérément absent : bière et vins portent sans-alcool et sont
+// en épicerie-salée — l'invariant ne doit jamais se déclencher sur eux.
+//
+// LIMITE CONNUE : la volaille (poulet, dinde) ne porte aucun de ces tags
+// → un poulet mal catégorisé resterait à tort végétarien sans déclencher
+// cet invariant. Fix éventuel : ajouter un champ `nature: animal|vegetal`
+// sur les ingrédients (voir backlog).
+const ANIMAL_EXCLUSION_TAGS = new Set([
+  'sans-porc',
+  'sans-viande-rouge',
+  'sans-poisson',
+  'sans-fruits-de-mer',
+] as const);
+
 // Catégories dont TOUS les ingrédients doivent avoir été triés.
 const SUSCEPTIBLE_CATEGORIES = new Set(['viandes-poissons', 'frais-traiteur']);
 
@@ -77,6 +93,7 @@ export const TRIAGE_COVERED = new Set([
   'moules-bouchot',
   'saumon-frais',
   'saumon-fume',
+  'sauce-worcestershire',
   'thon-boite',
 ]);
 
@@ -114,6 +131,22 @@ export function validateIngredientExclusionCompleteness(
       errors.push(
         `[${id}.yaml] catégorie "${ingredient.categorie}" susceptible — ajoutez cet ingrédient à TRIAGE_COVERED dans scripts/ingredient-exclusion-completeness.ts`,
       );
+    }
+
+    // ── Invariant croisé tag→catégorie ───────────────────────────────────────
+    // Un tag animal dans une catégorie != viandes-poissons signale une
+    // mauvaise classification (cas jambon-blanc en frais-traiteur).
+    // Sens unique uniquement : la réciproque n'est PAS implémentée
+    // (viandes-poissons sans tag animal est légal — ex : volaille).
+    for (const tag of ingredient.exclusion_tags) {
+      if (
+        ANIMAL_EXCLUSION_TAGS.has(tag as Parameters<typeof ANIMAL_EXCLUSION_TAGS.has>[0]) &&
+        ingredient.categorie !== 'viandes-poissons'
+      ) {
+        errors.push(
+          `[${id}.yaml] tag "${tag}" exige categorie "viandes-poissons" (catégorie trouvée : "${ingredient.categorie}")`,
+        );
+      }
     }
   }
 

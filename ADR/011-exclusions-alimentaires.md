@@ -541,6 +541,16 @@ Cette décision sera réévaluée si :
   Prod reste une application humaine séparée conformément à ADR-008.
 - 2026-06-11 — §9 amendé (curation tracée pour porc/viande-rouge/alcool) ;
   TK-20 requalifié en déclencheur de réouverture conditionnel.
+- 2026-06-11 — Invariant croisé tag→catégorie ajouté dans
+  `scripts/ingredient-exclusion-completeness.ts` : tout ingrédient dont
+  `exclusion_tags` contient `sans-porc`, `sans-viande-rouge`, `sans-poisson`
+  ou `sans-fruits-de-mer` DOIT être en catégorie `viandes-poissons` (sans-alcool
+  exclu). Ferme la classe de bug "tag correct, catégorie fausse" (ex : jambon-blanc
+  en frais-traiteur). Deux ingrédients recatégorisés : `bouillon-boeuf` et
+  `sauce-worcestershire` (epicerie-salee → viandes-poissons).
+  **Limite connue :** la volaille (poulet, dinde) ne porte aucun de ces tags
+  → un poulet mal catégorisé resterait à tort végétarien sans déclencher l'invariant.
+  Fix éventuel : ajouter un champ `nature: animal|vegetal` sur les ingrédients.
 - Phase 2B (qualification catalogue + garde build) — 2026-06-10 :
   - `scripts/ingredient-exclusion-completeness.ts` : règle de complétude
     `poissons → sans-poisson`, `crustaces|mollusques → sans-fruits-de-mer`

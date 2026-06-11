@@ -49,13 +49,15 @@ describe('validateIngredientExclusionCompleteness — Régime 1', () => {
 
   it('accepte les ingrédients correctement tagués (Régime 1)', () => {
     const errors = validateIngredientExclusionCompleteness(new Map([
-      ['saumon', ingredient({
-        id: 'saumon',
+      ['saumon-frais', ingredient({
+        id: 'saumon-frais',
+        categorie: 'viandes-poissons',
         allergenes: ['poissons'],
         exclusion_tags: ['sans-poisson'],
       })],
-      ['moules', ingredient({
-        id: 'moules',
+      ['moules-bouchot', ingredient({
+        id: 'moules-bouchot',
+        categorie: 'viandes-poissons',
         allergenes: ['mollusques'],
         exclusion_tags: ['sans-fruits-de-mer'],
       })],
@@ -116,6 +118,50 @@ describe('validateIngredientExclusionCompleteness — Régime 2 viande-rouge', (
     ]));
 
     expect(errors).toContain('[boeuf-hache.yaml] triage viande-rouge : exige exclusion_tags: "sans-viande-rouge"');
+  });
+});
+
+// ─── Invariant croisé tag→catégorie ──────────────────────────────────────────
+
+describe('validateIngredientExclusionCompleteness — invariant tag→catégorie', () => {
+  it('échoue si sans-porc est posé hors viandes-poissons (cas jambon-frais-traiteur)', () => {
+    const errors = validateIngredientExclusionCompleteness(new Map([
+      ['jambon-frais', ingredient({
+        id: 'jambon-frais',
+        categorie: 'frais-traiteur',
+        exclusion_tags: ['sans-porc'],
+      })],
+    ]));
+
+    expect(errors).toContain(
+      '[jambon-frais.yaml] tag "sans-porc" exige categorie "viandes-poissons" (catégorie trouvée : "frais-traiteur")',
+    );
+  });
+
+  it('ne se déclenche PAS sur sans-alcool hors viandes-poissons (bière, vin)', () => {
+    const errors = validateIngredientExclusionCompleteness(new Map([
+      ['biere-blonde', ingredient({
+        id: 'biere-blonde',
+        categorie: 'epicerie-salee',
+        exclusion_tags: ['sans-alcool'],
+      })],
+    ]));
+
+    const invariantErrors = errors.filter((e) => e.includes('exige categorie "viandes-poissons"'));
+    expect(invariantErrors).toHaveLength(0);
+  });
+
+  it('accepte un ingrédient animal correctement classé en viandes-poissons', () => {
+    const errors = validateIngredientExclusionCompleteness(new Map([
+      ['jambon-blanc', ingredient({
+        id: 'jambon-blanc',
+        categorie: 'viandes-poissons',
+        exclusion_tags: ['sans-porc'],
+      })],
+    ]));
+
+    const invariantErrors = errors.filter((e) => e.includes('exige categorie "viandes-poissons"'));
+    expect(invariantErrors).toHaveLength(0);
   });
 });
 
