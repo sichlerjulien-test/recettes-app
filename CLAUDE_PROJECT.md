@@ -30,7 +30,8 @@ PWA mobile-first pour planifier les repas et la liste de courses d'un groupe en 
 - **Prod :** https://recettes-app-nine.vercel.app — MVP fonctionnel bout en bout.
 - **Repo :** github.com/sichlerjulien-test/recettes-app
 - **Flow opérationnel :** création séjour → génération planning (LLM) → liste de courses cochable.
-- **Sprint 1 clôturé.** 13 PRs mergées, 6 ADRs, 98 tests unitaires verts, 0 dette TypeScript active, 0 secret committé.
+- **État courant : voir BACKLOG.md et ADR/.** (Les compteurs de PRs/ADRs ne sont pas maintenus ici — ils pourrissent. Au dernier relevé : 24+ PRs mergées, 11 ADRs, 0 dette TypeScript active, 0 secret committé.)
+- **TK-05 clos** (exclusions alimentaires bout en bout, PR #24). **TK-19 fait** (séparation instances DB, ADR-008). Migrations 001–009 appliquées dev + prod.
 - **1er test terrain réalisé** avec des amis. Les testeurs sont allés jusqu'au bout du flow (preuve : feedbacks sur la liste de courses). Le MVP tient debout en conditions réelles. Les feedbacks ont nourri le backlog actuel (voir BACKLOG.md).
 
 ---
@@ -39,7 +40,9 @@ PWA mobile-first pour planifier les repas et la liste de courses d'un groupe en 
 
 - **Front :** Next.js (App Router) + TypeScript strict + Tailwind. PWA.
 - **Back :** Next.js API routes.
-- **DB :** Postgres via Supabase. ⚠️ Une seule instance partagée dev/prod aujourd'hui (`ymxqahqrmzerlnyertjf`) — dette connue, à scinder.
+- **DB :** Postgres via Supabase. Deux instances séparées (ADR-008, TK-07 fait) :
+  - **prod** : `ymxqahqrmzerlnyertjf`
+  - **dev** : `wowjcfhyvjdbgouqwgcf` (jetable, reconstituée depuis `scripts/migrations/`)
 - **LLM :** API Claude (Sonnet) via Anthropic. ~0,02€ par génération de planning.
 - **Host :** Vercel (plan Hobby — ne montre pas tous les runtime logs ; pour debug prod, les logs Supabase sont souvent plus parlants).
 - **Tests :** Vitest (unitaires), Playwright (E2E).
@@ -65,7 +68,7 @@ Le module `src/lib/allergens/` est sanctuarisé. Toute modif exige des tests à 
 Ne JAMAIS mélanger les deux concepts :
 
 - **Allergène** (14 EU) : une erreur peut envoyer quelqu'un à l'hôpital. Forteresse déterministe, sacrée.
-- **Exclusion alimentaire** (viande rouge, porc, etc.) : une erreur gâche un repas, sans plus. Concept distinct, à liste prédéfinie (pas de saisie libre, qui casserait le filtre déterministe). Réutilise le même mécanisme technique de filtrage mais reste conceptuellement séparé. Fera l'objet de son propre ADR.
+- **Exclusion alimentaire** (viande rouge, porc, etc.) : une erreur gâche un repas, sans plus. Concept distinct, à liste prédéfinie (pas de saisie libre, qui casserait le filtre déterministe). Réutilise le même mécanisme technique de filtrage mais reste conceptuellement séparé. Cadré par **ADR-011** (Accepté), implémenté dans `src/lib/dietary/`.
 
 ### Définition de "repas cohérent" (règles dures, testables)
 
@@ -82,15 +85,17 @@ Un planning valide DOIT respecter :
 > ADR-009). L'équipement est filtré en amont (pool pré-LLM). La variété des types de cuisine
 > reste à faire, reportée V2 (TK-14) : souhaitable, non bloquante.
 
-### Modèle d'unités d'achat (en cours de refonte)
+### Modèle d'unités d'achat (fait — TK-02)
 
-Chaque ingrédient doit porter un **type d'unité** déterminant son affichage dans la liste de courses :
+Chaque ingrédient porte un **type d'unité** déterminant son affichage dans la liste de courses :
 
 - **À la pièce** (chou-fleur, oignon, œuf, citron) : entier + nom français. "1 chou-fleur", "3 oignons". Jamais de décimale.
 - **Au poids** (farine, sel, viande, pâtes) : grammes. "200g de pâtes". Pas de décimale absurde.
 - **Au volume** (lait, huile, crème) : ml ou cuillères. "200ml de lait".
 
-Objectif : tuer le "0.3 piece de chou-fleur" (unité anglaise + décimale absurde).
+Le schéma `unite_base`/`unite_achat`/`conversion` existait déjà. TK-02 a corrigé un bug d'arrondi dans `build-list.ts` (~12 lignes, zéro migration) — ce n'était pas une refonte de modèle de données.
+
+Résidu à vérifier : labels d'unités en français dans `src/lib/ui/labels.ts` (le fichier existe mais ne couvre pas encore les unités explicitement — micro-ticket UI si l'affichage est encore en anglais).
 
 ---
 
@@ -130,3 +135,5 @@ Objectif : tuer le "0.3 piece de chou-fleur" (unité anglaise + décimale absurd
 - `npm run build` ne se skip jamais sur une intuition. La preuve > l'intuition.
 - Les dettes traitées se suppriment du backlog (pas un cimetière d'historique).
 - Les sub-agents Claude Code font des observations utiles mais ne sont pas omniscients. Lecture critique.
+- **Règle de branche :** le main local ne diverge jamais — il suit `origin/main`. Aucun travail "fini" ne vit sur une branche ou en local sans réconciliation avec l'autorité distante. Commit + push = clôture de session.
+- **Règle de synchronisation CLAUDE_PROJECT.md :** toute modification de ce fichier déclenche **obligatoirement** la recopie dans le champ "Instructions" du Project Claude.ai dans le même flux (case dans le template de PR, ou gate de commit). Sans cette étape, la connaissance du Project diverge silencieusement du repo.
