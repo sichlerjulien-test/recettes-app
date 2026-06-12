@@ -204,6 +204,7 @@ Sous-tâches :
 - Mettre en place le suivi des migrations appliquées (si absent), pour que dev/prod/futures instances convergent depuis cette baseline.
 - Règle dure : tout changement de schéma = une migration committée, appliquée à TOUS les environnements. Fin du SQL dashboard hors-migration.
 - Rédiger l'ADR : le schéma DB a une source de vérité unique versionnée.
+- `001-initial-schema.sql` ne contient plus les FK `participants→sejours` et `plannings→sejours` (recréées en live via ALTER TABLE). Les régénérer dans le schéma de référence ou ajouter `002-restore-foreign-keys.sql`.
 
 **Critères :** une instance vierge reconstruit le schéma actuel en appliquant les migrations du repo ; dev et prod sont prouvés identiques à la baseline.
 
@@ -266,9 +267,33 @@ régression silencieuse si une référence pointe vers l'ancien vocabulaire.
 
 > Purement cosmétique/dette nomenclature. Aucun risque de régression comportementale.
 
+### TK-23 — Map non sérialisable en prop RSC→Client · S
+`src/app/sejour/[id]/page.tsx` passe `recettes` en `Map<string,Recette>` à `SejourContent`
+(Client). Non sérialisable au boundary RSC. Vérifier si c'est le cas aujourd'hui ; si oui,
+passer en `Record<string,Recette>`. Latent mais réel.
+
+### TK-24 — tool input_schema dérivé de Zod · S
+`COMPOSE_PLANNING_TOOL` (`llm/client.ts`) duplique `LLMPlanningOutputSchema`. Générer l'`input_schema`
+depuis le Zod (`zod-to-json-schema`). Cousin de TK-13.
+
+### TK-25 — Sortir buildFilterConstraintsFromSejour des routes · S
+Logique métier inline dans `planning/route.ts` → migrer dans `src/lib/allergens/filter.ts`.
+Propreté archi, non urgent.
+
+### TK-26 — État d'erreur UI explicite sur /sejour/[id] · S
+Distinguer "pas encore généré" de "erreur de chargement" (`query_failed` / `row_validation_failed`
+aujourd'hui silencieusement → null).
+
+### TK-27 — Dark mode : trancher · S
+Soit tokens dark propres, soit documenter light-only. Dette consciente Sprint 1, faible pri.
+
 ---
 
 ## V2 — Hors MVP (noté pour mémoire)
+
+### TK-28 — Chargement ciblé du catalogue recettes · V2
+Page séjour charge le catalogue complet. Jointure SQL / fetch par `recette_id`. Sans objet
+<100 recettes, structurant à 500.
 
 ### TK-08 — Optimisation réutilisation des ingrédients entre recettes
 **Origine :** feedback 9 · point C validé (report assumé).
@@ -321,5 +346,11 @@ avec un trou.
 | TK-20 | Raffiner taxonomie ingrédients (garde déterministe porc/viande-rouge/alcool) | P2 | M | À faire |
 | TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | À faire |
 | TK-22 | Nettoyage zombies vocabulaire DietaryRestrictionSchema / REGIME_LABELS | P2 | S | À faire |
+| TK-23 | Map non sérialisable RSC→Client | P2 | S | À faire |
+| TK-24 | tool input_schema dérivé de Zod | P2 | S | À faire |
+| TK-25 | Sortir buildFilterConstraintsFromSejour des routes | P2 | S | À faire |
+| TK-26 | État d'erreur UI explicite /sejour/[id] | P2 | S | À faire |
+| TK-27 | Dark mode : trancher | P2 | S | À faire |
+| TK-28 | Chargement ciblé du catalogue recettes | V2 | — | À faire |
 
-**Ordre conseillé :** dette data/DAL (TK-09, TK-10, TK-13, TK-12, TK-20) quand le fonctionnel est stable → V2 (TK-08, TK-14).
+**Ordre conseillé :** dette data/DAL (TK-09, TK-10, TK-13, TK-12, TK-20) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27) → V2 (TK-08, TK-14, TK-28).
