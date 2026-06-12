@@ -65,40 +65,6 @@ Le "zéro fantôme" persiste à l'affichage quand on modifie une quantité sur s
 
 ## P1 — Important, juste après le P0
 
-### TK-05 — Exclusions alimentaires (distinctes des allergènes)  ·  M  ·  ✅ Fait
-
-**Origine :** feedback 6 · point B validé.
-
-Un participant doit pouvoir exclure viande rouge, porc, etc. sans que ce soit traité comme un allergène EU14.
-
-#### Phase 1 — Extraction `lib/dietary/`  ·  ✅ Mergée (PR #21, commit 1c7adf8)
-
-La classification végétarien/végétalien a été extraite hors de `src/lib/allergens/` vers
-`src/lib/dietary/`. La forteresse allergènes est désormais mono-responsabilité. C'était le
-pré-requis archi nécessaire avant toute implémentation des exclusions.
-
-#### Phase 2A — Plomberie + schéma  ·  ✅ Fait
-
-La colonne DB `participants.regimes` a été renommée en `participants.exclusions`, avec
-`CHECK` sur le vocabulaire `EXCLUSION_TAGS`. Les vieux blobs JSONB
-`contraintes_utilisees.regimes` restent lus via normalisation legacy ; ils ne sont pas
-migrés.
-
-#### Session B — Qualification catalogue + garde build  ·  ✅ Fait
-
-- `scripts/ingredient-exclusion-completeness.ts` : règle de complétude `poissons → sans-poisson`, `crustaces|mollusques → sans-fruits-de-mer`, erreur de build.
-- Catalogue qualifié : 11 fichiers YAML — `sans-porc` (lardons, jambon, guanciale), `sans-viande-rouge` (bœuf, bouillon bœuf), `sans-alcool` (vins, bière).
-- Tests catalogue réel : quiche-lorraine (lardons) ∉ `sans-porc` ; poke-bowl saumon ∉ `sans-poisson`.
-- Trou résiduel documenté : porc/viande-rouge/alcool restent à qualification manuelle — ticket TK-20 ouvert.
-
-#### Session C — UI  ·  ✅ Fait
-
-- Picker exclusions dans `sejour-form.tsx` : presets (`Végétarien`, `Vegan`) en un tap + atomiques groupés (`sans-viande-rouge`, `sans-porc`, `sans-poisson`, `sans-fruits-de-mer`, `sans-alcool`) en pills secondaires. Palette neutre (gris) vs allergènes (primary bleu) — distinction visuelle garantie, jamais de rouge/cadenas.
-- `pool_empty` : kind dédié dans l'API (`'pool_empty'`), message actionnable, redirection vers `/edit` pour corriger les exclusions.
-- E2E Playwright (`e2e/exclusions.spec.ts`) : criterion vegetarien (un tap) + sans-viande-rouge prouvé ; défaut vide ; pool_empty ; distinction visuelle.
-
-**Critères d'acceptation :** l'ami sujet à la goutte peut exclure la viande rouge ; le planning n'en contient aucune ; la forteresse allergènes reste inchangée. ✅
-
 ### TK-11 — Combinaisons allergènes manquantes en test intensif  ·  S/M  ·  ✅ Fait
 **Origine :** allergen-guard (TK-03). Forteresse — P1.
 
@@ -339,7 +305,6 @@ avec un trou.
 | TK-02 | Refonte modèle d'unités d'achat | P0 | L (réel S) | Fait |
 | TK-03 | Édition séjour + flow génération | P0 | L | Fait |
 | TK-04 | Bug inputs number iPhone | P0 | S | Fait |
-| TK-05 | Exclusions alimentaires | P1 | M | Fait |
 | TK-06 | CI workflows | P2 | M | Fait |
 | TK-07 | Scission Supabase dev/prod | P2 | M | Fait |
 | TK-08 | Réutilisation ingrédients | V2 | — | À faire |
