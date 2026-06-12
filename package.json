@@ -10,7 +10,8 @@
     "build-data": "tsx scripts/build-data.ts",
     "build-data:prod": "npm run validate && ENV_FILE=.env.prod.local tsx scripts/build-data.ts --prod",
     "test": "vitest run",
-    "test:integration": "vitest run --config vitest.integration.config.ts"
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
@@ -38,6 +39,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.19.39",
     "@types/react": "^19",

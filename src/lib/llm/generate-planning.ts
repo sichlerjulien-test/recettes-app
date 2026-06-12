@@ -47,10 +47,13 @@ export async function generatePlanning(
   sejourContexte: GeneratePlanningInput['contexte'],
 ): Promise<{ ok: true; entries: PlanningEntry[]; warnings?: CoherenceWarning[] } | { ok: false; error: LLMError }> {
   const allergenPool = filterRecipes(catalogue, constraints);
-  const pool = filterByExclusions(allergenPool, constraints);
+  if (allergenPool.length === 0) {
+    return { ok: false, error: { kind: 'pool_empty', cause: 'allergen' } };
+  }
 
+  const pool = filterByExclusions(allergenPool, constraints);
   if (pool.length === 0) {
-    return { ok: false, error: { kind: 'pool_empty' } };
+    return { ok: false, error: { kind: 'pool_empty', cause: 'exclusion' } };
   }
 
   const expectedSlots = buildSequence(sejourContexte.repartition_repas);

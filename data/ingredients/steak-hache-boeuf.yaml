@@ -8,3 +8,5 @@ conversion: 1
 allergenes: []
 contient_trace: []
 substituts: []
+exclusion_tags:
+  - sans-viande-rouge

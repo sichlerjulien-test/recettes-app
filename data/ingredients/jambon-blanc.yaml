@@ -1,10 +1,12 @@
 id: jambon-blanc
 nom_singulier: Jambon blanc
 nom_pluriel: Jambons blancs
-categorie: frais-traiteur
+categorie: viandes-poissons
 unite_base: piece
 unite_achat: piece
 conversion: 1
 allergenes: []
 contient_trace: []
 substituts: []
+exclusion_tags:
+  - sans-porc

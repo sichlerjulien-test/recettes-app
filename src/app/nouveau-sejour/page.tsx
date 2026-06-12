@@ -60,6 +60,7 @@ export default function NouveauSejourPage() {
     }
 
     setIsGenerating(true)
+    let destination = `/sejour/${created.id}?t=${created.token}`
     try {
       const genResponse = await fetch(`/api/sejours/${created.id}/planning`, {
         method: "POST",
@@ -68,11 +69,17 @@ export default function NouveauSejourPage() {
 
       if (!genResponse.ok) {
         const genJson: unknown = await genResponse.json()
-        toast.error(extractErrorMessage(genJson))
+        const parsed = ApiErrorSchema.safeParse(genJson)
+        if (parsed.success && parsed.data.error.kind === 'pool_empty') {
+          toast.error(parsed.data.error.message)
+          destination = `/sejour/${created.id}/edit?t=${created.token}`
+        } else {
+          toast.error(extractErrorMessage(genJson))
+        }
       }
     } finally {
       setIsGenerating(false)
-      router.push(`/sejour/${created.id}?t=${created.token}`)
+      router.push(destination)
     }
   }
 

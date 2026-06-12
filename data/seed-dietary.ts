@@ -4,6 +4,11 @@
  */
 
 export const DIETARY_RESTRICTIONS = [
+  'sans-viande-rouge',
+  'sans-porc',
+  'sans-poisson',
+  'sans-fruits-de-mer',
+  'sans-alcool',
   'vegetarien',
   'vegan',
 ] as const;
@@ -15,6 +20,11 @@ export function isDietaryRestriction(value: string): value is DietaryRestriction
 }
 
 export const DIETARY_LABELS: Record<DietaryRestriction, string> = {
+  'sans-viande-rouge': 'Sans viande rouge',
+  'sans-porc': 'Sans porc',
+  'sans-poisson': 'Sans poisson',
+  'sans-fruits-de-mer': 'Sans fruits de mer',
+  'sans-alcool': 'Sans alcool',
   'vegetarien': 'Végétarien',
   'vegan': 'Vegan',
 };

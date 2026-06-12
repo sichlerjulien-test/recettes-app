@@ -9,3 +9,5 @@ allergenes:
   - sulfites
 contient_trace: []
 substituts: []
+exclusion_tags:
+  - sans-alcool

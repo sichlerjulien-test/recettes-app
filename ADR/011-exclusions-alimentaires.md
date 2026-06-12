@@ -281,33 +281,49 @@ Aucune modification dans `lib/allergens/`. Périmètre :
 7. `generatePlanning` amendé : deux filtres en séquence, trois validateurs.
 8. UI : composant de sélection des exclusions par participant.
 
-### 9 — Validation CI de complétude des `exclusion_tags` et garde allergen-guard sur les YAML ingrédients
+### 9 — Complétude des `exclusion_tags` : garde déterministe pour les exclusions ancrées sur un allergène, curation tracée pour les autres
 
-**Règle de complétude au build :** le validateur YAML existant embarque une règle de
-complétude sur `exclusion_tags` :
+**Amendement (2026-06-11, après 1er test terrain) — remplace la règle de
+complétude par catégorie.**
 
-> Tout ingrédient dont la catégorie appartient à `CATEGORIES_PORC` (constante dans le
-> script de validation, ex : `'charcuterie'`, `'viandes-porcines'`, `'porcin'`) **doit**
-> porter `sans-porc` dans ses `exclusion_tags`.
+La règle initiale (« tout ingrédient de catégorie CATEGORIES_PORC doit porter
+`sans-porc`, erreur de build, même traitement qu'un allergène manquant ») n'est
+pas retenue. Motif : la taxonomie de catégorie des ingrédients ne distingue pas
+finement charcuterie / viande rouge / alcool ; la scinder toucherait le calcul
+végé/vegan qui lit la catégorie coarse (blast radius dans une logique déjà
+extraite et testée). Surtout, imposer une garantie grade-allergène à une
+exclusion dont l'erreur est bornée (gâche un repas, pas l'hôpital) sur-calibre
+la sévérité — la confusion de catégories qu'ADR-001 interdit, en sens inverse.
 
-La violation est une **erreur de build**, pas un warning — même traitement qu'un
-allergène manquant dans seed-allergenes. Elle ferme la fenêtre d'un ingrédient porcin
-silencieusement non-tagué, sans reposer sur l'œil du relecteur.
+**Règle révisée, deux régimes :**
 
-Le gate est déclaratif : si `CATEGORIES_PORC` est étendue, la règle couvre
-automatiquement les nouveaux ingrédients sans PR de suivi.
+1. **Exclusions ancrées sur un allergène EU14** (`sans-poisson` ↔ `poisson` ;
+   `sans-fruits-de-mer` ↔ `crustacés`/`mollusques`) : garde déterministe au
+   build, erreur bloquante. L'allergène fournit un second signal gratuit ; on
+   croise les deux champs. Inchangé, déjà livré.
+2. **Exclusions non ancrées sur un allergène** (`sans-porc`,
+   `sans-viande-rouge`, `sans-alcool`) : curation manuelle tracée, garantie par
+   trois mécanismes, pas par un garde catégorie :
+   - un test discriminant par tag atomique : une recette portant l'ingrédient
+     concerné ∉ `exclusions_compatibles[tag]`, plus une recette témoin ∈
+     (contrôle positif) ;
+   - une liste de tri (`tests/dietary/triage-list.ts`) énumérant les ingrédients
+     revus pour ces tags ; un test asserte que tout ingrédient des catégories
+     susceptibles de porter porc / viande rouge / alcool ∈ liste de tri. Un
+     nouvel ingrédient non trié dans ces catégories = échec CI ;
+   - une checklist d'ajout au catalogue : ajouter un ingrédient viande /
+     charcuterie / alcool impose de renseigner ses `exclusion_tags` et de
+     l'inscrire à la liste de tri.
 
-**Garde allergen-guard sur le YAML ingrédients :** allergen-guard est déclenché sur
-toute PR qui modifie `data/ingredients/` **et** touche un tag à coût social élevé
-(`sans-porc`, ou tout tag dont l'impact sur une pratique religieuse ou morale est
-documenté dans EXCLUSION_TAGS). La frontière de sanctuaire (ADR-001) reste sur le
-code (`lib/allergens/`). L'exigence de soin suit la criticité de la donnée
-indépendamment : un tag manqué dans un YAML ingrédient a le même potentiel de dommage
-qu'un bug dans le code du filtre.
+La garantie du régime 2 est « curation tracée », pas « déterministe
+grade-allergène », et on ne le maquille pas : un tag oublié structurellement
+casse la CI ; un tag posé mais faux reste attrapable en revue, pas par la
+machine.
 
-La configuration allergen-guard (hooks CI ou CODEOWNERS) liste explicitement
-`data/ingredients/*.yaml` comme périmètre déclencheur pour les tags à coût social
-élevé.
+**Réouverture (ex-TK-20) :** reconstruire le garde catégorie si un seuil est
+franchi — catalogue trop gros pour une curation fiable, ou une erreur
+d'exclusion non-allergène atteignant un utilisateur en conditions réelles. Tant
+qu'aucun seuil n'est franchi, la curation tracée tient.
 
 ### 10 — Validateur `validateExclusions` : bloquant + retry, hors forteresse
 
@@ -523,3 +539,30 @@ Cette décision sera réévaluée si :
   `participants.regimes` -> `participants.exclusions`, ajout du CHECK
   `participants_exclusions_valid`, suppression du mapping DAL app<->DB.
   Prod reste une application humaine séparée conformément à ADR-008.
+- 2026-06-11 — §9 amendé (curation tracée pour porc/viande-rouge/alcool) ;
+  TK-20 requalifié en déclencheur de réouverture conditionnel.
+- 2026-06-11 — Invariant croisé tag→catégorie ajouté dans
+  `scripts/ingredient-exclusion-completeness.ts` : tout ingrédient dont
+  `exclusion_tags` contient `sans-porc`, `sans-viande-rouge`, `sans-poisson`
+  ou `sans-fruits-de-mer` DOIT être en catégorie `viandes-poissons` (sans-alcool
+  exclu). Ferme la classe de bug "tag correct, catégorie fausse" (ex : jambon-blanc
+  en frais-traiteur). Deux ingrédients recatégorisés : `bouillon-boeuf` et
+  `sauce-worcestershire` (epicerie-salee → viandes-poissons).
+  **Limite connue :** la volaille (poulet, dinde) ne porte aucun de ces tags
+  → un poulet mal catégorisé resterait à tort végétarien sans déclencher l'invariant.
+  Fix éventuel : ajouter un champ `nature: animal|vegetal` sur les ingrédients.
+- Phase 2B (qualification catalogue + garde build) — 2026-06-10 :
+  - `scripts/ingredient-exclusion-completeness.ts` : règle de complétude
+    `poissons → sans-poisson`, `crustaces|mollusques → sans-fruits-de-mer`
+    branché sur `npm run validate` (erreur de build, pas warning).
+  - Catalogue `data/ingredients/` qualifié : 11 fichiers YAML mis à jour —
+    `sans-porc` (lardon-fume, jambon-blanc, guanciale-ou-lardon),
+    `sans-viande-rouge` (boeuf-bourguignon, boeuf-hache, boeuf-tartare,
+    steak-hache-boeuf, bouillon-boeuf),
+    `sans-alcool` (biere-blonde, vin-blanc-sec, vin-rouge-cuisine).
+    Les tags poisson/fruits-de-mer étaient déjà présents.
+  - Tests discriminants sur catalogue réel (`tests/dietary/catalog-exclusions.test.ts`) :
+    quiche-lorraine (lardon-fume) ∉ `sans-porc` ;
+    poke-bowl-saumon (saumon-frais) ∉ `sans-poisson`.
+  - Trou résiduel documenté (§9) : porc/viande-rouge/alcool restent à qualification
+    manuelle, gardés par allergen-guard. Ticket TK-20 ouvert pour raffiner la taxonomie.

@@ -96,12 +96,13 @@ export async function POST(
 
   if (!planningResult.ok) {
     switch (planningResult.error.kind) {
-      case 'pool_empty':
-        return jsonError(
-          422,
-          'business_error',
-          'Vos contraintes alimentaires excluent toutes les recettes du catalogue',
-        );
+      case 'pool_empty': {
+        const { cause } = planningResult.error;
+        const message = cause === 'allergen'
+          ? 'Aucune recette ne correspond aux allergies déclarées. Vérifiez les allergies des participants.'
+          : 'Aucune recette ne correspond à ces exclusions alimentaires. Essayez d\'en retirer une.';
+        return jsonError(422, 'pool_empty', message, { cause });
+      }
       case 'validation_failed_after_retries':
         return jsonError(
           422,

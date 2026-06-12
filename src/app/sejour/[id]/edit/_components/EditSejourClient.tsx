@@ -35,9 +35,25 @@ export function EditSejourClient({ sejour, token, hasPlanning }: Props) {
   const router = useRouter()
   const [showModal, setShowModal] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [generationError, setGenerationError] = useState<string | null>(null)
+
+  function extractApiError(json: unknown): { kind: string; message: string } | null {
+    if (
+      typeof json === "object" && json !== null && "error" in json &&
+      typeof (json as { error: unknown }).error === "object" &&
+      (json as { error: { message?: unknown; kind?: unknown } }).error !== null
+    ) {
+      const err = (json as { error: { kind: unknown; message: unknown } }).error
+      if (typeof err.message === "string" && typeof err.kind === "string") {
+        return { kind: err.kind, message: err.message }
+      }
+    }
+    return null
+  }
 
   async function generatePlanning() {
     setIsGenerating(true)
+    setGenerationError(null)
     try {
       const response = await fetch(`/api/sejours/${sejour.id}/planning`, {
         method: "POST",
@@ -46,20 +62,21 @@ export function EditSejourClient({ sejour, token, hasPlanning }: Props) {
 
       if (!response.ok) {
         const json: unknown = await response.json()
-        const message =
-          typeof json === "object" && json !== null && "error" in json &&
-          typeof (json as { error: unknown }).error === "object" &&
-          (json as { error: { message?: unknown } }).error !== null &&
-          typeof (json as { error: { message?: unknown } }).error.message === "string"
-            ? (json as { error: { message: string } }).error.message
-            : "Erreur lors de la génération du planning"
-        toast.error(message)
+        const apiError = extractApiError(json)
+        const message = apiError?.message ?? "Erreur lors de la génération du planning"
+
+        if (apiError?.kind === "pool_empty") {
+          setGenerationError(message)
+        } else {
+          toast.error(message)
+          router.push(`/sejour/${sejour.id}?t=${token}`)
+        }
       } else {
         toast.success("Planning généré")
+        router.push(`/sejour/${sejour.id}?t=${token}`)
       }
     } finally {
       setIsGenerating(false)
-      router.push(`/sejour/${sejour.id}?t=${token}`)
     }
   }
 
@@ -155,6 +172,17 @@ export function EditSejourClient({ sejour, token, hasPlanning }: Props) {
               </Button>
             </div>
           </div>
+        </div>
+      )}
+
+      {generationError && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          data-testid="pool-empty-banner"
+          className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+        >
+          {generationError}
         </div>
       )}
 

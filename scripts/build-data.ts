@@ -20,6 +20,7 @@ import type { IngredientOutput, RecetteOutput } from '../src/lib/types/schemas';
 import { computeRecipeMetadata } from '../src/lib/allergens/compute';
 import { computeDietaryMetadata } from '../src/lib/dietary/compute';
 import { resolveEnvFile, isProdEnvFile } from './resolve-env-file';
+import { validateIngredientExclusionCompleteness } from './ingredient-exclusion-completeness';
 
 // ---------------------------------------------------------------------------
 // ENV
@@ -93,6 +94,7 @@ type RecetteRow = {
   allergenes_calcules: string[];
   est_vegetarien: boolean;
   est_vegan: boolean;
+  exclusions_compatibles: string[];
   created_at: string;
   updated_at: string;
 };
@@ -252,6 +254,7 @@ async function main(): Promise<void> {
   const { items: ingredients, errors: ingredientLoadErrors } =
     await loadYamlFiles<IngredientOutput>(INGREDIENTS_DIR, IngredientSchema);
   buildErrors.push(...ingredientLoadErrors);
+  buildErrors.push(...validateIngredientExclusionCompleteness(ingredients));
 
   console.log('Chargement des recettes YAML…');
   const { items: recettes, errors: recetteLoadErrors } =
@@ -336,6 +339,7 @@ async function main(): Promise<void> {
       allergenes_calcules: [...allergenMeta.allergenes_calcules],
       est_vegetarien,
       est_vegan,
+      exclusions_compatibles: [...dietaryMeta.exclusions_compatibles],
     });
   }
 

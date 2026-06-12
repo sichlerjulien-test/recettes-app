@@ -1,7 +1,7 @@
 id: bouillon-boeuf
 nom_singulier: Bouillon de bœuf
 nom_pluriel: Bouillon de bœuf
-categorie: epicerie-salee
+categorie: viandes-poissons
 unite_base: ml
 unite_achat: ml
 conversion: 1
@@ -9,3 +9,5 @@ allergenes: []
 contient_trace:
   - celeri
 substituts: []
+exclusion_tags:
+  - sans-viande-rouge

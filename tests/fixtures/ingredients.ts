@@ -52,7 +52,7 @@ const INGREDIENTS: Ingredient[] = [
   {
     id: 'saumon-frais', nom_singulier: 'Saumon frais', nom_pluriel: 'Saumons frais',
     categorie: 'viandes-poissons', unite_base: 'g', unite_achat: 'kg',
-    conversion: 1000, allergenes: ['poissons'], contient_trace: [], substituts: [], exclusion_tags: [],
+    conversion: 1000, allergenes: ['poissons'], contient_trace: [], substituts: [], exclusion_tags: ['sans-poisson'],
   },
 
   // ─── 2-3 allergènes (5) ────────────────────────────────────────────────────
@@ -80,7 +80,7 @@ const INGREDIENTS: Ingredient[] = [
   {
     id: 'crevettes', nom_singulier: 'Crevettes', nom_pluriel: 'Crevettes',
     categorie: 'viandes-poissons', unite_base: 'g', unite_achat: 'kg',
-    conversion: 1000, allergenes: ['crustaces'], contient_trace: [], substituts: [], exclusion_tags: [],
+    conversion: 1000, allergenes: ['crustaces'], contient_trace: [], substituts: [], exclusion_tags: ['sans-fruits-de-mer'],
   },
 
   // ─── Pour tests vegan / produits laitiers (3) ──────────────────────────────
