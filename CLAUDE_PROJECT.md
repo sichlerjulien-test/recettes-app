@@ -135,5 +135,25 @@ Résidu à vérifier : labels d'unités en français dans `src/lib/ui/labels.ts`
 - `npm run build` ne se skip jamais sur une intuition. La preuve > l'intuition.
 - Les dettes traitées se suppriment du backlog (pas un cimetière d'historique).
 - Les sub-agents Claude Code font des observations utiles mais ne sont pas omniscients. Lecture critique.
+
+## Triage des observations d'agents de revue
+
+Chaque observation d'un agent de revue est triée séance tenante. Pas de
+"j'y reviendrai" : une observation non triée est une observation qui pourrit.
+
+0. **Valide ?** Confronter l'observation au code réel avant de la classer.
+   Fausse ou hors-sujet → écartée, une ligne de justification, fin. Un agent
+   n'est pas omniscient ; son ton assuré ne vaut pas preuve. Seules les
+   observations qui survivent entrent dans les cases ci-dessous.
+1. **Bloquant** → corrigé dans la PR courante. (Si le bloquant révèle que
+   l'approche entière de la PR est mauvaise : fermer la PR, re-cadrer — pas
+   rustiner.)
+2. **Réel mais différable** → une ligne dans le backlog. Une ligne, pas un
+   ticket de 15 lignes. Le ticket se rédige quand on le sort, pas quand on le range.
+3. **Théorique / cosmétique** → poubelle, sans culpabilité.
+
+Test de bon fonctionnement : à six semaines, le backlog ne contient aucune
+ligne devenue incompréhensible ni aucun ticket pré-rédigé jamais ouvert.
+
 - **Règle de branche :** le main local ne diverge jamais — il suit `origin/main`. Aucun travail "fini" ne vit sur une branche ou en local sans réconciliation avec l'autorité distante. Commit + push = clôture de session.
 - **Règle de synchronisation CLAUDE_PROJECT.md :** toute modification de ce fichier déclenche **obligatoirement** la recopie dans le champ "Instructions" du Project Claude.ai dans le même flux (case dans le template de PR, ou gate de commit). Sans cette étape, la connaissance du Project diverge silencieusement du repo.
