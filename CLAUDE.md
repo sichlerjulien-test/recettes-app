@@ -14,3 +14,6 @@ Avant d'écrire la moindre ligne sur un ticket :
      Reporter la vraie localisation ; retour Project pour re-cadrage.
 3. Effort réel qui dépasse l'estimation d'un cran (S→M, M→L) → signal que la
    localisation était fausse (cf. TK-02). STOP, ne pas pousser au travers.
+4. Fork d'approche structurel non tranché = STOP, même si l'hypothèse de localisation
+   paraît complète. Ne pas choisir l'approche à la place du Project. Router vers
+   architect + ADR ; le ticket retourne au Project.

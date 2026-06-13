@@ -155,6 +155,8 @@ se ferme vraiment que côté Claude Code, qui confirme l'hypothèse par une pass
 cheap avant d'écrire (règle dans CLAUDE.md). Hypothèse falsifiée ou effort qui
 gonfle d'un cran = STOP, retour ici.
 
+Un ticket n'est pas ready si le résoudre impose de choisir entre des approches à conséquence structurante. Ce choix se tranche avant le cadrage (architect + ADR), pas par l'exécutant.
+
 ## Triage des observations d'agents de revue
 
 Chaque observation d'un agent de revue est triée séance tenante. Pas de
