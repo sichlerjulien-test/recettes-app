@@ -287,6 +287,24 @@ aujourd'hui silencieusement → null).
 ### TK-27 — Dark mode : trancher · S
 Soit tokens dark propres, soit documenter light-only. Dette consciente Sprint 1, faible pri.
 
+### TK-30 — Cleanup CLAUDE_PROJECT.md : supprimer les règles mécanisées par end-session · S
+**Origine :** clôture session post-TK-29 (gate end-session).
+
+Les règles de discipline couvertes mécaniquement par `npm run end-session` restent documentées en double dans CLAUDE_PROJECT.md. Double comptabilité → risque de divergence si l'une évolue sans l'autre.
+
+**Critères :** les règles couvertes par end-session sont retirées de CLAUDE_PROJECT.md ; la source de vérité est le script, pas le doc.
+
+> Pas de risque comportemental. Tâche côté Project (édition du doc).
+
+### TK-31 — Convention TK-XX dans les commits : mini-ADR · S
+**Origine :** clôture session post-TK-29 · préalable au gate backlog v2.
+
+Aucune règle formelle ne définit si/comment le numéro de ticket doit apparaître dans les commits. Le gate backlog v2 ne peut pas vérifier la couverture si la convention est floue.
+
+**Critères :** un mini-ADR tranche la convention (obligatoire/optionnel, format, scope) ; le gate backlog v2 s'y réfère.
+
+> **Préalable au gate backlog v2.** À trancher en session dédiée, avant tout ticket d'exécution qui ajouterait une règle dépendante.
+
 ---
 
 ## V2 — Hors MVP (noté pour mémoire)
@@ -352,5 +370,7 @@ avec un trou.
 | TK-26 | État d'erreur UI explicite /sejour/[id] | P2 | S | À faire |
 | TK-27 | Dark mode : trancher | P2 | S | À faire |
 | TK-28 | Chargement ciblé du catalogue recettes | V2 | — | À faire |
+| TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | À faire |
+| TK-31 | Convention TK-XX commits (mini-ADR) | P2 | S | À faire |
 
-**Ordre conseillé :** dette data/DAL (TK-09, TK-10, TK-13, TK-12, TK-20) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27) → V2 (TK-08, TK-14, TK-28).
+**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → dette data/DAL (TK-09, TK-10, TK-13, TK-12, TK-20) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28).
