@@ -11,7 +11,8 @@
     "build-data:prod": "npm run validate && ENV_FILE=.env.prod.local tsx scripts/build-data.ts --prod",
     "test": "vitest run",
     "test:integration": "vitest run --config vitest.integration.config.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "end-session": "bash scripts/end-session.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
