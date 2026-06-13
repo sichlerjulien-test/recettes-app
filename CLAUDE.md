@@ -17,3 +17,7 @@ Avant d'écrire la moindre ligne sur un ticket :
 4. Fork d'approche structurel non tranché = STOP, même si l'hypothèse de localisation
    paraît complète. Ne pas choisir l'approche à la place du Project. Router vers
    architect + ADR ; le ticket retourne au Project.
+
+# Gate de clôture de session
+
+Clôture de session : `npm run end-session` doit afficher OK avant de fermer la conversation. Échec = session non close.
