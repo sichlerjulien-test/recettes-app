@@ -59,3 +59,16 @@ jobs:
       - run: npm ci
       - name: Validation des données YAML
         run: npm run validate
+
+  project-sync:
+    name: project-sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - name: Vérification hash CLAUDE_PROJECT.md
+        run: npm run check:project-sync
