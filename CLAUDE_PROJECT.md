@@ -136,6 +136,25 @@ Résidu à vérifier : labels d'unités en français dans `src/lib/ui/labels.ts`
 - Les dettes traitées se suppriment du backlog (pas un cimetière d'historique).
 - Les sub-agents Claude Code font des observations utiles mais ne sont pas omniscients. Lecture critique.
 
+## Gate de cadrage avant Claude Code (Definition of Ready)
+
+Aucun ticket ne part en exécution sans être "ready". Ready = trois éléments :
+1. Critères d'acceptation testables (une assertion de test ou une repro manuelle
+   vérifiable — pas "ça marche mieux").
+2. Hypothèse de localisation : quels fichiers/modules. Explicitement un pari,
+   à confirmer côté Claude Code avant d'écrire une ligne.
+3. Effort estimé (S/M/L/XL), conditionnel à l'hypothèse.
+
+Si on ne peut pas remplir les trois ici, le ticket n'est pas prêt : il reste au
+Project pour cadrage, il ne part pas. Le cadrage se fait quand le ticket est tiré
+(session kickoff), pas en batch d'avance.
+
+Les trois cases cochées ne suffisent pas. TK-02 avait un effort (L) et une
+localisation implicite (le modèle de données) : les deux étaient faux. Le gate ne
+se ferme vraiment que côté Claude Code, qui confirme l'hypothèse par une passe
+cheap avant d'écrire (règle dans CLAUDE.md). Hypothèse falsifiée ou effort qui
+gonfle d'un cran = STOP, retour ici.
+
 ## Triage des observations d'agents de revue
 
 Chaque observation d'un agent de revue est triée séance tenante. Pas de
