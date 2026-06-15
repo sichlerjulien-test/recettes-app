@@ -177,4 +177,4 @@ Test de bon fonctionnement : à six semaines, le backlog ne contient aucune
 ligne devenue incompréhensible ni aucun ticket pré-rédigé jamais ouvert.
 
 - **Règle de branche :** le main local ne diverge jamais — il suit `origin/main`. Aucun travail "fini" ne vit sur une branche ou en local sans réconciliation avec l'autorité distante. Commit + push = clôture de session.
-- **Règle de synchronisation CLAUDE_PROJECT.md :** toute modification de ce fichier déclenche **obligatoirement** la recopie dans le champ "Instructions" du Project Claude.ai dans le même flux (case dans le template de PR, ou gate de commit). Sans cette étape, la connaissance du Project diverge silencieusement du repo.
+- **Synchro CLAUDE_PROJECT.md :** gardée par sentinelle de hash en CI (ADR-012). Sur changement : `npm run sync:project`, coller dans l'UI, confirmer.
