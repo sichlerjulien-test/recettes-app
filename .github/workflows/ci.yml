@@ -115,11 +115,12 @@ jobs:
       - name: Diff replay vs canonical
         run: |
           normalize() {
-            grep -v "^-- Dumped\|^\\\\restrict\|^\\\\unrestrict" "$1" | cat -s
+            grep -v "^-- Dumped\|^\\\\restrict\|^\\\\unrestrict" "$1"
           }
           normalize schema/canonical.sql > /tmp/canonical_norm.sql
           normalize /tmp/replay.sql     > /tmp/replay_norm.sql
-          if ! diff -u /tmp/canonical_norm.sql /tmp/replay_norm.sql; then
+          # -B : ignore les hunks ne contenant que des lignes vides (trailing newline, espacements)
+          if ! diff -uB /tmp/canonical_norm.sql /tmp/replay_norm.sql; then
             echo "Dérive schéma détectée — mettre à jour schema/canonical.sql et les migrations"
             exit 1
           fi
