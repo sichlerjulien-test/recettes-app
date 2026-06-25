@@ -112,11 +112,14 @@ jobs:
           pg_dump -s -n public --no-acl -h localhost -U postgres postgres \
             | grep -v "^-- Dumped\|^\\\\restrict\|^\\\\unrestrict" \
             > /tmp/replay.sql
-      - name: Normaliser canonical pour la comparaison
-        run: grep -v "^-- Dumped\|^\\\\restrict\|^\\\\unrestrict" schema/canonical.sql > /tmp/canonical.sql
       - name: Diff replay vs canonical
         run: |
-          if ! diff -u /tmp/canonical.sql /tmp/replay.sql; then
+          normalize() {
+            grep -v "^-- Dumped\|^\\\\restrict\|^\\\\unrestrict" "$1" | cat -s
+          }
+          normalize schema/canonical.sql > /tmp/canonical_norm.sql
+          normalize /tmp/replay.sql     > /tmp/replay_norm.sql
+          if ! diff -u /tmp/canonical_norm.sql /tmp/replay_norm.sql; then
             echo "Dérive schéma détectée — mettre à jour schema/canonical.sql et les migrations"
             exit 1
           fi
