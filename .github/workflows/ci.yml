@@ -72,3 +72,46 @@ jobs:
       - run: npm ci
       - name: Vérification hash CLAUDE_PROJECT.md
         run: npm run check:project-sync
+
+  schema-replay:
+    name: schema-replay
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Rejouer les migrations 001→N
+        env:
+          PGPASSWORD: postgres
+        run: |
+          for f in scripts/migrations/0*.sql; do
+            echo "→ $f"
+            psql -h localhost -U postgres -d postgres -f "$f"
+          done
+      - name: Dump schéma replay
+        env:
+          PGPASSWORD: postgres
+        run: |
+          pg_dump -s -n public --no-acl -h localhost -U postgres postgres \
+            | grep -v "^-- Dumped" \
+            > /tmp/replay.sql
+      - name: Normaliser canonical pour la comparaison
+        run: grep -v "^-- Dumped" schema/canonical.sql > /tmp/canonical.sql
+      - name: Diff replay vs canonical
+        run: |
+          if ! diff -u /tmp/canonical.sql /tmp/replay.sql; then
+            echo "Dérive schéma détectée — mettre à jour schema/canonical.sql et les migrations"
+            exit 1
+          fi
+          echo "Schéma conforme au canonical"
