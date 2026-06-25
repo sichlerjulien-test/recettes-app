@@ -51,16 +51,14 @@ ALTER TABLE recettes
    sans erreur. C'est le test qui prouve que le schéma accepte les données réelles.
 3. **Smoke test.** `npm run dev` → créer un séjour → générer → ouvrir la liste de courses.
 4. **prod ensuite, à l'identique.** Même fichier, SQL Editor prod → Run → zéro erreur.
-5. **Prouver la reconstructibilité.**
+5. **Mettre à jour `schema/canonical.sql`.** Régénérer depuis dev après l'application :
 
-       pg_dump -s -n public "URI_DEV"  > /tmp/dev.sql
-       pg_dump -s -n public "URI_PROD" > /tmp/prod.sql
-       diff /tmp/dev.sql /tmp/prod.sql
+       pg_dump -s -n public --no-acl "URI_SESSION_POOLER_DEV" \
+         | grep -v "^-- Dumped" > schema/canonical.sql
 
-   Diff vide = clôture. Tolérer uniquement le bruit d'en-tête (SET, commentaires, version
-   pg_dump). Toute différence sur CREATE TABLE / CONSTRAINT / INDEX / POLICY / FUNCTION est
-   un échec. Fallback sans pg_dump : re-lancer la requête `pg_constraint` sur les deux
-   instances et confirmer l'identité — plus faible, aveugle au reste du schéma.
+   Committer canonical.sql dans la même PR. Le job CI `schema-replay` (ADR-013 §4) vérifie
+   automatiquement que le replay 001→N produit un schéma identique à cet oracle.
+   Un diff non vide bloque le merge.
 
 ## Interdits
 
