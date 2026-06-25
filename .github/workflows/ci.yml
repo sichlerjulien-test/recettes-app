@@ -110,10 +110,10 @@ jobs:
           PGPASSWORD: postgres
         run: |
           pg_dump -s -n public --no-acl -h localhost -U postgres postgres \
-            | grep -v "^-- Dumped" \
+            | grep -v "^-- Dumped\|^\\\\restrict\|^\\\\unrestrict" \
             > /tmp/replay.sql
       - name: Normaliser canonical pour la comparaison
-        run: grep -v "^-- Dumped" schema/canonical.sql > /tmp/canonical.sql
+        run: grep -v "^-- Dumped\|^\\\\restrict\|^\\\\unrestrict" schema/canonical.sql > /tmp/canonical.sql
       - name: Diff replay vs canonical
         run: |
           if ! diff -u /tmp/canonical.sql /tmp/replay.sql; then

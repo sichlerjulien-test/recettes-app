@@ -23,7 +23,6 @@ SET row_security = off;
 
 CREATE SCHEMA public;
 
-
 ALTER SCHEMA public OWNER TO pg_database_owner;
 
 --
@@ -31,7 +30,6 @@ ALTER SCHEMA public OWNER TO pg_database_owner;
 --
 
 COMMENT ON SCHEMA public IS 'standard public schema';
-
 
 --
 -- Name: set_updated_at(); Type: FUNCTION; Schema: public; Owner: postgres
@@ -45,7 +43,6 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-
 
 ALTER FUNCTION public.set_updated_at() OWNER TO postgres;
 
@@ -86,7 +83,6 @@ BEGIN
 END;
 $$;
 
-
 ALTER FUNCTION public.update_sejour_with_participants(p_id uuid, p_nom text, p_date_debut date, p_nb_jours integer, p_repartition_repas jsonb, p_parametres jsonb, p_participants jsonb) OWNER TO postgres;
 
 SET default_tablespace = '';
@@ -99,6 +95,7 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.ingredients (
     id text NOT NULL,
+    nom_singulier text NOT NULL,
     nom_pluriel text NOT NULL,
     categorie text NOT NULL,
     unite_base text NOT NULL,
@@ -111,16 +108,13 @@ CREATE TABLE public.ingredients (
     notes text,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    nom_singulier text NOT NULL,
     CONSTRAINT ingredients_categorie_check CHECK ((categorie = ANY (ARRAY['fruits-legumes'::text, 'viandes-poissons'::text, 'cremerie-oeufs'::text, 'epicerie-salee'::text, 'epicerie-sucree'::text, 'feculents-pates-riz'::text, 'boulangerie'::text, 'surgele'::text, 'boissons'::text, 'condiments-epices'::text, 'frais-traiteur'::text]))),
     CONSTRAINT ingredients_conversion_check CHECK ((conversion > (0)::numeric)),
     CONSTRAINT ingredients_unite_achat_check CHECK ((unite_achat = ANY (ARRAY['g'::text, 'kg'::text, 'ml'::text, 'l'::text, 'piece'::text, 'botte'::text, 'sachet'::text, 'cuillere-soupe'::text, 'cuillere-cafe'::text]))),
     CONSTRAINT ingredients_unite_base_check CHECK ((unite_base = ANY (ARRAY['g'::text, 'ml'::text, 'piece'::text])))
 );
 
-
 ALTER TABLE public.ingredients OWNER TO postgres;
-
 
 --
 -- Name: participants; Type: TABLE; Schema: public; Owner: postgres
@@ -137,7 +131,6 @@ CREATE TABLE public.participants (
     CONSTRAINT participants_exclusions_valid CHECK ((exclusions <@ ARRAY['sans-viande-rouge'::text, 'sans-porc'::text, 'sans-poisson'::text, 'sans-fruits-de-mer'::text, 'sans-alcool'::text, 'vegetarien'::text, 'vegan'::text]))
 );
 
-
 ALTER TABLE public.participants OWNER TO postgres;
 
 --
@@ -151,7 +144,6 @@ CREATE TABLE public.plannings (
     contraintes_utilisees jsonb NOT NULL,
     genere_le timestamp with time zone DEFAULT now() NOT NULL
 );
-
 
 ALTER TABLE public.plannings OWNER TO postgres;
 
@@ -170,7 +162,6 @@ CREATE TABLE public.recette_ingredients (
     CONSTRAINT recette_ingredients_quantite_base_check CHECK ((quantite_base > (0)::numeric)),
     CONSTRAINT recette_ingredients_unite_check CHECK ((unite = ANY (ARRAY['g'::text, 'kg'::text, 'ml'::text, 'l'::text, 'piece'::text, 'botte'::text, 'sachet'::text, 'cuillere-soupe'::text, 'cuillere-cafe'::text])))
 );
-
 
 ALTER TABLE public.recette_ingredients OWNER TO postgres;
 
@@ -213,7 +204,6 @@ CREATE TABLE public.recettes (
     CONSTRAINT recettes_type_repas_check CHECK ((cardinality(type_repas) > 0))
 );
 
-
 ALTER TABLE public.recettes OWNER TO postgres;
 
 --
@@ -239,7 +229,6 @@ CREATE TABLE public.sejours (
     CONSTRAINT temps_disponible_valid CHECK (((parametres ->> 'temps_disponible'::text) = ANY (ARRAY['rapide'::text, 'standard'::text])))
 );
 
-
 ALTER TABLE public.sejours OWNER TO postgres;
 
 --
@@ -249,14 +238,12 @@ ALTER TABLE public.sejours OWNER TO postgres;
 ALTER TABLE ONLY public.ingredients
     ADD CONSTRAINT ingredients_pkey PRIMARY KEY (id);
 
-
 --
 -- Name: participants participants_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.participants
     ADD CONSTRAINT participants_pkey PRIMARY KEY (id);
-
 
 --
 -- Name: plannings plannings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
@@ -265,14 +252,12 @@ ALTER TABLE ONLY public.participants
 ALTER TABLE ONLY public.plannings
     ADD CONSTRAINT plannings_pkey PRIMARY KEY (id);
 
-
 --
 -- Name: recette_ingredients recette_ingredients_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.recette_ingredients
     ADD CONSTRAINT recette_ingredients_pkey PRIMARY KEY (recette_id, ingredient_id, "position");
-
 
 --
 -- Name: recettes recettes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
@@ -281,14 +266,12 @@ ALTER TABLE ONLY public.recette_ingredients
 ALTER TABLE ONLY public.recettes
     ADD CONSTRAINT recettes_pkey PRIMARY KEY (id);
 
-
 --
 -- Name: sejours sejours_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.sejours
     ADD CONSTRAINT sejours_pkey PRIMARY KEY (id);
-
 
 --
 -- Name: sejours sejours_token_key; Type: CONSTRAINT; Schema: public; Owner: postgres
@@ -297,13 +280,11 @@ ALTER TABLE ONLY public.sejours
 ALTER TABLE ONLY public.sejours
     ADD CONSTRAINT sejours_token_key UNIQUE (token);
 
-
 --
 -- Name: idx_ingredients_categorie; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX idx_ingredients_categorie ON public.ingredients USING btree (categorie);
-
 
 --
 -- Name: idx_participants_sejour_id; Type: INDEX; Schema: public; Owner: postgres
@@ -311,13 +292,11 @@ CREATE INDEX idx_ingredients_categorie ON public.ingredients USING btree (catego
 
 CREATE INDEX idx_participants_sejour_id ON public.participants USING btree (sejour_id);
 
-
 --
 -- Name: idx_plannings_sejour_id; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX idx_plannings_sejour_id ON public.plannings USING btree (sejour_id);
-
 
 --
 -- Name: idx_recette_ingredients_ingredient_id; Type: INDEX; Schema: public; Owner: postgres
@@ -325,20 +304,17 @@ CREATE INDEX idx_plannings_sejour_id ON public.plannings USING btree (sejour_id)
 
 CREATE INDEX idx_recette_ingredients_ingredient_id ON public.recette_ingredients USING btree (ingredient_id);
 
-
 --
 -- Name: ingredients trg_ingredients_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
 CREATE TRIGGER trg_ingredients_updated_at BEFORE UPDATE ON public.ingredients FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
-
 --
 -- Name: recettes trg_recettes_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
 CREATE TRIGGER trg_recettes_updated_at BEFORE UPDATE ON public.recettes FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
-
 
 --
 -- Name: participants participants_sejour_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
@@ -347,14 +323,12 @@ CREATE TRIGGER trg_recettes_updated_at BEFORE UPDATE ON public.recettes FOR EACH
 ALTER TABLE ONLY public.participants
     ADD CONSTRAINT participants_sejour_id_fkey FOREIGN KEY (sejour_id) REFERENCES public.sejours(id) ON DELETE CASCADE;
 
-
 --
 -- Name: plannings plannings_sejour_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.plannings
     ADD CONSTRAINT plannings_sejour_id_fkey FOREIGN KEY (sejour_id) REFERENCES public.sejours(id) ON DELETE CASCADE;
-
 
 --
 -- Name: recette_ingredients recette_ingredients_ingredient_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
@@ -363,7 +337,6 @@ ALTER TABLE ONLY public.plannings
 ALTER TABLE ONLY public.recette_ingredients
     ADD CONSTRAINT recette_ingredients_ingredient_id_fkey FOREIGN KEY (ingredient_id) REFERENCES public.ingredients(id) ON DELETE RESTRICT;
 
-
 --
 -- Name: recette_ingredients recette_ingredients_recette_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
@@ -371,13 +344,11 @@ ALTER TABLE ONLY public.recette_ingredients
 ALTER TABLE ONLY public.recette_ingredients
     ADD CONSTRAINT recette_ingredients_recette_id_fkey FOREIGN KEY (recette_id) REFERENCES public.recettes(id) ON DELETE CASCADE;
 
-
 --
 -- Name: participants allow_all_mvp; Type: POLICY; Schema: public; Owner: postgres
 --
 
 CREATE POLICY allow_all_mvp ON public.participants USING (true) WITH CHECK (true);
-
 
 --
 -- Name: plannings allow_all_mvp; Type: POLICY; Schema: public; Owner: postgres
@@ -385,20 +356,17 @@ CREATE POLICY allow_all_mvp ON public.participants USING (true) WITH CHECK (true
 
 CREATE POLICY allow_all_mvp ON public.plannings USING (true) WITH CHECK (true);
 
-
 --
 -- Name: sejours allow_all_mvp; Type: POLICY; Schema: public; Owner: postgres
 --
 
 CREATE POLICY allow_all_mvp ON public.sejours USING (true) WITH CHECK (true);
 
-
 --
 -- Name: ingredients; Type: ROW SECURITY; Schema: public; Owner: postgres
 --
 
 ALTER TABLE public.ingredients ENABLE ROW LEVEL SECURITY;
-
 
 --
 -- Name: participants; Type: ROW SECURITY; Schema: public; Owner: postgres
@@ -429,7 +397,6 @@ ALTER TABLE public.recettes ENABLE ROW LEVEL SECURITY;
 --
 
 ALTER TABLE public.sejours ENABLE ROW LEVEL SECURITY;
-
 
 --
 -- PostgreSQL database dump complete
