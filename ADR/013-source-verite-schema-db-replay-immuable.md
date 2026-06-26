@@ -109,10 +109,18 @@ par ADR-008 §4, ici rendu **vérifiable mécaniquement** et non plus seulement 
 - **Régénérer les FK dans `001` / ajouter `002-restore-foreign-keys.sql`** : impossible.
   `001` immuable, `002` déjà pris. Toute réconciliation va en `010+`.
 
+## Note posture RLS catalogue
+
+`canonical.sql` encode `ENABLE ROW LEVEL SECURITY` sans aucune policy sur `ingredients`,
+`recette_ingredients` et `recettes`. C'est une posture consciente : l'app accède via la clé
+`service_role` côté serveur, qui contourne le RLS. Ces tables ne sont pas protégées en
+pratique — ne pas interpréter `ENABLE ROW LEVEL SECURITY` comme une garantie d'isolation.
+
 ## Références
 
 - ADR-008 — séparation des instances Supabase et discipline de migration (réaffirmé)
 - ADR-010 — gate CI trois jobs (étendu par le 4e job §4)
 - MIGRATIONS.md — runbook d'application
-- `scripts/migrations/001`→`009` — historique immuable
+- `scripts/migrations/001`→`010` — historique immuable
 - TK-15 (backlog), TK-16 (gate déploiement DB↔code, cousin)
+- `docs/incidents/500-shopping-list.md` — post-mortem de l'incident déclencheur
