@@ -213,6 +213,16 @@ Les règles de discipline couvertes mécaniquement par `npm run end-session` res
 
 > Pas de risque comportemental. Tâche côté Project (édition du doc).
 
+### TK-32 — Garde read-contract.ts ↔ selects DAL réels · S
+Vérifier que chaque colonne déclarée dans `read-contract.ts` est effectivement lue par une
+requête du DAL, et que chaque colonne lue par le DAL figure dans `read-contract.ts`. Contrat
+statique seul (TK-16 Modèle A) : si une colonne disparaît du DAL sans être retirée du contrat,
+aucun gate ne le détecte.
+
+**Critères :** un écart `read-contract.ts` ↔ selects DAL réels est détecté en CI.
+
+> Complément naturel de TK-16 Modèle A. Requiert AST ou grep structuré sur les requêtes DAL.
+
 ### TK-31 — Convention TK-XX dans les commits : mini-ADR · S
 **Origine :** clôture session post-TK-29 · préalable au gate backlog v2.
 
@@ -268,7 +278,7 @@ avec un trou.
 | TK-13 | Source unique enums SQL + Zod (Trou A) | P2 | M | À faire |
 | TK-14 | Règles de cohérence sémantiques restantes | V2 | — | À faire |
 | TK-15 | Baseline schéma DB + source de vérité | P2 | M | Fait |
-| TK-16 | Gate déploiement : schéma DB ↔ code | P2 | M | À faire |
+| TK-16 | Gate déploiement : schéma DB ↔ code | P2 | M | Fait |
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
 | TK-18 | Bug hydratation ShareLink | P2 | S | À faire |
 | TK-20 | Raffiner taxonomie ingrédients (garde déterministe porc/viande-rouge/alcool) | P2 | M | À faire |
@@ -282,5 +292,6 @@ avec un trou.
 | TK-28 | Chargement ciblé du catalogue recettes | V2 | — | À faire |
 | TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | À faire |
 | TK-31 | Convention TK-XX commits (mini-ADR) | P2 | S | À faire |
+| TK-32 | Garde read-contract.ts ↔ selects DAL réels | P2 | S | À faire |
 
 **Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → dette data/DAL (TK-09, TK-10, TK-13, TK-12, TK-20) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28).
