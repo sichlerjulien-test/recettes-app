@@ -78,38 +78,6 @@ sans qualification manuelle nécessaire. Cousin de TK-13 (Trou A SQL/Zod).
 
 > À séquencer après TK-05 Phase 2C (UI). Touche `IngredientCategorySchema` → passe architect.
 
-### TK-13 — Source unique pour enums SQL + Zod (Trou A)  ·  M
-**Origine :** investigation TK-07 (Trou A), ADR-008.
-
-`validate-data` (Zod) ne reflète pas les CHECK SQL. Les deux calques — contraintes
-CHECK côté Postgres et enums côté Zod — sont maintenus à la main et dérivent
-indépendamment. Une valeur peut passer la CI (Zod la tolère) et casser au seed (le
-CHECK SQL la refuse). C'est exactement ce qui s'est produit sur TK-07 : Zod acceptait
-`equipement: []`, le CHECK SQL le refusait, et la donnée a voyagé jusqu'au seed dev.
-Tant que ce mécanisme existe, l'épisode 005 peut se rejouer à la prochaine divergence.
-
-Sous-tâches :
-- Trancher l'approche. Deux familles, qui ne couvrent PAS le même périmètre :
-  - **Génération** : un script émet les `ARRAY` des CHECK SQL depuis les enums Zod au
-    build. Ferme le trou à la racine pour les CHECK d'appartenance (ingredient_principal,
-    type_cuisine). Aveugle aux CHECK d'une autre forme.
-  - **Assertion runtime** : `validate-data` lit les CHECK de la migration et les confronte
-    aux enums Zod. Crie plus tôt (CI au lieu du seed) sans rendre l'écart impossible, mais
-    couvre TOUS les CHECK — y compris la cardinalité, c.-à-d. le cas `equipement` qui a
-    déclenché l'épisode.
-- Implémenter au minimum sur `ingredient_principal` et `type_cuisine` (les deux enums qui
-  ont effectivement dérivé).
-- Test discriminant : une divergence introduite volontairement entre un enum Zod et son
-  CHECK SQL doit échouer en CI, pas au seed.
-
-**Critères d'acceptation :** un écart enum Zod ↔ CHECK SQL est détecté en CI. Idéalement
-structurellement impossible.
-
-> Point de cadrage qui tranche le choix : la génération seule ne couvre que les CHECK
-> d'appartenance. Le cas `equipement` était une contrainte de cardinalité — une génération
-> d'enums ne l'aurait jamais attrapé. Si l'objectif est de fermer tout le Trou A (le cas
-> vécu inclus), la génération seule est insuffisante ; il faut l'assertion runtime, ou les
-> deux. À ouvrir en session dédiée, pas en cours de route.
 
 ### TK-15 — Baseline de schéma DB + source de vérité unique  ·  M
 **Origine :** incident 500 /shopping-list. Cause racine : aucune migration ne reproduit le schéma courant from scratch.
@@ -223,6 +191,13 @@ aucun gate ne le détecte.
 
 > Complément naturel de TK-16 Modèle A. Requiert AST ou grep structuré sur les requêtes DAL.
 
+> **Note (2026-06-27) :** Le parser de `check-read-contract.ts` cible `schema/canonical.sql`
+> (DDL, blocs `CREATE TABLE`) — pas la section `COL` produite par `introspect-schema.sql`
+> (introspection live). Si `canonical.sql` présente des variantes de formatage non couvertes
+> par le regex (colonnes en `"guillemets"`, `CONSTRAINT` imbriqué, indentation non standard),
+> le parser peut manquer des colonnes silencieusement. TK-32 devra valider ou corriger ce parser
+> en même temps que la garde DAL ↔ contrat.
+
 ### TK-31 — Convention TK-XX dans les commits : mini-ADR · S
 **Origine :** clôture session post-TK-29 · préalable au gate backlog v2.
 
@@ -275,7 +250,7 @@ avec un trou.
 | TK-09 | Nettoyage DAL sejours | P2 | M | À faire |
 | TK-10 | createSejour atomique via RPC | P2 | M | À faire |
 | TK-12 | Tests d'intégration TK-03 | P2 | M | À faire |
-| TK-13 | Source unique enums SQL + Zod (Trou A) | P2 | M | À faire |
+| TK-13 | Source unique enums SQL + Zod (Trou A) | P2 | S | Fait |
 | TK-14 | Règles de cohérence sémantiques restantes | V2 | — | À faire |
 | TK-15 | Baseline schéma DB + source de vérité | P2 | M | Fait |
 | TK-16 | Gate déploiement : schéma DB ↔ code | P2 | M | Fait |
@@ -294,4 +269,4 @@ avec un trou.
 | TK-31 | Convention TK-XX commits (mini-ADR) | P2 | S | À faire |
 | TK-32 | Garde read-contract.ts ↔ selects DAL réels | P2 | S | À faire |
 
-**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → dette data/DAL (TK-09, TK-10, TK-13, TK-12, TK-20) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28).
+**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → dette data/DAL (TK-09, TK-10, TK-12, TK-20) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28).

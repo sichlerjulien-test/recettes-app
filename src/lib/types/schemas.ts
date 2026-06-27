@@ -39,6 +39,7 @@ export const IngredientCategorySchema = z.enum([
 export const CONTINUOUS_UNITS = ['g', 'kg', 'ml', 'l', 'cuillere-soupe', 'cuillere-cafe'] as const;
 export const DISCRETE_UNITS   = ['piece', 'botte', 'sachet'] as const;
 export const UnitSchema = z.enum([...CONTINUOUS_UNITS, ...DISCRETE_UNITS]);
+export const UniteBaseSchema = z.enum(['g', 'ml', 'piece']);
 export type ContinuousUnit = typeof CONTINUOUS_UNITS[number];
 export type DiscreteUnit   = typeof DISCRETE_UNITS[number];
 
@@ -50,7 +51,7 @@ export const MealTypeSchema = z.enum(['midi', 'soir', 'petit-dejeuner']);
 
 export const SeasonSchema = z.enum(['printemps', 'ete', 'automne', 'hiver', 'toutes']);
 
-export const DifficultySchema = z.enum(['facile', 'normale', 'moyen']);
+export const DifficultySchema = z.enum(['facile', 'normale']);
 
 export const CuisineTypeSchema = z.enum([
   'francaise', 'italienne', 'asiatique', 'mexicaine',
@@ -125,7 +126,7 @@ export const IngredientSchema = z.object({
   nom_singulier: z.string().min(1).max(100),
   nom_pluriel: z.string().min(1).max(100),
   categorie: IngredientCategorySchema,
-  unite_base: z.enum(['g', 'ml', 'piece']),
+  unite_base: UniteBaseSchema,
   unite_achat: UnitSchema,
   conversion: z.number().positive(),
   allergenes: z.array(AllergenSchema).default([]),
