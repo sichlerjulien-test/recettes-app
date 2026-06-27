@@ -1,6 +1,7 @@
 import 'server-only';
 import { z } from 'zod';
 import { getSupabaseClient } from './supabase';
+import { assertSchema } from './schema-guard';
 import { IngredientSchema } from '../types/schemas';
 import type { Ingredient } from '../types/domain';
 import type { DbError } from '../types/domain';
@@ -44,6 +45,9 @@ function mapIngredientRow(item: unknown): unknown {
  * Retourne l'ensemble des ingrédients du catalogue.
  */
 export async function getAllIngredients(): Promise<IngredientsResult> {
+  const guard = await assertSchema();
+  if (!guard.ok) return { ok: false, error: guard.error };
+
   const supabase = getSupabaseClient();
 
   const { data, error } = await supabase.from('ingredients').select('*');
@@ -91,6 +95,9 @@ export async function getAllIngredientsAsMap(): Promise<IngredientsMapResult> {
  * Retourne une erreur not_found si l'ingrédient n'existe pas.
  */
 export async function getIngredientById(id: string): Promise<IngredientResult> {
+  const guard = await assertSchema();
+  if (!guard.ok) return { ok: false, error: guard.error };
+
   const supabase = getSupabaseClient();
 
   const { data, error } = await supabase

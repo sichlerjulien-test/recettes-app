@@ -31,10 +31,25 @@ Le gate confronte le contrat de lecture DB au schéma RÉELLEMENT déployé, pas
 
 ### 2 — Forme : assertion runtime mémoïsée (B1), pas gate pré-deploy (B2)
 Un guard au bord du DAL introspecte la DB connectée au plus une fois par instance chaude.
-Sur dérive (colonne requise absente, type ou nullabilité divergents) : retourne un DbError
-typé `schema_drift` nommant table + colonne + écart. Les routes concernées répondent 503
-explicite, jamais un 500 opaque ni un payload vide. Aligné sur ADR-006 (« échouer tôt et
-bruyamment »).
+Sur dérive (colonne requise absente) : retourne un DbError typé `schema_drift` nommant
+table + colonne. Les routes concernées répondent 503 explicite, jamais un 500 opaque ni
+un payload vide. Aligné sur ADR-006 (« échouer tôt et bruyamment »).
+
+**Périmètre du check runtime** : existence des colonnes uniquement. Type et nullabilité
+sont couverts systémiquement par ADR-013 (replay CI canonical.sql) et ne sont pas
+re-checkés au runtime via RPC/introspection — ce serait redondant et coûteux. Le guard
+détecte la fenêtre de timing entre deploy code et application migration manuelle (ADR-008) ;
+il ne remplace pas la validation Zod qui reste en charge de la forme métier.
+
+**Throw row-level — arbitrage (a)** : `requireExclusionsCompatibles` peut lancer si la
+colonne `exclusions_compatibles` est null (migration appliquée mais `build-data` pas encore
+tourné). Le DAL encapsule ce throw dans un `try/catch` et retourne
+`{ kind: 'row_validation_failed' }` (ADR-006), jamais un throw non capturé. Les routes
+mappent ce variant vers HTTP 503 au même titre que `schema_drift`.
+
+**Hors périmètre** : `getSupabaseClient` et son throw sur variables d'environnement
+manquantes restent inchangés — c'est un problème de configuration boot, pas de schéma,
+traité dans un ticket séparé (TK-XX config-boot).
 
 B2 (bloquer la promotion Vercel sur un check prod) est écarté : collision avec l'auto-deploy
 Vercel Hobby et la discipline manuelle dev→prod d'ADR-008, pour un coût L/XL injustifié à
@@ -55,9 +70,18 @@ Il ne dispense jamais de §1.
 
 Positives : la fenêtre de timing résiduelle post-ADR-013 devient détectée et diagnostiquée ;
 couverture de tous les schémas de lecture en un point ; échec légible en une ligne de log.
-Coût : une introspection par instance chaude (mémoïsée, négligeable) ; un variant DbError ;
-un contrat de lecture explicite au bord DB à maintenir.
+Coût : une introspection par instance chaude (mémoïsée, négligeable) ; deux variants DbError
+(`schema_drift`, `row_validation_failed` — ce dernier existait déjà) ; un contrat de lecture
+`read-contract.ts` à maintenir manuellement ; `dbErrorToResponse` doit couvrir les deux
+variants → 503 avec diagnostic (TypeScript enforce l'exhaustivité).
 Risque : si B2 redevenait exigé, STOP / retour Project (effort gonfle d'un cran).
+
+### Décisions réaffirmées lors de l'implémentation TK-16
+
+- **Arbitrage (a)** : le DAL honore ADR-006 (Result) — le throw de `requireExclusionsCompatibles`
+  est intercepté dans `recettes.ts` ; `getSupabaseClient` reste hors périmètre.
+- **Type/nullabilité** non re-checkés au runtime (§2 ci-dessus) : évite RPC ou migration
+  redondante, cohérent avec ADR-013 qui couvre déjà cette couche statiquement.
 
 ## Alternatives écartées
 - A seul : vert pendant l'incident qu'il prétend prévenir. Rejeté.

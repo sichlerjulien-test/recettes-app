@@ -14,7 +14,9 @@ export type ApiErrorKind =
   | 'business_error'
   | 'pool_empty'
   | 'db_error'
-  | 'llm_unavailable';
+  | 'llm_unavailable'
+  | 'schema_drift'
+  | 'row_validation_failed';
 
 export function jsonError(
   status: number,

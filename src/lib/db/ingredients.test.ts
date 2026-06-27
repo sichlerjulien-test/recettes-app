@@ -5,8 +5,13 @@ vi.mock('./supabase', () => ({
   getSupabaseClient: vi.fn(),
   _resetSupabaseClientForTests: vi.fn(),
 }));
+vi.mock('./schema-guard', () => ({
+  assertSchema: vi.fn().mockResolvedValue({ ok: true }),
+  _resetSchemaGuardForTests: vi.fn(),
+}));
 
 import { getSupabaseClient } from './supabase';
+import { assertSchema } from './schema-guard';
 import { getAllIngredients, getIngredientById, getAllIngredientsAsMap } from './ingredients';
 
 // ─── Mock Supabase chainable builder ─────────────────────────────────────────
@@ -59,6 +64,7 @@ const RAW_INGREDIENT_ROW = {
 describe('ingredients DAL', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.mocked(assertSchema).mockResolvedValue({ ok: true });
   });
 
   describe('getAllIngredients', () => {

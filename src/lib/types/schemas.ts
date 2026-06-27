@@ -432,6 +432,10 @@ export const DbErrorSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('row_validation_failed'), cause: z.string() }),
   z.object({ kind: z.literal('not_found'), entity: z.string(), id: z.string() }),
   z.object({ kind: z.literal('constraint_violation'), cause: z.string() }),
+  z.object({
+    kind: z.literal('schema_drift'),
+    missing: z.array(z.object({ table: z.string(), column: z.string() })),
+  }),
 ]);
 
 // ============================================================================
