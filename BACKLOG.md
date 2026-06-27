@@ -267,7 +267,7 @@ avec un trou.
 | TK-12 | Tests d'intégration TK-03 | P2 | M | À faire |
 | TK-13 | Source unique enums SQL + Zod (Trou A) | P2 | M | À faire |
 | TK-14 | Règles de cohérence sémantiques restantes | V2 | — | À faire |
-| TK-15 | Baseline schéma DB + source de vérité | P2 | M | À faire |
+| TK-15 | Baseline schéma DB + source de vérité | P2 | M | Fait |
 | TK-16 | Gate déploiement : schéma DB ↔ code | P2 | M | À faire |
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
 | TK-18 | Bug hydratation ShareLink | P2 | S | À faire |
