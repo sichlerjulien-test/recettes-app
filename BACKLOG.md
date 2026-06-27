@@ -195,8 +195,28 @@ aucun gate ne le détecte.
 > (DDL, blocs `CREATE TABLE`) — pas la section `COL` produite par `introspect-schema.sql`
 > (introspection live). Si `canonical.sql` présente des variantes de formatage non couvertes
 > par le regex (colonnes en `"guillemets"`, `CONSTRAINT` imbriqué, indentation non standard),
-> le parser peut manquer des colonnes silencieusement. TK-32 devra valider ou corriger ce parser
-> en même temps que la garde DAL ↔ contrat.
+> le parser peut manquer des colonnes silencieusement. TK-33 couvre le durcissement du parser ;
+> TK-32 peut ensuite s'appuyer dessus pour la garde DAL ↔ contrat.
+
+### TK-33 — Durcir + tester le parser canonical.sql de check-read-contract.ts · S
+**Origine :** note de fin de session TK-16 / TK-32.
+
+Le parser de `check-read-contract.ts` extrait les colonnes des blocs `CREATE TABLE` de
+`schema/canonical.sql` via regex. Guillemets (`"colonne"`) et `CONSTRAINT` inline sont déjà
+gérés. Les cas restants non couverts :
+- indentation non standard (tabulations, espaces multiples)
+- `CONSTRAINT` sur ligne séparée (multi-ligne)
+
+Un parser qui rate ces cas manque des colonnes **silencieusement** — aucune erreur, faux-positif
+de conformité.
+
+**Critères :**
+- Au moins un test unitaire par cas manquant (indentation non standard, `CONSTRAINT` multi-ligne)
+- Le parser passe tous les cas sans régression sur les cas existants
+- CI verte (`typecheck` + `test` + `validate`)
+
+> Prérequis de TK-32 : la garde DAL ↔ contrat ne peut être fiable que si le parser
+> en amont est couvert. À faire avant ou en même temps que TK-32.
 
 ### TK-31 — Convention TK-XX dans les commits : mini-ADR · S
 **Origine :** clôture session post-TK-29 · préalable au gate backlog v2.
@@ -268,5 +288,6 @@ avec un trou.
 | TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | À faire |
 | TK-31 | Convention TK-XX commits (mini-ADR) | P2 | S | À faire |
 | TK-32 | Garde read-contract.ts ↔ selects DAL réels | P2 | S | À faire |
+| TK-33 | Durcir + tester le parser canonical.sql (check-read-contract.ts) | P2 | S | À faire |
 
 **Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → dette data/DAL (TK-09, TK-10, TK-12, TK-20) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28).

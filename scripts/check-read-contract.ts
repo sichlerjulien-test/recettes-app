@@ -9,52 +9,67 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { READ_CONTRACT } from '../src/lib/db/read-contract';
 
-const sql = readFileSync(join(process.cwd(), 'schema/canonical.sql'), 'utf8');
-
 // Parse les blocs CREATE TABLE pour extraire { "table.colonne" }
-const schemaColumns = new Set<string>();
-let currentTable: string | null = null;
+export function parseSchemaColumns(sql: string): Set<string> {
+  const schemaColumns = new Set<string>();
+  let currentTable: string | null = null;
 
-for (const line of sql.split('\n')) {
-  const tableMatch = line.match(/^CREATE TABLE public\.(\w+)\s*\(/);
-  if (tableMatch) {
-    currentTable = tableMatch[1] ?? null;
-    continue;
+  for (const line of sql.split('\n')) {
+    const tableMatch = line.match(/^CREATE TABLE public\.(\w+)\s*\(/);
+    if (tableMatch) {
+      currentTable = tableMatch[1] ?? null;
+      continue;
+    }
+
+    if (currentTable === null) continue;
+
+    if (line === ');') {
+      currentTable = null;
+      continue;
+    }
+
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('--') || trimmed.startsWith('CONSTRAINT')) continue;
+
+    // Le nom de colonne est le premier token, potentiellement entre guillemets (ex. "position")
+    const colMatch = trimmed.match(/^"?(\w+)"?\s/);
+    if (colMatch) schemaColumns.add(`${currentTable}.${colMatch[1]}`);
   }
 
-  if (currentTable === null) continue;
-
-  if (line === ');') {
-    currentTable = null;
-    continue;
-  }
-
-  const trimmed = line.trim();
-  if (!trimmed || trimmed.startsWith('--') || trimmed.startsWith('CONSTRAINT')) continue;
-
-  // Le nom de colonne est le premier token, potentiellement entre guillemets (ex. "position")
-  const colMatch = trimmed.match(/^"?(\w+)"?\s/);
-  if (colMatch) schemaColumns.add(`${currentTable}.${colMatch[1]}`);
+  return schemaColumns;
 }
 
-// Confronter READ_CONTRACT au schéma extrait
-const missing: string[] = [];
-for (const [table, cols] of Object.entries(READ_CONTRACT)) {
-  for (const col of cols) {
-    if (!schemaColumns.has(`${table}.${col}`)) {
-      missing.push(`${table}.${col}`);
+// Confronter un contrat au schéma extrait ; retourne les clés manquantes
+export function findMissingColumns(
+  contract: Record<string, readonly string[]>,
+  schemaColumns: Set<string>,
+): string[] {
+  const missing: string[] = [];
+  for (const [table, cols] of Object.entries(contract)) {
+    for (const col of cols) {
+      if (!schemaColumns.has(`${table}.${col}`)) {
+        missing.push(`${table}.${col}`);
+      }
     }
   }
+  return missing;
 }
 
-if (missing.length > 0) {
-  process.stderr.write(`[check-read-contract] FAIL — colonnes requises absentes de schema/canonical.sql :\n`);
-  for (const col of missing) {
-    process.stderr.write(`  - ${col}\n`);
+if (fileURLToPath(import.meta.url) === process.argv[1]) {
+  const sql = readFileSync(join(process.cwd(), 'schema/canonical.sql'), 'utf8');
+  const schemaColumns = parseSchemaColumns(sql);
+  const missing = findMissingColumns(READ_CONTRACT, schemaColumns);
+
+  if (missing.length > 0) {
+    process.stderr.write(`[check-read-contract] FAIL — colonnes requises absentes de schema/canonical.sql :\n`);
+    for (const col of missing) {
+      process.stderr.write(`  - ${col}\n`);
+    }
+    process.exit(1);
   }
-  process.exit(1);
-}
 
-console.log('[check-read-contract] OK — toutes les colonnes du contrat sont présentes dans canonical.sql');
+  console.log('[check-read-contract] OK — toutes les colonnes du contrat sont présentes dans canonical.sql');
+}
