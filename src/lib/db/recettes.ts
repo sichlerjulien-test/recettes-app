@@ -1,6 +1,7 @@
 import 'server-only';
 import { z } from 'zod';
 import { getSupabaseClient } from './supabase';
+import { assertSchema } from './schema-guard';
 import { RecetteSchema } from '../types/schemas';
 import type { Recette } from '../types/domain';
 import type { DbError } from '../types/domain';
@@ -85,6 +86,9 @@ function mapRecetteRow(item: unknown): unknown {
  * Les ingrédients sont triés par leur position dans la recette.
  */
 export async function getAllRecettes(): Promise<RecettesResult> {
+  const guard = await assertSchema();
+  if (!guard.ok) return { ok: false, error: guard.error };
+
   const supabase = getSupabaseClient();
 
   const { data, error } = await supabase
@@ -100,7 +104,19 @@ export async function getAllRecettes(): Promise<RecettesResult> {
     return { ok: false, error: { kind: 'query_failed', cause: 'Format de réponse inattendu' } };
   }
 
-  const mapped = raw.map(mapRecetteRow);
+  let mapped: unknown[];
+  try {
+    mapped = raw.map(mapRecetteRow);
+  } catch (cause) {
+    return {
+      ok: false,
+      error: {
+        kind: 'row_validation_failed',
+        cause: cause instanceof Error ? cause.message : String(cause),
+      },
+    };
+  }
+
   const parsed = z.array(RecetteSchema).safeParse(mapped);
 
   if (!parsed.success) {
@@ -118,6 +134,9 @@ export async function getAllRecettes(): Promise<RecettesResult> {
  * Retourne une erreur not_found si la recette n'existe pas.
  */
 export async function getRecetteById(id: string): Promise<RecetteResult> {
+  const guard = await assertSchema();
+  if (!guard.ok) return { ok: false, error: guard.error };
+
   const supabase = getSupabaseClient();
 
   const { data, error } = await supabase
@@ -134,7 +153,19 @@ export async function getRecetteById(id: string): Promise<RecetteResult> {
     return { ok: false, error: { kind: 'not_found', entity: 'recette', id } };
   }
 
-  const mapped = mapRecetteRow(data);
+  let mapped: unknown;
+  try {
+    mapped = mapRecetteRow(data);
+  } catch (cause) {
+    return {
+      ok: false,
+      error: {
+        kind: 'row_validation_failed',
+        cause: cause instanceof Error ? cause.message : String(cause),
+      },
+    };
+  }
+
   const parsed = RecetteSchema.safeParse(mapped);
 
   if (!parsed.success) {

@@ -5,8 +5,13 @@ vi.mock('./supabase', () => ({
   getSupabaseClient: vi.fn(),
   _resetSupabaseClientForTests: vi.fn(),
 }));
+vi.mock('./schema-guard', () => ({
+  assertSchema: vi.fn().mockResolvedValue({ ok: true }),
+  _resetSchemaGuardForTests: vi.fn(),
+}));
 
 import { getSupabaseClient } from './supabase';
+import { assertSchema } from './schema-guard';
 import { getAllRecettes, getRecetteById, getAllRecettesAsMap } from './recettes';
 
 // ─── Mock Supabase chainable builder ─────────────────────────────────────────
@@ -73,6 +78,7 @@ const RAW_RECETTE_ROW = {
 describe('recettes DAL', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.mocked(assertSchema).mockResolvedValue({ ok: true });
   });
 
   describe('getAllRecettes', () => {
@@ -233,6 +239,43 @@ describe('recettes DAL', () => {
         expect(recette.exclusions_compatibles).not.toContain('sans-alcool');
         expect(recette.exclusions_compatibles).toContain('vegetarien');
         expect(recette.exclusions_compatibles).toContain('vegan');
+      }
+    });
+  });
+
+  // ─── Régression TK-16 : throw row-level converti en Result ──────────────────
+  // requireExclusionsCompatibles lève une erreur si exclusions_compatibles est null.
+  // Le DAL doit attraper ce throw et retourner row_validation_failed, jamais laisser
+  // l'erreur remonter au niveau route.
+
+  describe('exclusions_compatibles = null → row_validation_failed (pas un throw)', () => {
+    it('getAllRecettes retourne row_validation_failed quand exclusions_compatibles est null', async () => {
+      const rowNullExclusions = { ...RAW_RECETTE_ROW, exclusions_compatibles: null };
+
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        createMockSupabase({ recettes: [{ data: [rowNullExclusions], error: null }] }),
+      );
+
+      const result = await getAllRecettes();
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('row_validation_failed');
+      }
+    });
+
+    it('getRecetteById retourne row_validation_failed quand exclusions_compatibles est null', async () => {
+      const rowNullExclusions = { ...RAW_RECETTE_ROW, exclusions_compatibles: null };
+
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        createMockSupabase({ recettes: [{ data: rowNullExclusions, error: null }] }),
+      );
+
+      const result = await getRecetteById('salade-tomate-basilic');
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('row_validation_failed');
       }
     });
   });

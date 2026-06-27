@@ -5,8 +5,13 @@ vi.mock('./supabase', () => ({
   getSupabaseClient: vi.fn(),
   _resetSupabaseClientForTests: vi.fn(),
 }));
+vi.mock('./schema-guard', () => ({
+  assertSchema: vi.fn().mockResolvedValue({ ok: true }),
+  _resetSchemaGuardForTests: vi.fn(),
+}));
 
 import { getSupabaseClient } from './supabase';
+import { assertSchema } from './schema-guard';
 import { createPlanning, getPlanningBySejourId } from './plannings';
 import type { CreatePlanningInput } from './plannings';
 
@@ -81,6 +86,7 @@ const RAW_PLANNING_ROW_OLD_FORMAT = {
 describe('plannings DAL', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.mocked(assertSchema).mockResolvedValue({ ok: true });
   });
 
   describe('getPlanningBySejourId', () => {

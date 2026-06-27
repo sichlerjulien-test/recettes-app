@@ -1,5 +1,6 @@
 import 'server-only';
 import { getSupabaseClient } from './supabase';
+import { assertSchema } from './schema-guard';
 import { PlanningSchema } from '../types/schemas';
 import type { Planning, PlanningEntry } from '../types/domain';
 import type { DbError } from '../types/domain';
@@ -23,6 +24,9 @@ export type GetPlanningResult =
  * Retourne not_found si aucun planning n'existe pour ce séjour.
  */
 export async function getPlanningBySejourId(sejourId: string): Promise<GetPlanningResult> {
+  const guard = await assertSchema();
+  if (!guard.ok) return { ok: false, error: guard.error };
+
   const supabase = getSupabaseClient();
 
   const { data, error } = await supabase
