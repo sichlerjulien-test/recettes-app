@@ -125,3 +125,16 @@ jobs:
             exit 1
           fi
           echo "Schéma conforme au canonical"
+
+  read-contract-gate:
+    name: read-contract-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - name: Contrat de lecture ⊆ canonical.sql
+        run: npx tsx scripts/check-read-contract.ts

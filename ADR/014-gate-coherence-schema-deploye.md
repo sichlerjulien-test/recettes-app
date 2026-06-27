@@ -61,10 +61,11 @@ Ce qui a throw, c'est `requireExclusionsCompatibles` sur une ligne brute, pas Re
 (forme post-mapping, champs calculés inclus). Le contrat vérifié est la forme de ligne que
 le DAL attend AVANT mapping. Un naïf « introspecter RecetteSchema » serait faux.
 
-### 4 — Modèle A en bonus conditionnel, jamais en substitut
-Un job CI statique (contrat ⊆ canonical.sql) attrape une classe distincte — colonne requise
-sans migration — et n'est ajouté que s'il réutilise l'extraction du guard sans surcoût.
-Il ne dispense jamais de §1.
+### 4 — Modèle A livré, jamais substitut de §1
+Un job CI statique `read-contract-gate` (contrat ⊆ canonical.sql) attrape une classe distincte —
+colonne déclarée dans `read-contract.ts` mais absente de `schema/canonical.sql` (migration manquante).
+`scripts/check-read-contract.ts` parse les blocs `CREATE TABLE` du dump pg, exit 1 en nommant chaque
+colonne manquante. Livré dans le même PR que §1. Il ne dispense jamais de §1.
 
 ## Conséquences
 
