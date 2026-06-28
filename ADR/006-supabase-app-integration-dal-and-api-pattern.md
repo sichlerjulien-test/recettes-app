@@ -116,8 +116,10 @@ est temporairement indisponible, à réessayer), et c'est l'usage standard
 des outils de monitoring qui interrogent les health endpoints.
 
 Note : le `kind` côté API est distinct du `kind` interne des modules
-métier. La route fait le mapping (ex: LLMError.pool_empty
-→ business_error avec message adapté).
+métier. La route fait le mapping, mais sans tout aplatir : pool_empty est
+promu kind API de première classe (422, porte details.cause), distinct de
+business_error, car le client doit le discriminer et différencier le
+message allergène/exclusion.
 
 ### 6. Routes API au MVP de la Session
 

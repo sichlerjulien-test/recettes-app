@@ -60,7 +60,7 @@ const TEST_PARAMS = { params: Promise.resolve({ id: 'sejour-uuid-123' }) };
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-describe('POST /api/sejours/[id]/planning — pool_empty', () => {
+describe('POST /api/sejours/[id]/planning', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     process.env['ANTHROPIC_API_KEY'] = 'test-key';
@@ -70,31 +70,64 @@ describe('POST /api/sejours/[id]/planning — pool_empty', () => {
     vi.mocked(getAllRecettesAsMap).mockResolvedValue({ ok: true, recettes: new Map() });
   });
 
-  it('returns 422 pool_empty with cause=allergen when pool is empty due to allergens', async () => {
-    vi.mocked(generatePlanning).mockResolvedValue({
-      ok: false,
-      error: { kind: 'pool_empty', cause: 'allergen' },
+  // Contrat verrouillé : pool_empty est un kind API distinct (pas business_error)
+  // et porte details.cause — le client discrimine bannière/redirect et différencie
+  // le message allergène/exclusion selon cette valeur.
+  describe('pool_empty → 422', () => {
+    it('cause allergen : status 422, kind pool_empty, details.cause allergen, message allergène', async () => {
+      vi.mocked(generatePlanning).mockResolvedValue({
+        ok: false,
+        error: { kind: 'pool_empty', cause: 'allergen' },
+      });
+
+      const response = await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
+
+      expect(response.status).toBe(422);
+      const body = await response.json();
+      expect(body.error.kind).toBe('pool_empty');
+      expect(body.error.details.cause).toBe('allergen');
+      expect(body.error.message).toContain('allergi');
     });
 
-    const response = await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
+    it('cause exclusion : status 422, kind pool_empty, details.cause exclusion, message exclusion', async () => {
+      vi.mocked(generatePlanning).mockResolvedValue({
+        ok: false,
+        error: { kind: 'pool_empty', cause: 'exclusion' },
+      });
 
-    expect(response.status).toBe(422);
-    const body = await response.json();
-    expect(body.error.kind).toBe('pool_empty');
-    expect(body.error.details.cause).toBe('allergen');
+      const response = await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
+
+      expect(response.status).toBe(422);
+      const body = await response.json();
+      expect(body.error.kind).toBe('pool_empty');
+      expect(body.error.details.cause).toBe('exclusion');
+      expect(body.error.message).toContain('exclusion');
+    });
   });
 
-  it('returns 422 pool_empty with cause=exclusion when pool is empty due to exclusions', async () => {
+  it('validation_failed_after_retries → 422 business_error', async () => {
     vi.mocked(generatePlanning).mockResolvedValue({
       ok: false,
-      error: { kind: 'pool_empty', cause: 'exclusion' },
+      error: { kind: 'validation_failed_after_retries', lastViolations: [] },
     });
 
     const response = await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
 
     expect(response.status).toBe(422);
     const body = await response.json();
-    expect(body.error.kind).toBe('pool_empty');
-    expect(body.error.details.cause).toBe('exclusion');
+    expect(body.error.kind).toBe('business_error');
+  });
+
+  it('llm_unavailable → 503 llm_unavailable', async () => {
+    vi.mocked(generatePlanning).mockResolvedValue({
+      ok: false,
+      error: { kind: 'llm_unavailable', cause: 'timeout' },
+    });
+
+    const response = await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
+
+    expect(response.status).toBe(503);
+    const body = await response.json();
+    expect(body.error.kind).toBe('llm_unavailable');
   });
 });
