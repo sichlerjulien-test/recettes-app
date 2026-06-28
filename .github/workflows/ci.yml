@@ -149,8 +149,8 @@ jobs:
           node-version: '24'
           cache: 'npm'
       - run: npm ci
-      - name: Accès DAL ⊆ READ_CONTRACT (TK-32)
-        run: npx tsx scripts/check-dal-read-contract.ts
+      - name: DAL reads ⊆ READ_CONTRACT (ADR-016)
+        run: npx tsx scripts/check-dal-reads.ts
 
   enum-check-gate:
     name: enum-check-gate
@@ -164,16 +164,3 @@ jobs:
       - run: npm ci
       - name: Enum Zod ⊆⊇ CHECK SQL membership (ADR-015)
         run: npx tsx scripts/check-enum-checks.ts
-
-  dal-reads-gate:
-    name: dal-reads-gate
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-          cache: 'npm'
-      - run: npm ci
-      - name: DAL reads ⊆ READ_CONTRACT (TK-33)
-        run: npx tsx scripts/check-dal-reads.ts

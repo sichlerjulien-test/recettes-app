@@ -227,8 +227,6 @@ Aucune règle formelle ne définit si/comment le numéro de ticket doit apparaî
 
 > **Préalable au gate backlog v2.** À trancher en session dédiée, avant tout ticket d'exécution qui ajouterait une règle dépendante.
 
-**TK-34 · S** — Unifier `check-dal-read-contract` (précis fonction→table) et `check-dal-reads` (large, tous accès + plannings.ts) en un seul checker AST précis-en-fonction/large-hors-fonction — fork tranché, voir ADR-016.
-
 ---
 
 ## V2 — Hors MVP (noté pour mémoire)
@@ -291,6 +289,6 @@ avec un trou.
 | TK-31 | Convention TK-XX commits (mini-ADR) | P2 | S | À faire |
 | TK-32 | Garde read-contract.ts ↔ selects DAL réels | P2 | S | Fait |
 | TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
-| TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | À faire |
+| TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 
 **Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → dette data/DAL (TK-09, TK-10, TK-12, TK-20) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28).
