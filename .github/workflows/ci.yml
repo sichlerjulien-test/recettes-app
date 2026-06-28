@@ -139,6 +139,19 @@ jobs:
       - name: Contrat de lecture ⊆ canonical.sql
         run: npx tsx scripts/check-read-contract.ts
 
+  dal-read-contract-gate:
+    name: dal-read-contract-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - name: Accès DAL ⊆ READ_CONTRACT (TK-32)
+        run: npx tsx scripts/check-dal-read-contract.ts
+
   enum-check-gate:
     name: enum-check-gate
     runs-on: ubuntu-latest

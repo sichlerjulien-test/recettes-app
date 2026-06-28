@@ -20,6 +20,6 @@ export const READ_CONTRACT: Record<string, readonly string[]> = {
   plannings: ['id', 'sejour_id', 'entries', 'genere_le', 'contraintes_utilisees'],
   ingredients: [
     'id', 'nom_singulier', 'nom_pluriel', 'categorie', 'unite_base', 'unite_achat',
-    'conversion', 'allergenes', 'contient_trace', 'substituts', 'saisonnalite',
+    'conversion', 'allergenes', 'contient_trace', 'substituts', 'saisonnalite', 'notes',
   ],
 };
