@@ -1,12 +1,5 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-
-// jsdom n'implémente pas ResizeObserver (utilisé par @radix-ui/react-use-size)
-global.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
 import { EditSejourClient } from '@/app/sejour/[id]/edit/_components/EditSejourClient'
 import type { Sejour } from '@/lib/types/domain'
