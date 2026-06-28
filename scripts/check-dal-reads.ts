@@ -1,7 +1,10 @@
 /**
- * Vérifie que chaque colonne lue via bracket notation dans les fonctions de
- * mapping DAL est déclarée dans READ_CONTRACT.
- * Gate CI statique : DAL reads ⊆ READ_CONTRACT (complément de check-read-contract.ts).
+ * Gate CI unifié DAL reads ⊆ READ_CONTRACT (ADR-016 — TK-34).
+ *
+ * Deux branches de vérification :
+ *  - Précise : accès dans une fonction de mapping connue (FUNCTION_TO_TABLE)
+ *    → contrôle contre la table dédiée de cette fonction.
+ *  - Large : accès hors fonction connue → contrôle contre l'union des tables du fichier.
  *
  * Usage : npx tsx scripts/check-dal-reads.ts
  * Exit 0 = OK, exit 1 = dérives (listées sur stderr avec fichier + numéro de ligne).
@@ -12,6 +15,14 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { READ_CONTRACT } from '../src/lib/db/read-contract';
+
+// Attribution fonction → table (surface maintenue manuellement — ADR-016).
+export const FUNCTION_TO_TABLE: Record<string, string> = {
+  mapRecetteRow: 'recettes',
+  mapRecetteIngredientRow: 'recette_ingredients',
+  byPosition: 'recette_ingredients',
+  mapIngredientRow: 'ingredients',
+};
 
 // Fichiers DAL à analyser, groupés par table couverte dans READ_CONTRACT.
 // sejours.ts exclu : la table sejours n'est pas (encore) dans READ_CONTRACT.
@@ -31,11 +42,12 @@ export interface DriftEntry {
 /**
  * Extrait tous les accès par bracket notation avec un string literal
  * (ex. `row['colname']`) depuis le source TypeScript fourni.
+ * Inclut le nom de la FunctionDeclaration englobante la plus proche (ou null).
  */
 export function extractBracketAccesses(
   source: string,
   filename = 'input.ts',
-): { column: string; line: number }[] {
+): { column: string; line: number; enclosingFn: string | null }[] {
   const sourceFile = ts.createSourceFile(
     filename,
     source,
@@ -43,7 +55,18 @@ export function extractBracketAccesses(
     /* setParentNodes */ true,
   );
 
-  const result: { column: string; line: number }[] = [];
+  const result: { column: string; line: number; enclosingFn: string | null }[] = [];
+
+  function getEnclosingFnName(node: ts.Node): string | null {
+    let current: ts.Node = node.parent;
+    while (current) {
+      if (ts.isFunctionDeclaration(current) && current.name) {
+        return current.name.text;
+      }
+      current = current.parent;
+    }
+    return null;
+  }
 
   function visit(node: ts.Node): void {
     if (
@@ -52,7 +75,8 @@ export function extractBracketAccesses(
     ) {
       const column = node.argumentExpression.text;
       const line = sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1;
-      result.push({ column, line });
+      const enclosingFn = getEnclosingFnName(node);
+      result.push({ column, line, enclosingFn });
     }
     ts.forEachChild(node, visit);
   }
@@ -63,17 +87,17 @@ export function extractBracketAccesses(
 
 /**
  * Pour chaque fichier dans fileContents, extrait les bracket accesses et
- * détecte ceux qui ne figurent pas dans READ_CONTRACT pour les tables
- * couvertes par ce fichier.
+ * détecte les dérives par rapport à READ_CONTRACT.
  *
- * Règle de skip : si la clé d'accès est elle-même un nom de table dans
- * readContract (ex. row['recette_ingredients']), c'est un résultat de join —
- * pas une colonne scalaire — et on l'ignore.
+ * Règle de skip : clé == nom de table dans readContract → résultat de join, ignoré.
+ * Branche précise : accès dans une fonction de functionToTable → contrôle sa table dédiée.
+ * Branche large : accès hors fonction connue → contrôle l'union des tables du fichier.
  */
 export function findDriftedReads(
   fileContents: Map<string, string>,
   dalFilesByTable: Record<string, string[]>,
   readContract: Record<string, readonly string[]>,
+  functionToTable: Record<string, string> = FUNCTION_TO_TABLE,
 ): DriftEntry[] {
   const tableNames = new Set(Object.keys(readContract));
 
@@ -91,14 +115,26 @@ export function findDriftedReads(
   const drifts: DriftEntry[] = [];
 
   for (const [file, content] of fileContents) {
-    const allowed = allowedByFile.get(file);
-    if (allowed === undefined) continue; // fichier hors périmètre → ignoré
+    if (!allowedByFile.has(file)) continue; // fichier hors périmètre → ignoré
 
     const accesses = extractBracketAccesses(content, file);
-    for (const { column, line } of accesses) {
+    for (const { column, line, enclosingFn } of accesses) {
       if (tableNames.has(column)) continue; // résultat de join → skip
-      if (!allowed.has(column)) {
-        drifts.push({ file, column, line });
+
+      const table = enclosingFn !== null ? functionToTable[enclosingFn] : undefined;
+
+      if (table !== undefined) {
+        // Branche précise : contrôle la table dédiée de la fonction
+        const contractCols = new Set(readContract[table] ?? []);
+        if (!contractCols.has(column)) {
+          drifts.push({ file, column, line });
+        }
+      } else {
+        // Branche large : union des tables du fichier
+        const allowed = allowedByFile.get(file)!;
+        if (!allowed.has(column)) {
+          drifts.push({ file, column, line });
+        }
       }
     }
   }
