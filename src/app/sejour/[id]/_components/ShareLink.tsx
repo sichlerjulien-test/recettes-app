@@ -6,22 +6,13 @@ import { toast } from "sonner";
 import { Copy, Check } from "lucide-react";
 
 interface Props {
-  sejourId: string;
-  token: string;
+  url: string;
 }
 
-export function ShareLink({ sejourId, token }: Props) {
+export function ShareLink({ url }: Props) {
   const [copied, setCopied] = useState(false);
 
-  function buildAbsoluteUrl(): string {
-    if (typeof window === "undefined") {
-      return `/sejour/${sejourId}?t=${token}`;
-    }
-    return `${window.location.origin}/sejour/${sejourId}?t=${token}`;
-  }
-
   async function handleCopy() {
-    const url = buildAbsoluteUrl();
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -32,12 +23,10 @@ export function ShareLink({ sejourId, token }: Props) {
     }
   }
 
-  const displayUrl = buildAbsoluteUrl();
-
   return (
     <div className="flex items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2">
       <code className="flex-1 truncate text-sm font-mono text-muted-foreground">
-        {displayUrl}
+        {url}
       </code>
       <Button
         type="button"

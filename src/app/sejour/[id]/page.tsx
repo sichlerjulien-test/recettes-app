@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SejourContent } from "./_components/SejourContent";
 import { ShareLink } from "./_components/ShareLink";
+import { getSiteUrl } from "@/lib/url";
 
 export default async function SejourPage({
   params,
@@ -70,6 +71,7 @@ export default async function SejourPage({
   }
 
   const initialPlanning = planningResult.ok ? planningResult.planning : null;
+  const shareUrl = `${await getSiteUrl()}/sejour/${id}?t=${token}`;
 
   return (
     <main className="container max-w-2xl mx-auto p-6 space-y-8">
@@ -108,7 +110,7 @@ export default async function SejourPage({
             consulter le séjour.
           </p>
         </div>
-        <ShareLink sejourId={id} token={token} />
+        <ShareLink url={shareUrl} />
       </section>
     </main>
   );
