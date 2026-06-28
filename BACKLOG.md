@@ -56,27 +56,35 @@ Sous-tâches :
 
 **Critères :** le flow de re-génération TK-03 couvert end-to-end ; mapping pool_empty→422 testé.
 
-### TK-20 — Raffiner la taxonomie des ingrédients (garde déterministe porc/viande-rouge/alcool)  ·  M
-**Origine :** ADR-011 §9 · trou résiduel documenté en Phase 2B.
+### TK-20 — [DORMANT] Réouverture conditionnelle du garde catégorie porc/viande-rouge/alcool
+**Origine :** ADR-011 §9 (amendé 2026-06-11). Requalifié de tâche en déclencheur de réouverture.
 
-La catégorie `viandes-poissons` est trop grossière pour distinguer porc, viande rouge, poisson
-et fruits de mer. Résultat : les tags `sans-porc`, `sans-viande-rouge` et `sans-alcool` ne peuvent
-pas être vérifiés automatiquement au build (contrairement à `sans-poisson`/`sans-fruits-de-mer`
-qui s'appuient sur les allergènes EU14). La qualification actuelle est manuelle, gardée par
-allergen-guard sur `data/ingredients/`.
+NE PART PAS EN EXÉCUTION en l'état. L'approche que ce ticket décrivait — scinder
+`viandes-poissons` + garde déterministe grade-allergène sur `sans-porc`/`sans-viande-rouge`/
+`sans-alcool` — a été explicitement REJETÉE par ADR-011 §9, pour deux raisons :
+  1. Blast radius : scinder la catégorie touche le calcul végé/vegan qui lit la catégorie
+     coarse (logique déjà extraite et testée).
+  2. Sur-calibrage de sévérité : imposer une garantie grade-allergène à une exclusion dont
+     l'erreur gâche un repas (pas l'hôpital) = la confusion de catégories qu'ADR-001 interdit,
+     en sens inverse.
 
-Sous-tâches :
-- Trancher le découpage : scinder `viandes-poissons` (ex. `viandes-rouges`, `viandes-blanches`,
-  `charcuterie`, `poissons-fruits-de-mer`) et ajouter une catégorie `alcool`.
-- Mettre à jour `IngredientCategorySchema` et la migration SQL (touche le CHECK initial).
-- Étendre `ingredient-exclusion-completeness.ts` pour vérifier `sans-porc` et `sans-viande-rouge`
-  depuis les nouvelles catégories.
-- Test discriminant obligatoire : un lardon sans `sans-porc` DOIT faire échouer le build.
+Déjà livré à la place (régime 2, « curation tracée », enforced en CI) : `TRIAGE_PORC` /
+`TRIAGE_VIANDE_ROUGE` / `TRIAGE_ALCOOL` dans `scripts/ingredient-exclusion-completeness.ts`,
+tests discriminants, invariant croisé tag→catégorie. Le « enforced au build » est donc déjà
+acquis ; seul le « sans qualification manuelle » est délibérément non fait.
 
-**Critères :** les tags `sans-porc`, `sans-viande-rouge`, `sans-alcool` sont enforced au build,
-sans qualification manuelle nécessaire. Cousin de TK-13 (Trou A SQL/Zod).
+**Seuils de réouverture (un seul suffit) :**
+  - le catalogue grossit au point que la curation manuelle n'est plus fiable, OU
+  - une erreur d'exclusion non-allergène atteint un utilisateur en conditions réelles.
 
-> À séquencer après TK-05 Phase 2C (UI). Touche `IngredientCategorySchema` → passe architect.
+Tant qu'aucun seuil n'est franchi (état actuel : ~11 ingrédients triés, zéro signalement
+terrain), la curation tracée tient et il n'y a rien à exécuter. Si un seuil tombe : rouvrir
+ADR-011 §9 avec la donnée, ne pas pousser ce ticket tel quel.
+
+**Résidu connexe, hors TK-20 :** limite volaille (un poulet mal catégorisé reste à tort
+végétarien sans déclencher l'invariant croisé). Fix candidat documenté : champ
+`nature: animal|vegetal`. Choix structurant → architect + amendement ADR avant tout cadrage.
+Risque de cohérence végé (gâche un repas), pas de sûreté allergène. Faible priorité.
 
 
 ### TK-15 — Baseline de schéma DB + source de vérité unique  ·  M
@@ -267,7 +275,7 @@ avec un trou.
 | TK-16 | Gate déploiement : schéma DB ↔ code | P2 | M | Fait |
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
 | TK-18 | Bug hydratation ShareLink | P2 | S | Fait |
-| TK-20 | Raffiner taxonomie ingrédients (garde déterministe porc/viande-rouge/alcool) | P2 | M | À faire |
+| TK-20 | [DORMANT] Réouverture conditionnelle garde porc/viande-rouge/alcool | P2 | — | Dormant |
 | TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | À faire |
 | TK-22 | Nettoyage zombies vocabulaire DietaryRestrictionSchema / REGIME_LABELS | P2 | S | À faire |
 | TK-23 | Map non sérialisable RSC→Client | P2 | S | À faire |
@@ -282,4 +290,4 @@ avec un trou.
 | TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
 | TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 
-**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → dette data/DAL (TK-09, TK-10, TK-12, TK-20) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28).
+**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → dette data/DAL (TK-09, TK-10, TK-12) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
