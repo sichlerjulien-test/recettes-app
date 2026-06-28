@@ -118,15 +118,6 @@ Sous-tâches :
 
 **Critères :** aucun ingrédient/recette hors-YAML ne subsiste après seed, ou détection explicite. Priorité basse, candidat V2.
 
-### TK-18 — Bug d'hydratation ShareLink (URL relative SSR vs absolue client)  ·  S
-**Origine :** repéré pendant le debug de l'incident shopping-list.
-
-`ShareLink.tsx:39` — `displayUrl` calculé via `window.location.origin`, indisponible au SSR. Le serveur rend le chemin relatif, le client l'URL absolue → mismatch d'hydratation. React régénère côté client, mais le warning est réel et l'URL de partage peut flasher en relatif. Or c'est LE mécanisme de partage du produit (CLAUDE_PROJECT.md §5), pas un détail.
-
-Sous-tâches :
-- Rendre l'origin déterministe des deux côtés via `NEXT_PUBLIC_SITE_URL` (SSR et client rendent la même URL absolue), plutôt qu'un calcul client-only avec flash.
-
-**Critères :** pas de mismatch d'hydratation sur `/sejour` ; URL de partage absolue, identique SSR et client.
 
 ### TK-21 — Violations séparées post-retry : allergènes ≠ exclusions  ·  S
 **Origine :** revue TK-05 2C (architect/qa-engineer), ADR-011 §7.
@@ -275,7 +266,7 @@ avec un trou.
 | TK-15 | Baseline schéma DB + source de vérité | P2 | M | Fait |
 | TK-16 | Gate déploiement : schéma DB ↔ code | P2 | M | Fait |
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
-| TK-18 | Bug hydratation ShareLink | P2 | S | À faire |
+| TK-18 | Bug hydratation ShareLink | P2 | S | Fait |
 | TK-20 | Raffiner taxonomie ingrédients (garde déterministe porc/viande-rouge/alcool) | P2 | M | À faire |
 | TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | À faire |
 | TK-22 | Nettoyage zombies vocabulaire DietaryRestrictionSchema / REGIME_LABELS | P2 | S | À faire |
