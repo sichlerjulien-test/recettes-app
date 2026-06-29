@@ -8,23 +8,13 @@
 
 ## P2 — Dette interne (invisible utilisateur)
 
-### TK-09 — Nettoyage DAL sejours : double SELECT + Zod-first  ·  M
-**Origine :** double SELECT (Claude Code, TK-03) + violation ADR-002 sur SejourDALInput (architect, TK-03).
-
-Deux dettes DAL sur la même fonction, traitées en une passe.
-- Double SELECT : le PATCH vérifie le token via getSejourById, puis updateSejour re-fetch.
-- SejourDALInput défini à la main (sejours.ts:8-14), viole ADR-002 (Zod-first). Diverge déjà
-  de CreateSejourBodySchema sur `nom`. TK-03 a ajouté un 2e consommateur sans corriger la source.
-
-Sous-tâches :
-- updateSejour ne re-fetch plus (passer le séjour, ou retirer le SELECT interne).
-- SejourDALInputSchema = CreateSejourBodySchema.omit({participants:true}).extend({nom: z.string()})
-  → z.infer. Supprimer le type manuel.
-- Adapter signature + appelants (createSejour, updateSejour) + tests.
-
-**Critères :** un PATCH = un seul SELECT. SejourDALInput inféré d'un schéma Zod. Tests verts.
-
-> À faire avant tout 3e consommateur du DAL sejours.
+### TK-09b — [DORMANT] Double SELECT PATCH sejour
+Redondance lecture sur PATCH (route getSejourById + SELECT interne updateSejour,
+load-bearing : RPC update_sejour_with_participants retourne void, UUIDs participants
+post-INSERT). Tout fix propre = RPC en RETURNING (migration ≥011 + canonical.sql).
+Coût > bénéfice tant que le PATCH reste froid.
+Réouverture (un seul suffit) : l'update RPC est de toute façon retouchée par un
+chantier voisin (candidat : TK-10), OU le PATCH devient un hot path.
 
 ### TK-10 — createSejour atomique via RPC  ·  M
 **Origine :** architect (TK-03) + TODO inline sejours.ts:145-147 sorti du code.
@@ -43,7 +33,8 @@ Sous-tâches :
 
 
 
-### TK-12 — Tests d'intégration TK-03  ·  M
+### TK-12 — Tests d'intégration TK-03  ·  M  ✅ Livré
+
 **Origine :** allergen-guard + qa (TK-03), lacunes de couverture.
 
 - pool_empty : aucun test ne lie {ok:false, kind:'pool_empty'} au HTTP 422 retourné au client.
@@ -51,8 +42,8 @@ Sous-tâches :
   de TK-03 n'a pas de test d'intégration.
 
 Sous-tâches :
-- Test route : pool_empty → 422.
-- E2E Playwright : Sarah ajoute un participant, régénère, planning cohérent et sûr.
+- ~~Test route : pool_empty → 422.~~ (TK-12a — #47, #50)
+- ~~E2E Playwright : Sarah ajoute un participant, régénère, planning cohérent et sûr.~~ (TK-12b — #49 + tk-12b-route ; ADR-017 : frontière LLM hors E2E → remplacé par RTL + test route)
 
 **Critères :** le flow de re-génération TK-03 couvert end-to-end ; mapping pool_empty→422 testé.
 
@@ -266,9 +257,9 @@ avec un trou.
 | Ticket | Titre | Priorité | Effort | Statut |
 |--------|-------|----------|--------|--------|
 | TK-08 | Réutilisation ingrédients | V2 | — | À faire |
-| TK-09 | Nettoyage DAL sejours | P2 | M | À faire |
+| TK-09b | [DORMANT] Double SELECT PATCH sejour | P2 | — | Dormant |
 | TK-10 | createSejour atomique via RPC | P2 | M | À faire |
-| TK-12 | Tests d'intégration TK-03 | P2 | M | À faire |
+| TK-12 | Tests d'intégration TK-03 | P2 | M | Fait |
 | TK-13 | Source unique enums SQL + Zod (Trou A) | P2 | S | Fait |
 | TK-14 | Règles de cohérence sémantiques restantes | V2 | — | À faire |
 | TK-15 | Baseline schéma DB + source de vérité | P2 | M | Fait |
@@ -290,4 +281,4 @@ avec un trou.
 | TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
 | TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 
-**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → dette data/DAL (TK-09, TK-10, TK-12) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
+**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → dette data/DAL (TK-10) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
