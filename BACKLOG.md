@@ -193,6 +193,32 @@ Aucune règle formelle ne définit si/comment le numéro de ticket doit apparaî
 
 > **Préalable au gate backlog v2.** À trancher en session dédiée, avant tout ticket d'exécution qui ajouterait une règle dépendante.
 
+### TK-35 — [DORMANT] canonical.sql : génération pg_dump déterministe cross-machine
+**Origine :** clôture TK-10. schema-replay rouge sur PR #54, cause non traitée.
+
+`schema/canonical.sql` est un `pg_dump` brut (ADR-013 §3). Sa forme dépend de la version de
+pg_dump qui le génère : Homebrew/Mac trie les fonctions par OID de création + 2 lignes vides
+avant `ALTER FUNCTION` (CREATE OR REPLACE sans DROP) ; Ubuntu/pgdg (la CI) trie
+alphabétiquement + 1 ligne vide. Le replay CI diff contre canonical → rouge purement
+cosmétique, sans rapport avec le schéma. En TK-10, régénéré à la main pour matcher la CI.
+La cause demeure : le prochain dump depuis un Mac reproduit l'écart.
+
+Décision active : on absorbe à la main (solo, mono-machine — douleur latente, pas active).
+Choix explicite, PAS un oubli.
+
+NE PART PAS EN EXÉCUTION en l'état — porte un fork structurant à trancher avant cadrage :
+  - Normaliser le dump (tri + whitespace avant diff) redéfinit ce que canonical.sql EST :
+    il cesse d'être un pg_dump brut → amendement ADR-013 §3 (on touche l'oracle de diff).
+  - Figer la version pg_dump (conteneur de génération) ne touche pas l'oracle, contraint sa
+    production (tout contributeur génère via le conteneur) → conséquence opérationnelle.
+Les deux voies divergent sur ce qu'on sanctuarise → architect + ADR (vraisemblablement
+amendement ADR-013), pas un choix d'exécutant. Penchant courant : conteneur > normalisation
+(ne pas glisser une couche de traitement entre la réalité et l'oracle qui a fermé l'incident
+500).
+
+Réouverture (un seul suffit) : 2e contributeur sur OS différent · changement de ta machine
+ou de version pg_dump locale · prochaine divergence replay non liée au schéma réel.
+
 ---
 
 ## V2 — Hors MVP (noté pour mémoire)
@@ -254,5 +280,6 @@ avec un trou.
 | TK-32 | Garde read-contract.ts ↔ selects DAL réels | P2 | S | Fait |
 | TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
 | TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
+| TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
 
 **Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
