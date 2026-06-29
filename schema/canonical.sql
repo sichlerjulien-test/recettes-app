@@ -32,21 +32,6 @@ ALTER SCHEMA public OWNER TO pg_database_owner;
 COMMENT ON SCHEMA public IS 'standard public schema';
 
 --
--- Name: set_updated_at(); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION public.set_updated_at() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-  NEW.updated_at = now();
-  RETURN NEW;
-END;
-$$;
-
-ALTER FUNCTION public.set_updated_at() OWNER TO postgres;
-
---
 -- Name: create_sejour_with_participants(text, text, date, integer, jsonb, jsonb, jsonb); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
@@ -99,7 +84,24 @@ BEGIN
 END;
 $$;
 
+
 ALTER FUNCTION public.create_sejour_with_participants(p_token text, p_nom text, p_date_debut date, p_nb_jours integer, p_repartition_repas jsonb, p_parametres jsonb, p_participants jsonb) OWNER TO postgres;
+
+--
+-- Name: set_updated_at(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.set_updated_at() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.set_updated_at() OWNER TO postgres;
 
 --
 -- Name: update_sejour_with_participants(uuid, text, date, integer, jsonb, jsonb, jsonb); Type: FUNCTION; Schema: public; Owner: postgres
