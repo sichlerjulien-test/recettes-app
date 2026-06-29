@@ -8,30 +8,6 @@
 
 ## P2 — Dette interne (invisible utilisateur)
 
-### TK-09b — [DORMANT] Double SELECT PATCH sejour
-Redondance lecture sur PATCH (route getSejourById + SELECT interne updateSejour,
-load-bearing : RPC update_sejour_with_participants retourne void, UUIDs participants
-post-INSERT). Tout fix propre = RPC en RETURNING (migration ≥011 + canonical.sql).
-Coût > bénéfice tant que le PATCH reste froid.
-Réouverture (un seul suffit) : l'update RPC est de toute façon retouchée par un
-chantier voisin (candidat : TK-10), OU le PATCH devient un hot path.
-
-### TK-10 — createSejour atomique via RPC  ·  M
-**Origine :** architect (TK-03) + TODO inline sejours.ts:145-147 sorti du code.
-
-createSejour fait une écriture multi-étapes non-atomique. updateSejour (TK-03) a établi le
-pattern RPC transactionnel. Aligner createSejour pour tuer le risque de séjour partiellement créé.
-
-Sous-tâches :
-- Migration RPC create_sejour transactionnelle (sur le modèle de update_sejour).
-- Refactor createSejour, supprimer le TODO inline.
-- Tests succès + erreur.
-
-**Critères :** une création échouée en cours de route ne laisse aucun enregistrement orphelin.
-
-> Dépend de l'amendement d'ADR-006 (pattern RPC) fait en amont.
-
-
 
 ### TK-12 — Tests d'intégration TK-03  ·  M  ✅ Livré
 
@@ -257,8 +233,6 @@ avec un trou.
 | Ticket | Titre | Priorité | Effort | Statut |
 |--------|-------|----------|--------|--------|
 | TK-08 | Réutilisation ingrédients | V2 | — | À faire |
-| TK-09b | [DORMANT] Double SELECT PATCH sejour | P2 | — | Dormant |
-| TK-10 | createSejour atomique via RPC | P2 | M | À faire |
 | TK-12 | Tests d'intégration TK-03 | P2 | M | Fait |
 | TK-13 | Source unique enums SQL + Zod (Trou A) | P2 | S | Fait |
 | TK-14 | Règles de cohérence sémantiques restantes | V2 | — | À faire |
@@ -281,4 +255,4 @@ avec un trou.
 | TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
 | TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 
-**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → dette data/DAL (TK-10) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
+**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
