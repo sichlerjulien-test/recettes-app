@@ -36,18 +36,20 @@ function createMockSupabase(
   const rpcSpy = vi.fn((_name: string, _args?: unknown) =>
     Promise.resolve(rpcQueueCopy.shift() ?? { data: null, error: null }),
   );
+  const fromSpy = vi.fn((table: string) => {
+    const queue = tableQueues[table] ?? [];
+    const next = queue.shift() ?? { data: null, error: null };
+    return makeChain(Promise.resolve(next));
+  });
   return {
-    from: (table: string) => {
-      const queue = tableQueues[table] ?? [];
-      const next = queue.shift() ?? { data: null, error: null };
-      return makeChain(Promise.resolve(next));
-    },
+    from: fromSpy,
     rpc: rpcSpy,
     _rpcSpy: rpcSpy,
+    _fromSpy: fromSpy,
   };
 }
 
-// cast nécessaire : mock partiel inclut _rpcSpy (spy de test) absent de l'interface Supabase
+// cast nécessaire : mock partiel inclut _rpcSpy/_fromSpy (spies de test) absents de l'interface Supabase
 function asMockClient(
   m: ReturnType<typeof createMockSupabase>,
 ): ReturnType<typeof getSupabaseClient> {
@@ -113,16 +115,9 @@ describe('sejours DAL', () => {
   });
 
   describe('createSejour', () => {
-    it('should return ok with sejour when DB inserts succeed', async () => {
-      vi.mocked(getSupabaseClient).mockReturnValue(
-        asMockClient(createMockSupabase({
-          sejours: [
-            { data: { id: 'sejour-uuid-123' }, error: null },
-            { data: SEJOUR_DB_ROW, error: null },
-          ],
-          participants: [{ data: null, error: null }],
-        })),
-      );
+    it('rpc 1× → séjour mappé, aucun SELECT post-create', async () => {
+      const mock = createMockSupabase({}, [{ data: SEJOUR_DB_ROW, error: null }]);
+      vi.mocked(getSupabaseClient).mockReturnValue(asMockClient(mock));
 
       const result = await createSejour(SEJOUR_INPUT, [PARTICIPANT_INPUT]);
 
@@ -131,14 +126,22 @@ describe('sejours DAL', () => {
         expect(result.sejour.nom).toBe('Séjour test');
         expect(result.sejour.nb_jours).toBe(3);
       }
+      expect(mock._rpcSpy).toHaveBeenCalledOnce();
+      expect(mock._fromSpy).not.toHaveBeenCalled();
+      expect(mock._rpcSpy).toHaveBeenCalledWith(
+        'create_sejour_with_participants',
+        expect.objectContaining({
+          p_nom: SEJOUR_INPUT.nom,
+          p_nb_jours: SEJOUR_INPUT.nb_jours,
+          p_repartition_repas: SEJOUR_INPUT.repartition_repas,
+          p_parametres: SEJOUR_INPUT.parametres,
+        }),
+      );
     });
 
-    it('should return query_failed when sejour insert errors', async () => {
-      vi.mocked(getSupabaseClient).mockReturnValue(
-        asMockClient(createMockSupabase({
-          sejours: [{ data: null, error: { message: 'DB connection failed' } }],
-        })),
-      );
+    it('rpc error → ok:false query_failed (zéro orphelin — atomicité RPC)', async () => {
+      const mock = createMockSupabase({}, [{ data: null, error: { message: 'DB connection failed' } }]);
+      vi.mocked(getSupabaseClient).mockReturnValue(asMockClient(mock));
 
       const result = await createSejour(SEJOUR_INPUT, [PARTICIPANT_INPUT]);
 
@@ -151,43 +154,20 @@ describe('sejours DAL', () => {
       }
     });
 
-    it('should return query_failed when participants insert errors (sejour persisted — known transactional risk)', async () => {
-      vi.mocked(getSupabaseClient).mockReturnValue(
-        asMockClient(createMockSupabase({
-          sejours: [{ data: { id: 'sejour-uuid-123' }, error: null }],
-          participants: [{ data: null, error: { message: 'Participants insert failed' } }],
-        })),
-      );
+    it('génère un token UUID v4 non-vide passé à la RPC', async () => {
+      let capturedToken: string | undefined;
+      const mock = createMockSupabase({}, [{ data: SEJOUR_DB_ROW, error: null }]);
+      vi.mocked(getSupabaseClient).mockReturnValue(asMockClient(mock));
+      mock._rpcSpy.mockImplementation((_name: string, args: unknown) => {
+        capturedToken = (args as Record<string, unknown>)['p_token'] as string;
+        return Promise.resolve({ data: SEJOUR_DB_ROW, error: null });
+      });
 
-      const result = await createSejour(SEJOUR_INPUT, [PARTICIPANT_INPUT]);
+      await createSejour(SEJOUR_INPUT, []);
 
-      expect(result.ok).toBe(false);
-      if (!result.ok) {
-        expect(result.error.kind).toBe('query_failed');
-        if (result.error.kind === 'query_failed') {
-          expect(result.error.cause).toBe('Participants insert failed');
-        }
-      }
-    });
-
-    it('should generate a UUID token via crypto.randomUUID (token non-empty and matches UUID v4 pattern)', async () => {
-      vi.mocked(getSupabaseClient).mockReturnValue(
-        asMockClient(createMockSupabase({
-          sejours: [
-            { data: { id: 'sejour-uuid-123' }, error: null },
-            { data: SEJOUR_DB_ROW, error: null },
-          ],
-        })),
-      );
-
-      const result = await createSejour(SEJOUR_INPUT, []);
-
-      expect(result.ok).toBe(true);
-      if (result.ok) {
-        const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        expect(result.sejour.token).toBeTruthy();
-        expect(result.sejour.token).toMatch(UUID_V4_REGEX);
-      }
+      const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      expect(capturedToken).toBeTruthy();
+      expect(capturedToken).toMatch(UUID_V4_REGEX);
     });
   });
 
@@ -279,14 +259,9 @@ describe('sejours DAL', () => {
   });
 
   describe('updateSejour', () => {
-    it('should call rpc with correct payload and return ok when rpc succeeds', async () => {
-      const mock = createMockSupabase(
-        { sejours: [{ data: SEJOUR_DB_ROW, error: null }] },
-        [{ data: null, error: null }],
-      );
-      vi.mocked(getSupabaseClient).mockReturnValue(
-        asMockClient(mock),
-      );
+    it('rpc 1× → séjour mappé, aucun SELECT post-update', async () => {
+      const mock = createMockSupabase({}, [{ data: SEJOUR_DB_ROW, error: null }]);
+      vi.mocked(getSupabaseClient).mockReturnValue(asMockClient(mock));
 
       const result = await updateSejour('sejour-uuid-123', SEJOUR_INPUT, [PARTICIPANT_INPUT]);
 
@@ -296,6 +271,7 @@ describe('sejours DAL', () => {
         expect(result.sejour.nb_jours).toBe(3);
       }
       expect(mock._rpcSpy).toHaveBeenCalledOnce();
+      expect(mock._fromSpy).not.toHaveBeenCalled();
       expect(mock._rpcSpy).toHaveBeenCalledWith(
         'update_sejour_with_participants',
         expect.objectContaining({
@@ -308,14 +284,9 @@ describe('sejours DAL', () => {
       );
     });
 
-    it('should return query_failed when rpc returns an error — no partial success assumed', async () => {
-      const mock = createMockSupabase(
-        {},
-        [{ data: null, error: { message: 'RPC procedure failed' } }],
-      );
-      vi.mocked(getSupabaseClient).mockReturnValue(
-        asMockClient(mock),
-      );
+    it('rpc error → ok:false query_failed — aucune mutation partielle assumée', async () => {
+      const mock = createMockSupabase({}, [{ data: null, error: { message: 'RPC procedure failed' } }]);
+      vi.mocked(getSupabaseClient).mockReturnValue(asMockClient(mock));
 
       const result = await updateSejour('sejour-uuid-123', SEJOUR_INPUT, [PARTICIPANT_INPUT]);
 
