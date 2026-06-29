@@ -1,17 +1,15 @@
 import 'server-only';
+import { z } from 'zod';
 import { randomUUID } from 'node:crypto';
 import { getSupabaseClient } from './supabase';
-import { SejourSchema } from '../types/schemas';
-import type { Sejour, Participant, SejourParametres } from '../types/domain';
-import type { DbError } from '../types/domain';
+import { SejourSchema, CreateSejourBodySchema } from '../types/schemas';
+import type { Sejour, Participant, DbError } from '../types/domain';
 
-export type SejourDALInput = {
-  nom: string;
-  date_debut?: string;
-  nb_jours: number;
-  repartition_repas: { premier_repas: 'matin' | 'midi' | 'soir'; midis: number; soirs: number; brunchs: number };
-  parametres: SejourParametres;
-};
+export const SejourDALInputSchema = CreateSejourBodySchema
+  .omit({ participants: true })
+  .extend({ nom: z.string() });
+
+export type SejourDALInput = z.infer<typeof SejourDALInputSchema>;
 
 export type ParticipantDALInput = Omit<Participant, 'id'>;
 

@@ -7,8 +7,9 @@ vi.mock('./supabase', () => ({
 }));
 
 import { getSupabaseClient } from './supabase';
-import { createSejour, getSejourById, getSejourByToken, updateSejour } from './sejours';
+import { createSejour, getSejourById, getSejourByToken, updateSejour, SejourDALInputSchema } from './sejours';
 import type { SejourDALInput, ParticipantDALInput } from './sejours';
+import { CreateSejourBodySchema } from '../types/schemas';
 
 // ─── Mock Supabase chainable builder ─────────────────────────────────────────
 
@@ -325,6 +326,30 @@ describe('sejours DAL', () => {
           expect(result.error.cause).toBe('RPC procedure failed');
         }
       }
+    });
+  });
+
+  describe('SejourDALInputSchema — dérivé ADR-002', () => {
+    it('valide une entrée construite depuis CreateSejourBodySchema (champs partagés en sync)', () => {
+      const body = CreateSejourBodySchema.parse({
+        nom: 'Camp été',
+        nb_jours: 3,
+        repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0 },
+        parametres: { niveau_cuisine: 'facile', equipement_disponible: ['four'], temps_disponible: 'standard' },
+        participants: [{ nom: 'Alice', allergies: [], exclusions: [], aime: [], n_aime_pas: [] }],
+      });
+      const { participants: _p, ...rest } = body;
+      const dalResult = SejourDALInputSchema.safeParse({ ...rest, nom: body.nom ?? 'Séjour' });
+      expect(dalResult.success).toBe(true);
+    });
+
+    it('rejette une entrée sans nom (nom requis dans SejourDALInputSchema, contrairement au body)', () => {
+      const result = SejourDALInputSchema.safeParse({
+        nb_jours: 3,
+        repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0 },
+        parametres: { niveau_cuisine: 'facile', equipement_disponible: ['four'], temps_disponible: 'standard' },
+      });
+      expect(result.success).toBe(false);
     });
   });
 });
