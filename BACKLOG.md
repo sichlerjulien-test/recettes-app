@@ -43,7 +43,8 @@ Sous-tâches :
 
 
 
-### TK-12 — Tests d'intégration TK-03  ·  M
+### TK-12 — Tests d'intégration TK-03  ·  M  ✅ Livré
+
 **Origine :** allergen-guard + qa (TK-03), lacunes de couverture.
 
 - pool_empty : aucun test ne lie {ok:false, kind:'pool_empty'} au HTTP 422 retourné au client.
@@ -51,8 +52,8 @@ Sous-tâches :
   de TK-03 n'a pas de test d'intégration.
 
 Sous-tâches :
-- Test route : pool_empty → 422.
-- E2E Playwright : Sarah ajoute un participant, régénère, planning cohérent et sûr.
+- ~~Test route : pool_empty → 422.~~ (TK-12a — #47, #50)
+- ~~E2E Playwright : Sarah ajoute un participant, régénère, planning cohérent et sûr.~~ (TK-12b — #49 + tk-12b-route ; ADR-017 : frontière LLM hors E2E → remplacé par RTL + test route)
 
 **Critères :** le flow de re-génération TK-03 couvert end-to-end ; mapping pool_empty→422 testé.
 
@@ -268,7 +269,7 @@ avec un trou.
 | TK-08 | Réutilisation ingrédients | V2 | — | À faire |
 | TK-09 | Nettoyage DAL sejours | P2 | M | À faire |
 | TK-10 | createSejour atomique via RPC | P2 | M | À faire |
-| TK-12 | Tests d'intégration TK-03 | P2 | M | À faire |
+| TK-12 | Tests d'intégration TK-03 | P2 | M | Fait |
 | TK-13 | Source unique enums SQL + Zod (Trou A) | P2 | S | Fait |
 | TK-14 | Règles de cohérence sémantiques restantes | V2 | — | À faire |
 | TK-15 | Baseline schéma DB + source de vérité | P2 | M | Fait |
