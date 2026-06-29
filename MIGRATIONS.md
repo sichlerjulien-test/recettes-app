@@ -70,6 +70,23 @@ ALTER TABLE recettes
 
 URI par instance : Supabase → Settings → Database → Connection string (URI).
 
+## Ledger des applications (dev + prod)
+
+| Migration | Description | dev | prod |
+|-----------|-------------|-----|------|
+| 001 | Initial schema | ✓ | ✓ |
+| 002 | Rename brunch → petit-déjeuner | ✓ | ✓ |
+| 003 | RPC update_sejour_with_participants (RETURNS void) | ✓ | ✓ |
+| 004 | Rename ingredient.nom | ✓ | ✓ |
+| 005 | Reconcile recettes constraints | ✓ | ✓ |
+| 006 | Reconcile ingredients schema | ✓ | ✓ |
+| 007 | Rename regimes → exclusions | ✓ | ✓ |
+| 008 | Add exclusions_compatibles | ✓ | ✓ |
+| 009 | exclusions_compatibles NULL sentinel | ✓ | ✓ |
+| 010 | Enable RLS catalogue | ✓ | ✓ |
+| 011 | RPC create_sejour_with_participants (RETURNS jsonb) | ✓ 2026-06-29 | ✓ 2026-06-29 |
+| 012 | RPC update_sejour_with_participants RETURNS void → jsonb | ✓ 2026-06-29 | ✓ 2026-06-29 |
+
 ## Dette connue
 
 `validate-data` (Zod) ne reflète pas les CHECK SQL (Trou A, ADR-008). Une valeur peut
