@@ -1,6 +1,6 @@
 # ADR-018 — Contrat de retour des RPC transactionnelles : RETURNING la ligne, jamais void
 
-**Statut** : Proposé — fork tranché en faveur de RETURNING, à ratifier.
+**Statut** : Accepté
 **Date** : 2026-06-29
 **Auteur** : Équipe Meal Planner
 **Lié à** : étend ADR-006 (pattern DAL/API, validation Zod des rows, contrat DbError) ·
