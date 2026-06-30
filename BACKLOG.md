@@ -104,18 +104,6 @@ chemin rare post-retry : un log de debug indistinguable rend l'analyse d'inciden
 
 **Critères :** `validation_failed_after_retries` expose deux champs séparés ; tests discriminants.
 
-### TK-22 — Nettoyage zombies vocabulaire : DietaryRestrictionSchema / REGIME_LABELS / toggleRegime  ·  S
-**Origine :** revue TK-05 2C (qa-engineer).
-
-Résidus de l'ancien vocabulaire "régimes" non supprimés lors du renommage en "exclusions" :
-`DietaryRestrictionSchema`, `REGIME_LABELS`, `toggleRegime` (et éventuellement des references
-dans les tests). Ces symboles créent une confusion nomenclature et augmentent le risque de
-régression silencieuse si une référence pointe vers l'ancien vocabulaire.
-
-**Critères :** `grep -r "toggleRegime\|REGIME_LABELS\|DietaryRestrictionSchema"` retourne zéro hit.
-
-> Purement cosmétique/dette nomenclature. Aucun risque de régression comportementale.
-
 ### TK-24 — tool input_schema dérivé de Zod · S
 `COMPOSE_PLANNING_TOOL` (`llm/client.ts`) duplique `LLMPlanningOutputSchema`. Générer l'`input_schema`
 depuis le Zod (`zod-to-json-schema`). Cousin de TK-13.
@@ -270,7 +258,6 @@ avec un trou.
 | TK-18 | Bug hydratation ShareLink | P2 | S | Fait |
 | TK-20 | [DORMANT] Réouverture conditionnelle garde porc/viande-rouge/alcool | P2 | — | Dormant |
 | TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | Fait |
-| TK-22 | Nettoyage zombies vocabulaire DietaryRestrictionSchema / REGIME_LABELS | P2 | S | À faire |
 | TK-24 | tool input_schema dérivé de Zod | P2 | S | À faire |
 | TK-25 | Sortir buildFilterConstraintsFromSejour des routes | P2 | S | À faire |
 | TK-27 | Dark mode : trancher | P2 | S | À faire |
@@ -283,4 +270,4 @@ avec un trou.
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
 | TK-36 | Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal | P2 | S/trivial | À faire |
 
-**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-22, TK-24, TK-25, TK-27, TK-30, TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
+**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-24, TK-25, TK-27, TK-30, TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).

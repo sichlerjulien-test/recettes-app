@@ -18,7 +18,6 @@ import { DIETARY_RESTRICTIONS } from '../../../data/seed-dietary';
 // ============================================================================
 
 export const AllergenSchema = z.enum(EU14_ALLERGENS);
-export const DietaryRestrictionSchema = z.enum(DIETARY_RESTRICTIONS);
 export const ExclusionTagSchema = z.enum(DIETARY_RESTRICTIONS);
 
 export const IngredientCategorySchema = z.enum([
