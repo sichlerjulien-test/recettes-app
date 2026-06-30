@@ -118,11 +118,6 @@ régression silencieuse si une référence pointe vers l'ancien vocabulaire.
 
 > Purement cosmétique/dette nomenclature. Aucun risque de régression comportementale.
 
-### TK-23 — Map non sérialisable en prop RSC→Client · S
-`src/app/sejour/[id]/page.tsx` passe `recettes` en `Map<string,Recette>` à `SejourContent`
-(Client). Non sérialisable au boundary RSC. Vérifier si c'est le cas aujourd'hui ; si oui,
-passer en `Record<string,Recette>`. Latent mais réel.
-
 ### TK-24 — tool input_schema dérivé de Zod · S
 `COMPOSE_PLANNING_TOOL` (`llm/client.ts`) duplique `LLMPlanningOutputSchema`. Générer l'`input_schema`
 depuis le Zod (`zod-to-json-schema`). Cousin de TK-13.
@@ -265,7 +260,6 @@ avec un trou.
 | TK-20 | [DORMANT] Réouverture conditionnelle garde porc/viande-rouge/alcool | P2 | — | Dormant |
 | TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | À faire |
 | TK-22 | Nettoyage zombies vocabulaire DietaryRestrictionSchema / REGIME_LABELS | P2 | S | À faire |
-| TK-23 | Map non sérialisable RSC→Client | P2 | S | À faire |
 | TK-24 | tool input_schema dérivé de Zod | P2 | S | À faire |
 | TK-25 | Sortir buildFilterConstraintsFromSejour des routes | P2 | S | À faire |
 | TK-27 | Dark mode : trancher | P2 | S | À faire |
@@ -277,4 +271,4 @@ avec un trou.
 | TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
 
-**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
+**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-21, TK-22, TK-24, TK-25, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
