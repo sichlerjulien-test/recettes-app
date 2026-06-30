@@ -119,7 +119,7 @@ describe('POST /api/sejours/[id]/planning', () => {
   it('validation_failed_after_retries → 422 business_error', async () => {
     vi.mocked(generatePlanning).mockResolvedValue({
       ok: false,
-      error: { kind: 'validation_failed_after_retries', lastViolations: [] },
+      error: { kind: 'validation_failed_after_retries', last_security_violations: [], last_exclusion_violations: [], last_coherence_violations: [] },
     });
 
     const response = await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
