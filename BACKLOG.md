@@ -104,10 +104,6 @@ chemin rare post-retry : un log de debug indistinguable rend l'analyse d'inciden
 
 **Critères :** `validation_failed_after_retries` expose deux champs séparés ; tests discriminants.
 
-### TK-25 — Sortir buildFilterConstraintsFromSejour des routes · S
-Logique métier inline dans `planning/route.ts` → migrer dans `src/lib/allergens/filter.ts`.
-Propreté archi, non urgent.
-
 ### TK-27 — Dark mode : trancher · S
 Soit tokens dark propres, soit documenter light-only. Dette consciente Sprint 1, faible pri.
 
@@ -255,7 +251,7 @@ avec un trou.
 | TK-20 | [DORMANT] Réouverture conditionnelle garde porc/viande-rouge/alcool | P2 | — | Dormant |
 | TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | Fait |
 | TK-24 | tool input_schema dérivé de Zod | P2 | S | Fait |
-| TK-25 | Sortir buildFilterConstraintsFromSejour des routes | P2 | S | À faire |
+| TK-25 | Sortir buildPlanningConstraints des routes | P2 | S | Fait |
 | TK-27 | Dark mode : trancher | P2 | S | À faire |
 | TK-28 | Chargement ciblé du catalogue recettes | V2 | — | À faire |
 | TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | À faire |
