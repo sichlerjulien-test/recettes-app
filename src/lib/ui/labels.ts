@@ -11,8 +11,7 @@ import type { IngredientCategory, MainIngredient } from '../types/domain';
 export type { Allergen } from '../../../data/seed-allergenes';
 export type { DietaryRestriction } from '../../../data/seed-dietary';
 export { EU14_ALLERGENS, DIETARY_RESTRICTIONS };
-export { ALLERGEN_LABELS };
-export const REGIME_LABELS = DIETARY_LABELS;
+export { ALLERGEN_LABELS, DIETARY_LABELS };
 
 export const CATEGORY_LABELS: Record<IngredientCategory, string> = {
   'fruits-legumes': 'Fruits & légumes',
