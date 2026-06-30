@@ -354,8 +354,8 @@ const RECETTES_BASE: RecetteBase[] = [
 
   {
     id: 'tajine-agneau-soir',
-    nom: "Tajine d'agneau",
-    description: 'Tajine parfumé aux légumes pour le dîner.',
+    nom: 'Tajine de bœuf',
+    description: 'Tajine parfumé à la viande et aux légumes pour le dîner.',
     portions_base: 4,
     duree_minutes: 90, duree_active: 20,
     difficulte: 'normale',
@@ -366,9 +366,10 @@ const RECETTES_BASE: RecetteBase[] = [
     ingredient_principal: 'boeuf',
     feculent_dominant: 'semoule',
     ingredients: [
-      { ingredient_id: 'tomate',  quantite_base: 400, unite: 'g', optionnel: false, groupe: undefined },
-      { ingredient_id: 'oignon',  quantite_base: 200, unite: 'g', optionnel: false, groupe: undefined },
-      { ingredient_id: 'carotte', quantite_base: 200, unite: 'g', optionnel: false, groupe: undefined },
+      { ingredient_id: 'boeuf-hache', quantite_base: 400, unite: 'g', optionnel: false, groupe: undefined },
+      { ingredient_id: 'tomate',      quantite_base: 400, unite: 'g', optionnel: false, groupe: undefined },
+      { ingredient_id: 'oignon',      quantite_base: 200, unite: 'g', optionnel: false, groupe: undefined },
+      { ingredient_id: 'carotte',     quantite_base: 200, unite: 'g', optionnel: false, groupe: undefined },
     ],
     etapes: ['Saisir la viande.', 'Ajouter les légumes.', 'Mijoter 1h.'],
     tags_libres: [],
