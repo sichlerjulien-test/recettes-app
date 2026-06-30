@@ -6,6 +6,7 @@ import Link from "next/link";
 import { SejourContent } from "./_components/SejourContent";
 import { ShareLink } from "./_components/ShareLink";
 import { getSiteUrl } from "@/lib/url";
+import { resolvePlanningState } from "@/lib/planning/resolve-planning-state";
 
 export default async function SejourPage({
   params,
@@ -70,7 +71,10 @@ export default async function SejourPage({
     );
   }
 
-  const initialPlanning = planningResult.ok ? planningResult.planning : null;
+  if (!planningResult.ok && planningResult.error.kind !== 'not_found') {
+    console.error(`[sejour/${id}] planning load error: ${planningResult.error.kind}`);
+  }
+  const planningState = resolvePlanningState(planningResult);
   const shareUrl = `${await getSiteUrl()}/sejour/${id}?t=${token}`;
 
   return (
@@ -98,7 +102,7 @@ export default async function SejourPage({
       <SejourContent
         sejourId={id}
         token={token}
-        initialPlanning={initialPlanning}
+        planningState={planningState}
         recettes={recettesResult.recettes}
       />
 
