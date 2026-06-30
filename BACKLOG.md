@@ -104,9 +104,6 @@ chemin rare post-retry : un log de debug indistinguable rend l'analyse d'inciden
 
 **Critères :** `validation_failed_after_retries` expose deux champs séparés ; tests discriminants.
 
-### TK-27 — Dark mode : trancher · S
-Soit tokens dark propres, soit documenter light-only. Dette consciente Sprint 1, faible pri.
-
 ### TK-30 — Cleanup CLAUDE_PROJECT.md : supprimer les règles mécanisées par end-session · S
 **Origine :** clôture session post-TK-29 (gate end-session).
 
@@ -252,7 +249,7 @@ avec un trou.
 | TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | Fait |
 | TK-24 | tool input_schema dérivé de Zod | P2 | S | Fait |
 | TK-25 | Sortir buildPlanningConstraints des routes | P2 | S | Fait |
-| TK-27 | Dark mode : trancher | P2 | S | À faire |
+| TK-27 | Dark mode : trancher | P2 | S | Fait |
 | TK-28 | Chargement ciblé du catalogue recettes | V2 | — | À faire |
 | TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | À faire |
 | TK-31 | Convention TK-XX commits (mini-ADR) | P2 | S | À faire |
@@ -262,6 +259,6 @@ avec un trou.
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
 | TK-36 | Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal | P2 | S/trivial | À faire |
 
-**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-25, TK-27, TK-30, TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
+**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-30, TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
 
 > **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.

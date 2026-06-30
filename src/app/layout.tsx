@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -20,6 +20,10 @@ export const metadata: Metadata = {
   title: "Meal Planner — Planifie tes repas en groupe",
   description:
     "Organise les repas d'un séjour entre amis en quelques minutes, avec toutes les contraintes alimentaires respectées et une liste de courses prête.",
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light",
 };
 
 export default function RootLayout({
