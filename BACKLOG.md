@@ -264,4 +264,4 @@ avec un trou.
 
 **Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-25, TK-27, TK-30, TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
 
-> **Question ouverte (Project) :** Trancher convention clôture backlog : le tableau récap est-il un index d'état (garde les Fait) ou open-only (purge rétroactive des lignes Fait) ? Décision Project, pas exécution.
+> **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.
