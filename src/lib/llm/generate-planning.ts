@@ -58,7 +58,9 @@ export async function generatePlanning(
 
   const expectedSlots = buildSequence(sejourContexte.repartition_repas);
   const portions = Math.max(participants.length, 1);
-  let lastViolations: ValidationViolation[] = [];
+  let lastSecurityViolations: ValidationViolation[] = [];
+  let lastExclusionViolations: ValidationViolation[] = [];
+  let lastCoherenceViolations: ValidationViolation[] = [];
 
   try {
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
@@ -100,18 +102,25 @@ export async function generatePlanning(
         };
       }
 
-      lastViolations = [...securityResult.violations, ...dietaryViolations, ...bloquantCoherence];
+      lastSecurityViolations = securityResult.violations;
+      lastExclusionViolations = dietaryViolations;
+      lastCoherenceViolations = bloquantCoherence;
       // MVP : log via console.warn. Logger injectable à introduire au Sprint 1
       // si besoin d'audit structuré (cf. ADR-001 mention "audit").
       console.warn(
-        `[generatePlanning] tentative ${attempt + 1}/${MAX_ATTEMPTS} — ${lastViolations.length} violation(s)`,
-        lastViolations,
+        `[generatePlanning] tentative ${attempt + 1}/${MAX_ATTEMPTS} — ${lastSecurityViolations.length} sécurité / ${lastExclusionViolations.length} exclusion / ${lastCoherenceViolations.length} cohérence`,
+        { security: lastSecurityViolations, exclusion: lastExclusionViolations, coherence: lastCoherenceViolations },
       );
     }
 
     return {
       ok: false,
-      error: { kind: 'validation_failed_after_retries', lastViolations },
+      error: {
+        kind: 'validation_failed_after_retries',
+        last_security_violations: lastSecurityViolations,
+        last_exclusion_violations: lastExclusionViolations,
+        last_coherence_violations: lastCoherenceViolations,
+      },
     };
   } catch (error) {
     const cause = error instanceof Error ? error.message : String(error);

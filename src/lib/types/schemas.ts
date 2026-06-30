@@ -396,7 +396,9 @@ export const LLMErrorSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('pool_empty'), cause: z.enum(['allergen', 'exclusion']) }),
   z.object({
     kind: z.literal('validation_failed_after_retries'),
-    lastViolations: z.array(ValidationViolationSchema),
+    last_security_violations: z.array(ValidationViolationSchema),
+    last_exclusion_violations: z.array(ValidationViolationSchema),
+    last_coherence_violations: z.array(ValidationViolationSchema),
   }),
   z.object({
     kind: z.literal('llm_unavailable'),
