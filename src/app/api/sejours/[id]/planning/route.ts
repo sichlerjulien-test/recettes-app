@@ -4,7 +4,7 @@ import { getAllRecettes, getAllRecettesAsMap } from '@/lib/db/recettes';
 import { createPlanning, getPlanningBySejourId } from '@/lib/db/plannings';
 import { createAnthropicClient } from '@/lib/llm/client';
 import { generatePlanning } from '@/lib/llm/generate-planning';
-import type { PlanningConstraints } from '@/lib/llm/generate-planning';
+import { buildPlanningConstraints } from '@/lib/planning/build-constraints';
 import { jsonError, jsonSuccess } from '@/lib/api/responses';
 import { dbErrorToResponse } from '@/lib/api/error-mapping';
 
@@ -70,11 +70,7 @@ export async function POST(
     return jsonError(503, 'llm_unavailable', 'Configuration LLM manquante');
   }
 
-  const constraints: PlanningConstraints = {
-    allergenes_groupe: [...new Set(sejour.participants.flatMap((p) => p.allergies))],
-    exclusions_groupe: [...new Set(sejour.participants.flatMap((p) => p.exclusions))],
-    equipement_disponible: sejour.parametres.equipement_disponible,
-  };
+  const constraints = buildPlanningConstraints(sejour);
 
   const contexte = {
     nb_jours: sejour.nb_jours,

@@ -18,11 +18,15 @@ vi.mock('@/lib/llm/client', () => ({
 vi.mock('@/lib/llm/generate-planning', () => ({
   generatePlanning: vi.fn(),
 }));
+vi.mock('@/lib/planning/build-constraints', () => ({
+  buildPlanningConstraints: vi.fn(),
+}));
 
 import { getSejourById } from '@/lib/db/sejours';
 import { getAllRecettes, getAllRecettesAsMap } from '@/lib/db/recettes';
 import { createPlanning } from '@/lib/db/plannings';
 import { generatePlanning } from '@/lib/llm/generate-planning';
+import { buildPlanningConstraints } from '@/lib/planning/build-constraints';
 import { NextRequest } from 'next/server';
 import { POST } from './route';
 
@@ -142,70 +146,31 @@ describe('POST /api/sejours/[id]/planning', () => {
     expect(body.error.kind).toBe('llm_unavailable');
   });
 
-  describe('dérivation des contraintes depuis les participants', () => {
+  describe('délégation des contraintes', () => {
     const STUB_ENTRIES = [
-      { jour: 1, repas: 'midi' as const, recette_id: 'recette-test', portions: 2 },
+      { jour: 1, repas: 'midi' as const, recette_id: 'recette-test', portions: 0 },
     ];
+    const STUB_CONSTRAINTS = {
+      allergenes_groupe: ['arachides' as const],
+      exclusions_groupe: ['vegetarien' as const],
+      equipement_disponible: ['plaque' as const],
+    };
 
     beforeEach(() => {
+      vi.mocked(buildPlanningConstraints).mockReturnValue(STUB_CONSTRAINTS);
       vi.mocked(generatePlanning).mockResolvedValue({ ok: true, entries: STUB_ENTRIES });
     });
 
-    it('union sur tous les participants — exclusion d\'un, allergène de l\'autre', async () => {
-      vi.mocked(getSejourById).mockResolvedValue({
-        ok: true,
-        sejour: {
-          ...SEJOUR_FIXTURE,
-          participants: [
-            { id: 'p1', nom: 'Alice', allergies: [], exclusions: ['vegetarien' as const], aime: [], n_aime_pas: [] },
-            { id: 'p2', nom: 'Bob', allergies: ['arachides' as const], exclusions: [], aime: [], n_aime_pas: [] },
-          ],
-        },
-      });
-
+    it('la route appelle buildPlanningConstraints avec le sejour et passe le résultat à generatePlanning', async () => {
       await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
 
+      expect(vi.mocked(buildPlanningConstraints)).toHaveBeenCalledOnce();
+      expect(vi.mocked(buildPlanningConstraints)).toHaveBeenCalledWith(SEJOUR_FIXTURE);
       const constraints = vi.mocked(generatePlanning).mock.calls[0]![3];
-      expect(constraints.exclusions_groupe).toContain('vegetarien');
-      expect(constraints.allergenes_groupe).toContain('arachides');
-    });
-
-    it('déduplication — allergène partagé par deux participants apparaît une seule fois', async () => {
-      vi.mocked(getSejourById).mockResolvedValue({
-        ok: true,
-        sejour: {
-          ...SEJOUR_FIXTURE,
-          participants: [
-            { id: 'p1', nom: 'Alice', allergies: ['gluten' as const], exclusions: [], aime: [], n_aime_pas: [] },
-            { id: 'p2', nom: 'Bob', allergies: ['gluten' as const], exclusions: [], aime: [], n_aime_pas: [] },
-          ],
-        },
-      });
-
-      await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
-
-      const constraints = vi.mocked(generatePlanning).mock.calls[0]![3];
-      expect(constraints.allergenes_groupe.filter((a) => a === 'gluten')).toHaveLength(1);
-    });
-
-    it('équipement — constraints.equipement_disponible égal à sejour.parametres.equipement_disponible', async () => {
-      await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
-
-      const constraints = vi.mocked(generatePlanning).mock.calls[0]![3];
-      expect(constraints.equipement_disponible).toEqual(SEJOUR_FIXTURE.parametres.equipement_disponible);
+      expect(constraints).toBe(STUB_CONSTRAINTS);
     });
 
     it('persistance — createPlanning appelé avec les bonnes données, réponse 201', async () => {
-      vi.mocked(getSejourById).mockResolvedValue({
-        ok: true,
-        sejour: {
-          ...SEJOUR_FIXTURE,
-          participants: [
-            { id: 'p1', nom: 'Alice', allergies: ['arachides' as const], exclusions: ['vegetarien' as const], aime: [], n_aime_pas: [] },
-          ],
-        },
-      });
-
       const response = await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
 
       expect(response.status).toBe(201);
