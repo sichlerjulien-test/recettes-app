@@ -94,7 +94,7 @@ Sous-tâches :
 **Critères :** aucun ingrédient/recette hors-YAML ne subsiste après seed, ou détection explicite. Priorité basse, candidat V2.
 
 
-### TK-21 — Violations séparées post-retry : allergènes ≠ exclusions  ·  S
+### TK-21 — Violations séparées post-retry : allergènes ≠ exclusions  ·  S  ✅ Livré
 **Origine :** revue TK-05 2C (architect/qa-engineer), ADR-011 §7.
 
 `validation_failed_after_retries` agrège toutes les violations dans `lastViolations` au lieu de
@@ -103,8 +103,6 @@ distinguer `last_security_violations` (allergènes EU14, criticité P0) et `last
 chemin rare post-retry : un log de debug indistinguable rend l'analyse d'incident difficile.
 
 **Critères :** `validation_failed_after_retries` expose deux champs séparés ; tests discriminants.
-
-> Chemin rare (post-retry), non-bloquant TK-05 2C. À traiter avant toute extension du validateur.
 
 ### TK-22 — Nettoyage zombies vocabulaire : DietaryRestrictionSchema / REGIME_LABELS / toggleRegime  ·  S
 **Origine :** revue TK-05 2C (qa-engineer).
@@ -184,6 +182,19 @@ Aucune règle formelle ne définit si/comment le numéro de ticket doit apparaî
 
 > **Préalable au gate backlog v2.** À trancher en session dédiée, avant tout ticket d'exécution qui ajouterait une règle dépendante.
 
+### TK-36 — Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal  ·  S/trivial
+**Origine :** fausse violation cohérence dans Test A (TK-21).
+
+Trois informations contradictoires sur le même fixture : nom « agneau », `ingredient_principal`
+`'boeuf'`, et ingrédients sans viande. Un sweep des usages est requis avant le fix : plusieurs
+tests (profils coeliaque / allergies-multiples) s'appuient sur `'boeuf' ≠ 'legumes'` pour ce
+fixture — aligner naïvement le nom sans adapter les assertions les casserait.
+
+**Critères :** `nom`, `ingredient_principal`, et ingrédients du fixture sont cohérents entre eux ;
+CI verte après sweep des tests dépendants.
+
+---
+
 ### TK-35 — [DORMANT] canonical.sql : génération pg_dump déterministe cross-machine
 **Origine :** clôture TK-10. schema-replay rouge sur PR #54, cause non traitée.
 
@@ -258,7 +269,7 @@ avec un trou.
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
 | TK-18 | Bug hydratation ShareLink | P2 | S | Fait |
 | TK-20 | [DORMANT] Réouverture conditionnelle garde porc/viande-rouge/alcool | P2 | — | Dormant |
-| TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | À faire |
+| TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | Fait |
 | TK-22 | Nettoyage zombies vocabulaire DietaryRestrictionSchema / REGIME_LABELS | P2 | S | À faire |
 | TK-24 | tool input_schema dérivé de Zod | P2 | S | À faire |
 | TK-25 | Sortir buildFilterConstraintsFromSejour des routes | P2 | S | À faire |
@@ -270,5 +281,6 @@ avec un trou.
 | TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
 | TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
+| TK-36 | Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal | P2 | S/trivial | À faire |
 
-**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-21, TK-22, TK-24, TK-25, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
+**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-22, TK-24, TK-25, TK-27, TK-30, TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
