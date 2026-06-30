@@ -131,10 +131,6 @@ depuis le Zod (`zod-to-json-schema`). Cousin de TK-13.
 Logique métier inline dans `planning/route.ts` → migrer dans `src/lib/allergens/filter.ts`.
 Propreté archi, non urgent.
 
-### TK-26 — État d'erreur UI explicite sur /sejour/[id] · S
-Distinguer "pas encore généré" de "erreur de chargement" (`query_failed` / `row_validation_failed`
-aujourd'hui silencieusement → null).
-
 ### TK-27 — Dark mode : trancher · S
 Soit tokens dark propres, soit documenter light-only. Dette consciente Sprint 1, faible pri.
 
@@ -272,7 +268,6 @@ avec un trou.
 | TK-23 | Map non sérialisable RSC→Client | P2 | S | À faire |
 | TK-24 | tool input_schema dérivé de Zod | P2 | S | À faire |
 | TK-25 | Sortir buildFilterConstraintsFromSejour des routes | P2 | S | À faire |
-| TK-26 | État d'erreur UI explicite /sejour/[id] | P2 | S | À faire |
 | TK-27 | Dark mode : trancher | P2 | S | À faire |
 | TK-28 | Chargement ciblé du catalogue recettes | V2 | — | À faire |
 | TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | À faire |
@@ -282,4 +277,4 @@ avec un trou.
 | TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
 
-**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
+**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
