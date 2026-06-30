@@ -13,6 +13,7 @@
  * extraire ces fonctions dans un module testable séparé.
  */
 import Anthropic from '@anthropic-ai/sdk';
+import { z } from 'zod';
 import { LLMPlanningOutputSchema } from '../types/schemas';
 import { buildSequence } from '../planning/build-sequence';
 import type { GeneratePlanningInput, GeneratePlanningOutput } from './types';
@@ -22,30 +23,18 @@ export interface LLMClient {
   generate(input: GeneratePlanningInput): Promise<GeneratePlanningOutput>;
 }
 
-const COMPOSE_PLANNING_TOOL = {
+/** Dérive le input_schema depuis LLMPlanningOutputSchema — source unique (TK-24). */
+export function buildComposePlanningToolInputSchema(): Anthropic.Tool['input_schema'] {
+  const { $schema: _$schema, ...schema } = z.toJSONSchema(LLMPlanningOutputSchema, { reused: 'inline' });
+  // ZodStandardJSONSchemaPayload n'est pas structurellement assignable à Tool['input_schema'] ;
+  // le cast est sûr car LLMPlanningOutputSchema est un z.object() → type:'object' garanti.
+  return schema as unknown as Anthropic.Tool['input_schema'];
+}
+
+export const COMPOSE_PLANNING_TOOL = {
   name: 'compose_planning',
   description: 'Compose un planning de repas à partir du pool fourni',
-  input_schema: {
-    type: 'object' as const,
-    properties: {
-      planning: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            jour: { type: 'integer', minimum: 1 },
-            repas: { type: 'string', enum: ['midi', 'soir', 'petit-dejeuner'] },
-            recette_id: { type: 'string' },
-          },
-          required: ['jour', 'repas', 'recette_id'],
-          additionalProperties: false,
-        },
-        minItems: 1,
-      },
-    },
-    required: ['planning'],
-    additionalProperties: false,
-  },
+  input_schema: buildComposePlanningToolInputSchema(),
 } satisfies Anthropic.Tool;
 
 function buildSystemPrompt(totalRepas: number): string {
