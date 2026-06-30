@@ -104,10 +104,6 @@ chemin rare post-retry : un log de debug indistinguable rend l'analyse d'inciden
 
 **Critères :** `validation_failed_after_retries` expose deux champs séparés ; tests discriminants.
 
-### TK-24 — tool input_schema dérivé de Zod · S  ✅ Livré
-`COMPOSE_PLANNING_TOOL` (`llm/client.ts`) duplique `LLMPlanningOutputSchema`. Générer l'`input_schema`
-depuis le Zod (`zod-to-json-schema`). Cousin de TK-13.
-
 ### TK-25 — Sortir buildFilterConstraintsFromSejour des routes · S
 Logique métier inline dans `planning/route.ts` → migrer dans `src/lib/allergens/filter.ts`.
 Propreté archi, non urgent.
@@ -271,3 +267,5 @@ avec un trou.
 | TK-36 | Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal | P2 | S/trivial | À faire |
 
 **Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-25, TK-27, TK-30, TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
+
+> **Question ouverte (Project) :** Trancher convention clôture backlog : le tableau récap est-il un index d'état (garde les Fait) ou open-only (purge rétroactive des lignes Fait) ? Décision Project, pas exécution.
