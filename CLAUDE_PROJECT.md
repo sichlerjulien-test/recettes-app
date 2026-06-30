@@ -117,7 +117,7 @@ Résidu à vérifier : labels d'unités en français dans `src/lib/ui/labels.ts`
 **Discipline de session :**
 - Une session = un objectif unique. Pas de Sprint entier en une conversation.
 - Démarrer chaque nouvelle conversation avec le brief court (voir SESSION_KICKOFF.md), pas en reconstruisant tout l'historique.
-- Terminer chaque session par commit + push, puis clore la conversation.
+- Clôture de session : `npm run end-session` doit afficher OK avant de clore la conversation. Le gate est la source de vérité de l'état git de fin de session.
 
 **Discipline de debug :**
 - Lire l'erreur AVANT de me l'envoyer. 80% des bugs sont évidents dans le bon log.
@@ -176,5 +176,4 @@ Chaque observation d'un agent de revue est triée séance tenante. Pas de
 Test de bon fonctionnement : à six semaines, le backlog ne contient aucune
 ligne devenue incompréhensible ni aucun ticket pré-rédigé jamais ouvert.
 
-- **Règle de branche :** le main local ne diverge jamais — il suit `origin/main`. Aucun travail "fini" ne vit sur une branche ou en local sans réconciliation avec l'autorité distante. Commit + push = clôture de session.
 - **Synchro CLAUDE_PROJECT.md :** gardée par sentinelle de hash en CI (ADR-012). Sur changement : `npm run sync:project`, coller dans l'UI, confirmer.
