@@ -85,7 +85,7 @@ Un planning valide DOIT respecter (règles réellement appliquées et testées) 
 > pas enforced — un invariant listé mais non tenu est un piège à fausse confiance.
 
 **Souhaité, NON garanti (ne pas s'y fier) :** variété des types de cuisine sur le séjour.
-Non implémentée à ce jour, reportée V2 (TK-14). Délibérément hors de la liste « DOIT »
+Non implémentée à ce jour, reportée V3 (TK-14). Délibérément hors de la liste « DOIT »
 ci-dessus : une règle non appliquée dans le code n'a rien à faire parmi les invariants,
 et aucun lecteur ni sub-agent ne doit la prendre pour acquise.
 
