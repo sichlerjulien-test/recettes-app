@@ -43,7 +43,7 @@ describe('validateCoherence', () => {
   });
 
   it('doit emettre slots_mismatch quand le planning a plus de slots que attendu', () => {
-    const planning = makePlanning(['salade-tomate-basilic', 'omelette-legumes', 'tajine-agneau-soir']);
+    const planning = makePlanning(['salade-tomate-basilic', 'omelette-legumes', 'tajine-boeuf-soir']);
     const expectedSlots = [
       { jour: 1, repas: 'midi' as const },
       { jour: 1, repas: 'soir' as const },

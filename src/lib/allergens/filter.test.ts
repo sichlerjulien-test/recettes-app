@@ -70,7 +70,7 @@ describe('filterRecipes', () => {
       expect(r.type_repas).toContain('midi');
     }
     expect(result.some((r) => r.id === 'raclette-soir')).toBe(false);
-    expect(result.some((r) => r.id === 'tajine-agneau-soir')).toBe(false);
+    expect(result.some((r) => r.id === 'tajine-boeuf-soir')).toBe(false);
   });
 
   it('doit ne pas filtrer sur le type de repas quand type_repas_requis est absent', () => {

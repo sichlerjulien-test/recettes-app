@@ -2,6 +2,9 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Light-only : les variantes dark: ne s'activent qu'avec la classe .dark, jamais posée. */
+@custom-variant dark (&:is(.dark *));
+
 
 @theme inline {
   --color-background: var(--background);
@@ -48,6 +51,7 @@
 }
 
 :root {
+  color-scheme: light;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);

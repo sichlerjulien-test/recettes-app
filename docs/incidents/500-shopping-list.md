@@ -16,15 +16,17 @@ Colonne `exclusions_compatibles` (`text[]`) absente de prod au moment de la requ
 
 Le DAL `getAllRecettesAsMap()` appelle `mapRecetteRow()` pour chaque ligne, qui invoque
 `requireExclusionsCompatibles(row['exclusions_compatibles'], row['id'])`. Cette fonction
-**jette un `Error` JS** si la valeur est `null` ou `undefined` — avant même le `safeParse`
-Zod. L'exception n'est pas catchée par `getAllRecettes()`, elle propage jusqu'à la route
+**jette un `Error` JS** si la valeur est `null` ou `undefined` — exigence de la couche de
+validation (`requireExclusionsCompatibles`), en amont de Zod, pas d'un schéma Zod.
+L'exception n'est pas catchée par `getAllRecettes()`, elle propage jusqu'à la route
 Next.js et produit un 500 opaque.
 
 La colonne est introduite par la migration `008-add-exclusions-compatibles.sql`, committée
 dans PR #24 le 2026-06-12. Le comportement jetant (via `requireExclusionsCompatibles`) est
 introduit dans le même PR par `43c0ebd` (2026-06-11 23:46). La migration n'est appliquée
-qu'à la main (MIGRATIONS.md) : si elle n'a pas précédé le déploiement du code, toute requête
-sur la liste de courses échoue en 500.
+qu'à la main (MIGRATIONS.md) : l'ordre exact d'application sur prod n'est pas récupérable
+a posteriori. Si la migration n'a pas précédé le déploiement du code, cette colonne
+*pouvait* provoquer le 500 pour toute requête sur la liste de courses.
 
 ## Cause systémique
 
@@ -38,8 +40,12 @@ rien ne le signalait avant le 500 en production.
 - Une vérification REST avec la `service_role` key confirme que la colonne est présente en
   prod et matérialisée (`["sans-viande-rouge","sans-porc",...]`). La boucle runtime est
   substantiellement fermée.
-- La vérification structurelle complète (contraintes, index, triggers, FK) reste à faire via
-  `pg_dump -s prod` vs `canonical.sql` dès que l'URI directe est disponible.
+- Vérification structurelle complète via `scripts/introspect-schema.sql` (session 2026-06-27) :
+  diff replay (001→010 sur PG17 local) vs prod — résultat vide sur les tables canoniques
+  (ingredients, recettes, recette_ingredients, sejours, participants, plannings). Colonnes,
+  contraintes, index, RLS, policies identiques. Seule divergence : table
+  `ingredients_backup_20260604` présente en prod uniquement (artefact opérationnel hors
+  migrations, sans impact fonctionnel). **Prod == canonical prouvé structurellement.**
 
 ## Ce qui empêche la récidive
 
@@ -60,5 +66,6 @@ du déploiement sans que rien ne le détecte avant le 500.
 | 2026-06-11 15:07 | Commit `2b9d3a2` : migration `008` créée, `recettes.ts` lit la colonne DB — fallback `[]` si absente (safe) |
 | 2026-06-11 23:46 | Commit `43c0ebd` : `requireExclusionsCompatibles` introduit — **throw si absent/null**, migration `009` créée |
 | 2026-06-12 16:59 | PR #24 mergée : code jetant déployé en prod, migrations `008`/`009` en attente d'application manuelle |
-| *(inconnu)* | Migrations `008`/`009` appliquées à prod — colonne créée, `build-data` matérialise les valeurs |
+| *(inconnu)* | Migrations `008`/`009` appliquées à prod — timestamp non récupérable a posteriori (historique Supabase inaccessible) |
 | 2026-06-26 | Vérification REST confirme colonne présente et matérialisée en prod |
+| 2026-06-27 | Introspection structurelle via `scripts/introspect-schema.sql` : prod == canonical (diff vide sur tables canoniques) |

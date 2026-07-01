@@ -72,18 +72,22 @@ Ne JAMAIS mélanger les deux concepts :
 
 ### Définition de "repas cohérent" (règles dures, testables)
 
-Un planning valide DOIT respecter :
+Un planning valide DOIT respecter (règles réellement appliquées et testées) :
 
 - Structure journalière stricte : exactement 1 petit-déjeuner, 1 midi, 1 soir par jour, dans cet ordre chronologique. Jamais deux midis le même jour.
 - Pas deux fois la même recette dans le séjour.
 - Pas deux fois le même ingrédient principal (protéine ou féculent dominant) en jour calendaire.
 - Respect strict de l'équipement disponible (pas de recette four sans four).
-- Variété des types de cuisine sur le séjour.
 
-> Structure journalière, non-répétition de recette et unicité de l'ingrédient principal/jour
-> sont implémentées et isolées dans `src/lib/coherence/` (validateur déterministe post-LLM,
-> ADR-009). L'équipement est filtré en amont (pool pré-LLM). La variété des types de cuisine
-> reste à faire, reportée V2 (TK-14) : souhaitable, non bloquante.
+> Garanties : les trois premières règles par le validateur déterministe post-LLM isolé
+> dans `src/lib/coherence/` (ADR-009) ; l'équipement par le filtre pré-LLM (pool). Règle
+> affichée ici = règle appliquée dans le code. Ne rien ajouter à cette liste qui ne soit
+> pas enforced — un invariant listé mais non tenu est un piège à fausse confiance.
+
+**Souhaité, NON garanti (ne pas s'y fier) :** variété des types de cuisine sur le séjour.
+Non implémentée à ce jour, reportée V2 (TK-14). Délibérément hors de la liste « DOIT »
+ci-dessus : une règle non appliquée dans le code n'a rien à faire parmi les invariants,
+et aucun lecteur ni sub-agent ne doit la prendre pour acquise.
 
 ### Modèle d'unités d'achat (fait — TK-02)
 
@@ -117,7 +121,7 @@ Résidu à vérifier : labels d'unités en français dans `src/lib/ui/labels.ts`
 **Discipline de session :**
 - Une session = un objectif unique. Pas de Sprint entier en une conversation.
 - Démarrer chaque nouvelle conversation avec le brief court (voir SESSION_KICKOFF.md), pas en reconstruisant tout l'historique.
-- Terminer chaque session par commit + push, puis clore la conversation.
+- Clôture de session : `npm run end-session` doit afficher OK avant de clore la conversation. Le gate est la source de vérité de l'état git de fin de session.
 
 **Discipline de debug :**
 - Lire l'erreur AVANT de me l'envoyer. 80% des bugs sont évidents dans le bon log.
@@ -176,5 +180,4 @@ Chaque observation d'un agent de revue est triée séance tenante. Pas de
 Test de bon fonctionnement : à six semaines, le backlog ne contient aucune
 ligne devenue incompréhensible ni aucun ticket pré-rédigé jamais ouvert.
 
-- **Règle de branche :** le main local ne diverge jamais — il suit `origin/main`. Aucun travail "fini" ne vit sur une branche ou en local sans réconciliation avec l'autorité distante. Commit + push = clôture de session.
 - **Synchro CLAUDE_PROJECT.md :** gardée par sentinelle de hash en CI (ADR-012). Sur changement : `npm run sync:project`, coller dans l'UI, confirmer.

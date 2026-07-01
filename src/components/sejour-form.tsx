@@ -11,7 +11,7 @@ import { setupZodFr } from "@/lib/zod-config"
 import { CreateSejourBodySchema, EquipmentSchema, AllergenSchema, ExclusionTagSchema } from "@/lib/types/schemas"
 import {
   ALLERGEN_LABELS,
-  REGIME_LABELS,
+  DIETARY_LABELS,
   EU14_ALLERGENS,
 } from "@/lib/ui/labels"
 import type { Allergen, DietaryRestriction } from "@/lib/ui/labels"
@@ -187,7 +187,7 @@ export function SejourForm({
     )
   }
 
-  function toggleRegime(index: number, regime: DietaryRestriction) {
+  function toggleExclusion(index: number, regime: DietaryRestriction) {
     const allParticipants = form.getValues("participants")
     const participant = allParticipants[index]
     if (!participant) return
@@ -621,7 +621,7 @@ export function SejourForm({
                               <button
                                 key={preset}
                                 type="button"
-                                onClick={() => toggleRegime(index, preset)}
+                                onClick={() => toggleExclusion(index, preset)}
                                 className={[
                                   "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
                                   isSelected
@@ -629,7 +629,7 @@ export function SejourForm({
                                     : "border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:bg-gray-50",
                                 ].join(" ")}
                               >
-                                {REGIME_LABELS[preset]}
+                                {DIETARY_LABELS[preset]}
                               </button>
                             )
                           })}
@@ -643,7 +643,7 @@ export function SejourForm({
                                 <button
                                   key={atomic}
                                   type="button"
-                                  onClick={() => toggleRegime(index, atomic)}
+                                  onClick={() => toggleExclusion(index, atomic)}
                                   className={[
                                     "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
                                     isSelected
@@ -651,7 +651,7 @@ export function SejourForm({
                                       : "border-gray-200 bg-white text-gray-400 hover:border-gray-300 hover:bg-gray-50",
                                   ].join(" ")}
                                 >
-                                  {REGIME_LABELS[atomic]}
+                                  {DIETARY_LABELS[atomic]}
                                 </button>
                               )
                             })}

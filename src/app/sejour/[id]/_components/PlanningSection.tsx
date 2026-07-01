@@ -1,14 +1,15 @@
 "use client";
 
 import type { Planning, Recette, MealType } from "@/lib/types/domain";
+import type { PlanningState } from "@/lib/planning/resolve-planning-state";
 
 interface Props {
-  planning: Planning | null;
+  planningState: PlanningState;
   recettes: Map<string, Recette>;
 }
 
-export function PlanningSection({ planning, recettes }: Props) {
-  if (!planning) {
+export function PlanningSection({ planningState, recettes }: Props) {
+  if (planningState.status === 'empty') {
     return (
       <section className="space-y-4">
         <p className="text-muted-foreground">
@@ -18,6 +19,20 @@ export function PlanningSection({ planning, recettes }: Props) {
       </section>
     );
   }
+
+  if (planningState.status === 'error') {
+    return (
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold">Planning</h2>
+        <p className="text-destructive">
+          Erreur de chargement du planning. Rechargez la page ou contactez
+          l&apos;organisateur si le problème persiste.
+        </p>
+      </section>
+    );
+  }
+
+  const planning = planningState.planning;
 
   const entriesByDay = groupByDay(planning.entries);
 

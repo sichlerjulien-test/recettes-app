@@ -125,3 +125,42 @@ jobs:
             exit 1
           fi
           echo "Schéma conforme au canonical"
+
+  read-contract-gate:
+    name: read-contract-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - name: Contrat de lecture ⊆ canonical.sql
+        run: npx tsx scripts/check-read-contract.ts
+
+  dal-read-contract-gate:
+    name: dal-read-contract-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - name: DAL reads ⊆ READ_CONTRACT (ADR-016)
+        run: npx tsx scripts/check-dal-reads.ts
+
+  enum-check-gate:
+    name: enum-check-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - name: Enum Zod ⊆⊇ CHECK SQL membership (ADR-015)
+        run: npx tsx scripts/check-enum-checks.ts

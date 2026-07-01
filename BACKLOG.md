@@ -8,42 +8,9 @@
 
 ## P2 — Dette interne (invisible utilisateur)
 
-### TK-09 — Nettoyage DAL sejours : double SELECT + Zod-first  ·  M
-**Origine :** double SELECT (Claude Code, TK-03) + violation ADR-002 sur SejourDALInput (architect, TK-03).
 
-Deux dettes DAL sur la même fonction, traitées en une passe.
-- Double SELECT : le PATCH vérifie le token via getSejourById, puis updateSejour re-fetch.
-- SejourDALInput défini à la main (sejours.ts:8-14), viole ADR-002 (Zod-first). Diverge déjà
-  de CreateSejourBodySchema sur `nom`. TK-03 a ajouté un 2e consommateur sans corriger la source.
+### TK-12 — Tests d'intégration TK-03  ·  M  ✅ Livré
 
-Sous-tâches :
-- updateSejour ne re-fetch plus (passer le séjour, ou retirer le SELECT interne).
-- SejourDALInputSchema = CreateSejourBodySchema.omit({participants:true}).extend({nom: z.string()})
-  → z.infer. Supprimer le type manuel.
-- Adapter signature + appelants (createSejour, updateSejour) + tests.
-
-**Critères :** un PATCH = un seul SELECT. SejourDALInput inféré d'un schéma Zod. Tests verts.
-
-> À faire avant tout 3e consommateur du DAL sejours.
-
-### TK-10 — createSejour atomique via RPC  ·  M
-**Origine :** architect (TK-03) + TODO inline sejours.ts:145-147 sorti du code.
-
-createSejour fait une écriture multi-étapes non-atomique. updateSejour (TK-03) a établi le
-pattern RPC transactionnel. Aligner createSejour pour tuer le risque de séjour partiellement créé.
-
-Sous-tâches :
-- Migration RPC create_sejour transactionnelle (sur le modèle de update_sejour).
-- Refactor createSejour, supprimer le TODO inline.
-- Tests succès + erreur.
-
-**Critères :** une création échouée en cours de route ne laisse aucun enregistrement orphelin.
-
-> Dépend de l'amendement d'ADR-006 (pattern RPC) fait en amont.
-
-
-
-### TK-12 — Tests d'intégration TK-03  ·  M
 **Origine :** allergen-guard + qa (TK-03), lacunes de couverture.
 
 - pool_empty : aucun test ne lie {ok:false, kind:'pool_empty'} au HTTP 422 retourné au client.
@@ -51,65 +18,41 @@ Sous-tâches :
   de TK-03 n'a pas de test d'intégration.
 
 Sous-tâches :
-- Test route : pool_empty → 422.
-- E2E Playwright : Sarah ajoute un participant, régénère, planning cohérent et sûr.
+- ~~Test route : pool_empty → 422.~~ (TK-12a — #47, #50)
+- ~~E2E Playwright : Sarah ajoute un participant, régénère, planning cohérent et sûr.~~ (TK-12b — #49 + tk-12b-route ; ADR-017 : frontière LLM hors E2E → remplacé par RTL + test route)
 
 **Critères :** le flow de re-génération TK-03 couvert end-to-end ; mapping pool_empty→422 testé.
 
-### TK-20 — Raffiner la taxonomie des ingrédients (garde déterministe porc/viande-rouge/alcool)  ·  M
-**Origine :** ADR-011 §9 · trou résiduel documenté en Phase 2B.
+### TK-20 — [DORMANT] Réouverture conditionnelle du garde catégorie porc/viande-rouge/alcool
+**Origine :** ADR-011 §9 (amendé 2026-06-11). Requalifié de tâche en déclencheur de réouverture.
 
-La catégorie `viandes-poissons` est trop grossière pour distinguer porc, viande rouge, poisson
-et fruits de mer. Résultat : les tags `sans-porc`, `sans-viande-rouge` et `sans-alcool` ne peuvent
-pas être vérifiés automatiquement au build (contrairement à `sans-poisson`/`sans-fruits-de-mer`
-qui s'appuient sur les allergènes EU14). La qualification actuelle est manuelle, gardée par
-allergen-guard sur `data/ingredients/`.
+NE PART PAS EN EXÉCUTION en l'état. L'approche que ce ticket décrivait — scinder
+`viandes-poissons` + garde déterministe grade-allergène sur `sans-porc`/`sans-viande-rouge`/
+`sans-alcool` — a été explicitement REJETÉE par ADR-011 §9, pour deux raisons :
+  1. Blast radius : scinder la catégorie touche le calcul végé/vegan qui lit la catégorie
+     coarse (logique déjà extraite et testée).
+  2. Sur-calibrage de sévérité : imposer une garantie grade-allergène à une exclusion dont
+     l'erreur gâche un repas (pas l'hôpital) = la confusion de catégories qu'ADR-001 interdit,
+     en sens inverse.
 
-Sous-tâches :
-- Trancher le découpage : scinder `viandes-poissons` (ex. `viandes-rouges`, `viandes-blanches`,
-  `charcuterie`, `poissons-fruits-de-mer`) et ajouter une catégorie `alcool`.
-- Mettre à jour `IngredientCategorySchema` et la migration SQL (touche le CHECK initial).
-- Étendre `ingredient-exclusion-completeness.ts` pour vérifier `sans-porc` et `sans-viande-rouge`
-  depuis les nouvelles catégories.
-- Test discriminant obligatoire : un lardon sans `sans-porc` DOIT faire échouer le build.
+Déjà livré à la place (régime 2, « curation tracée », enforced en CI) : `TRIAGE_PORC` /
+`TRIAGE_VIANDE_ROUGE` / `TRIAGE_ALCOOL` dans `scripts/ingredient-exclusion-completeness.ts`,
+tests discriminants, invariant croisé tag→catégorie. Le « enforced au build » est donc déjà
+acquis ; seul le « sans qualification manuelle » est délibérément non fait.
 
-**Critères :** les tags `sans-porc`, `sans-viande-rouge`, `sans-alcool` sont enforced au build,
-sans qualification manuelle nécessaire. Cousin de TK-13 (Trou A SQL/Zod).
+**Seuils de réouverture (un seul suffit) :**
+  - le catalogue grossit au point que la curation manuelle n'est plus fiable, OU
+  - une erreur d'exclusion non-allergène atteint un utilisateur en conditions réelles.
 
-> À séquencer après TK-05 Phase 2C (UI). Touche `IngredientCategorySchema` → passe architect.
+Tant qu'aucun seuil n'est franchi (état actuel : ~11 ingrédients triés, zéro signalement
+terrain), la curation tracée tient et il n'y a rien à exécuter. Si un seuil tombe : rouvrir
+ADR-011 §9 avec la donnée, ne pas pousser ce ticket tel quel.
 
-### TK-13 — Source unique pour enums SQL + Zod (Trou A)  ·  M
-**Origine :** investigation TK-07 (Trou A), ADR-008.
+**Résidu connexe, hors TK-20 :** limite volaille (un poulet mal catégorisé reste à tort
+végétarien sans déclencher l'invariant croisé). Fix candidat documenté : champ
+`nature: animal|vegetal`. Choix structurant → architect + amendement ADR avant tout cadrage.
+Risque de cohérence végé (gâche un repas), pas de sûreté allergène. Faible priorité.
 
-`validate-data` (Zod) ne reflète pas les CHECK SQL. Les deux calques — contraintes
-CHECK côté Postgres et enums côté Zod — sont maintenus à la main et dérivent
-indépendamment. Une valeur peut passer la CI (Zod la tolère) et casser au seed (le
-CHECK SQL la refuse). C'est exactement ce qui s'est produit sur TK-07 : Zod acceptait
-`equipement: []`, le CHECK SQL le refusait, et la donnée a voyagé jusqu'au seed dev.
-Tant que ce mécanisme existe, l'épisode 005 peut se rejouer à la prochaine divergence.
-
-Sous-tâches :
-- Trancher l'approche. Deux familles, qui ne couvrent PAS le même périmètre :
-  - **Génération** : un script émet les `ARRAY` des CHECK SQL depuis les enums Zod au
-    build. Ferme le trou à la racine pour les CHECK d'appartenance (ingredient_principal,
-    type_cuisine). Aveugle aux CHECK d'une autre forme.
-  - **Assertion runtime** : `validate-data` lit les CHECK de la migration et les confronte
-    aux enums Zod. Crie plus tôt (CI au lieu du seed) sans rendre l'écart impossible, mais
-    couvre TOUS les CHECK — y compris la cardinalité, c.-à-d. le cas `equipement` qui a
-    déclenché l'épisode.
-- Implémenter au minimum sur `ingredient_principal` et `type_cuisine` (les deux enums qui
-  ont effectivement dérivé).
-- Test discriminant : une divergence introduite volontairement entre un enum Zod et son
-  CHECK SQL doit échouer en CI, pas au seed.
-
-**Critères d'acceptation :** un écart enum Zod ↔ CHECK SQL est détecté en CI. Idéalement
-structurellement impossible.
-
-> Point de cadrage qui tranche le choix : la génération seule ne couvre que les CHECK
-> d'appartenance. Le cas `equipement` était une contrainte de cardinalité — une génération
-> d'enums ne l'aurait jamais attrapé. Si l'objectif est de fermer tout le Trou A (le cas
-> vécu inclus), la génération seule est insuffisante ; il faut l'assertion runtime, ou les
-> deux. À ouvrir en session dédiée, pas en cours de route.
 
 ### TK-15 — Baseline de schéma DB + source de vérité unique  ·  M
 **Origine :** incident 500 /shopping-list. Cause racine : aucune migration ne reproduit le schéma courant from scratch.
@@ -150,17 +93,8 @@ Sous-tâches :
 
 **Critères :** aucun ingrédient/recette hors-YAML ne subsiste après seed, ou détection explicite. Priorité basse, candidat V2.
 
-### TK-18 — Bug d'hydratation ShareLink (URL relative SSR vs absolue client)  ·  S
-**Origine :** repéré pendant le debug de l'incident shopping-list.
 
-`ShareLink.tsx:39` — `displayUrl` calculé via `window.location.origin`, indisponible au SSR. Le serveur rend le chemin relatif, le client l'URL absolue → mismatch d'hydratation. React régénère côté client, mais le warning est réel et l'URL de partage peut flasher en relatif. Or c'est LE mécanisme de partage du produit (CLAUDE_PROJECT.md §5), pas un détail.
-
-Sous-tâches :
-- Rendre l'origin déterministe des deux côtés via `NEXT_PUBLIC_SITE_URL` (SSR et client rendent la même URL absolue), plutôt qu'un calcul client-only avec flash.
-
-**Critères :** pas de mismatch d'hydratation sur `/sejour` ; URL de partage absolue, identique SSR et client.
-
-### TK-21 — Violations séparées post-retry : allergènes ≠ exclusions  ·  S
+### TK-21 — Violations séparées post-retry : allergènes ≠ exclusions  ·  S  ✅ Livré
 **Origine :** revue TK-05 2C (architect/qa-engineer), ADR-011 §7.
 
 `validation_failed_after_retries` agrège toutes les violations dans `lastViolations` au lieu de
@@ -170,65 +104,116 @@ chemin rare post-retry : un log de debug indistinguable rend l'analyse d'inciden
 
 **Critères :** `validation_failed_after_retries` expose deux champs séparés ; tests discriminants.
 
-> Chemin rare (post-retry), non-bloquant TK-05 2C. À traiter avant toute extension du validateur.
+### TK-30 — Cleanup CLAUDE_PROJECT.md · Annulé (2026-07-01)
+Prémisse infirmée : end-session.sh ne mécanise que l'état git final de
+session ; aucune règle de CLAUDE_PROJECT.md §6 n'est en double. La ligne
+« git status avant/après commit » est hors scope du gate (par-commit ≠
+état final) et RESTE. Rien à retirer.
 
-### TK-22 — Nettoyage zombies vocabulaire : DietaryRestrictionSchema / REGIME_LABELS / toggleRegime  ·  S
-**Origine :** revue TK-05 2C (qa-engineer).
+### TK-32 — Garde read-contract.ts ↔ selects DAL réels · S
+Vérifier que chaque colonne déclarée dans `read-contract.ts` est effectivement lue par une
+requête du DAL, et que chaque colonne lue par le DAL figure dans `read-contract.ts`. Contrat
+statique seul (TK-16 Modèle A) : si une colonne disparaît du DAL sans être retirée du contrat,
+aucun gate ne le détecte.
 
-Résidus de l'ancien vocabulaire "régimes" non supprimés lors du renommage en "exclusions" :
-`DietaryRestrictionSchema`, `REGIME_LABELS`, `toggleRegime` (et éventuellement des references
-dans les tests). Ces symboles créent une confusion nomenclature et augmentent le risque de
-régression silencieuse si une référence pointe vers l'ancien vocabulaire.
+**Critères :** un écart `read-contract.ts` ↔ selects DAL réels est détecté en CI.
 
-**Critères :** `grep -r "toggleRegime\|REGIME_LABELS\|DietaryRestrictionSchema"` retourne zéro hit.
+> Complément naturel de TK-16 Modèle A. Requiert AST ou grep structuré sur les requêtes DAL.
 
-> Purement cosmétique/dette nomenclature. Aucun risque de régression comportementale.
+> **Note (2026-06-27) :** Le parser de `check-read-contract.ts` cible `schema/canonical.sql`
+> (DDL, blocs `CREATE TABLE`) — pas la section `COL` produite par `introspect-schema.sql`
+> (introspection live). Si `canonical.sql` présente des variantes de formatage non couvertes
+> par le regex (colonnes en `"guillemets"`, `CONSTRAINT` imbriqué, indentation non standard),
+> le parser peut manquer des colonnes silencieusement. TK-33 couvre le durcissement du parser ;
+> TK-32 peut ensuite s'appuyer dessus pour la garde DAL ↔ contrat.
 
-### TK-23 — Map non sérialisable en prop RSC→Client · S
-`src/app/sejour/[id]/page.tsx` passe `recettes` en `Map<string,Recette>` à `SejourContent`
-(Client). Non sérialisable au boundary RSC. Vérifier si c'est le cas aujourd'hui ; si oui,
-passer en `Record<string,Recette>`. Latent mais réel.
+### TK-33 — Durcir + tester le parser canonical.sql de check-read-contract.ts · S
+**Origine :** note de fin de session TK-16 / TK-32.
 
-### TK-24 — tool input_schema dérivé de Zod · S
-`COMPOSE_PLANNING_TOOL` (`llm/client.ts`) duplique `LLMPlanningOutputSchema`. Générer l'`input_schema`
-depuis le Zod (`zod-to-json-schema`). Cousin de TK-13.
+Le parser de `check-read-contract.ts` extrait les colonnes des blocs `CREATE TABLE` de
+`schema/canonical.sql` via regex. Guillemets (`"colonne"`) et `CONSTRAINT` inline sont déjà
+gérés. Les cas restants non couverts :
+- indentation non standard (tabulations, espaces multiples)
+- `CONSTRAINT` sur ligne séparée (multi-ligne)
 
-### TK-25 — Sortir buildFilterConstraintsFromSejour des routes · S
-Logique métier inline dans `planning/route.ts` → migrer dans `src/lib/allergens/filter.ts`.
-Propreté archi, non urgent.
+Un parser qui rate ces cas manque des colonnes **silencieusement** — aucune erreur, faux-positif
+de conformité.
 
-### TK-26 — État d'erreur UI explicite sur /sejour/[id] · S
-Distinguer "pas encore généré" de "erreur de chargement" (`query_failed` / `row_validation_failed`
-aujourd'hui silencieusement → null).
+**Critères :**
+- Au moins un test unitaire par cas manquant (indentation non standard, `CONSTRAINT` multi-ligne)
+- Le parser passe tous les cas sans régression sur les cas existants
+- CI verte (`typecheck` + `test` + `validate`)
 
-### TK-27 — Dark mode : trancher · S
-Soit tokens dark propres, soit documenter light-only. Dette consciente Sprint 1, faible pri.
+> Prérequis de TK-32 : la garde DAL ↔ contrat ne peut être fiable que si le parser
+> en amont est couvert. À faire avant ou en même temps que TK-32.
 
-### TK-30 — Cleanup CLAUDE_PROJECT.md : supprimer les règles mécanisées par end-session · S
-**Origine :** clôture session post-TK-29 (gate end-session).
-
-Les règles de discipline couvertes mécaniquement par `npm run end-session` restent documentées en double dans CLAUDE_PROJECT.md. Double comptabilité → risque de divergence si l'une évolue sans l'autre.
-
-**Critères :** les règles couvertes par end-session sont retirées de CLAUDE_PROJECT.md ; la source de vérité est le script, pas le doc.
-
-> Pas de risque comportemental. Tâche côté Project (édition du doc).
-
-### TK-31 — Convention TK-XX dans les commits : mini-ADR · S
+### TK-31 — Convention TK-XX dans les commits : mini-ADR · S ✅
 **Origine :** clôture session post-TK-29 · préalable au gate backlog v2.
 
 Aucune règle formelle ne définit si/comment le numéro de ticket doit apparaître dans les commits. Le gate backlog v2 ne peut pas vérifier la couverture si la convention est floue.
 
 **Critères :** un mini-ADR tranche la convention (obligatoire/optionnel, format, scope) ; le gate backlog v2 s'y réfère.
 
-> **Préalable au gate backlog v2.** À trancher en session dédiée, avant tout ticket d'exécution qui ajouterait une règle dépendante.
+**Livré (2026-07-01) :** ADR-020 — surface primaire = label PR (`TK-XX` ou `no-ticket`) ; pushs directs sur main → trailer `Refs: TK-XX`. Convention merge-agnostique. Ligne ajoutée dans CLAUDE.md §Convention de référencement ticket ↔ PR. Ticket différable créé : TK-37 (politique de merge).
+
+### TK-37 — [structurant] Trancher squash-only sur main · à ADR
+**Origine :** cadrage TK-31 (ADR-020). Branch protection déjà active (PR obligatoire + 4 checks, constat terrain 2026-07-01) — le résidu ouvert n'est PAS l'interdiction des pushs directs (faite) mais le durcissement squash-only : désactiver merge-commit + rebase pour homogénéiser l'historique. Blast radius (granularité intra-feature perdue) → ADR dédié avant exécution. Différable : ADR-020 est merge-agnostique et tient sans ça.
+
+### TK-36 — Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal  ·  S/trivial
+**Origine :** fausse violation cohérence dans Test A (TK-21).
+
+Trois informations contradictoires sur le même fixture : nom « agneau », `ingredient_principal`
+`'boeuf'`, et ingrédients sans viande. Un sweep des usages est requis avant le fix : plusieurs
+tests (profils coeliaque / allergies-multiples) s'appuient sur `'boeuf' ≠ 'legumes'` pour ce
+fixture — aligner naïvement le nom sans adapter les assertions les casserait.
+
+**Critères :** `nom`, `ingredient_principal`, et ingrédients du fixture sont cohérents entre eux ;
+CI verte après sweep des tests dépendants.
+
+---
+
+### TK-35 — [DORMANT] canonical.sql : génération pg_dump déterministe cross-machine
+**Origine :** clôture TK-10. schema-replay rouge sur PR #54, cause non traitée.
+
+`schema/canonical.sql` est un `pg_dump` brut (ADR-013 §3). Sa forme dépend de la version de
+pg_dump qui le génère : Homebrew/Mac trie les fonctions par OID de création + 2 lignes vides
+avant `ALTER FUNCTION` (CREATE OR REPLACE sans DROP) ; Ubuntu/pgdg (la CI) trie
+alphabétiquement + 1 ligne vide. Le replay CI diff contre canonical → rouge purement
+cosmétique, sans rapport avec le schéma. En TK-10, régénéré à la main pour matcher la CI.
+La cause demeure : le prochain dump depuis un Mac reproduit l'écart.
+
+Décision active : on absorbe à la main (solo, mono-machine — douleur latente, pas active).
+Choix explicite, PAS un oubli.
+
+NE PART PAS EN EXÉCUTION en l'état — porte un fork structurant à trancher avant cadrage :
+  - Normaliser le dump (tri + whitespace avant diff) redéfinit ce que canonical.sql EST :
+    il cesse d'être un pg_dump brut → amendement ADR-013 §3 (on touche l'oracle de diff).
+  - Figer la version pg_dump (conteneur de génération) ne touche pas l'oracle, contraint sa
+    production (tout contributeur génère via le conteneur) → conséquence opérationnelle.
+Les deux voies divergent sur ce qu'on sanctuarise → architect + ADR (vraisemblablement
+amendement ADR-013), pas un choix d'exécutant. Penchant courant : conteneur > normalisation
+(ne pas glisser une couche de traitement entre la réalité et l'oracle qui a fermé l'incident
+500).
+
+Réouverture (un seul suffit) : 2e contributeur sur OS différent · changement de ta machine
+ou de version pg_dump locale · prochaine divergence replay non liée au schéma réel.
 
 ---
 
 ## V2 — Hors MVP (noté pour mémoire)
 
-### TK-28 — Chargement ciblé du catalogue recettes · V2
-Page séjour charge le catalogue complet. Jointure SQL / fetch par `recette_id`. Sans objet
-<100 recettes, structurant à 500.
+### TK-28 — [DORMANT] Chargement ciblé du catalogue recettes · V2
+Page séjour charge le catalogue complet (prémisse NON revérifiée — à confirmer côté code
+au réveil). Fix : jointure SQL / fetch par `recette_id`. Purement perf, zéro impact
+correction/sûreté.
+
+Seuil de réveil (un seul suffit) :
+  - catalogue > ~100 recettes, OU
+  - latence page séjour ressentie en conditions réelles.
+En-dessous, sans objet — le catalogue fait quelques dizaines de recettes.
+
+NE PAS CADRER tant que le seuil n'est pas franchi. Au réveil, passe cheap d'abord :
+confirmer que la page charge encore le catalogue complet — le fix peut déjà être caduc.
 
 ### TK-08 — Optimisation réutilisation des ingrédients entre recettes
 **Origine :** feedback 9 · point C validé (report assumé).
@@ -262,25 +247,28 @@ avec un trou.
 | Ticket | Titre | Priorité | Effort | Statut |
 |--------|-------|----------|--------|--------|
 | TK-08 | Réutilisation ingrédients | V2 | — | À faire |
-| TK-09 | Nettoyage DAL sejours | P2 | M | À faire |
-| TK-10 | createSejour atomique via RPC | P2 | M | À faire |
-| TK-12 | Tests d'intégration TK-03 | P2 | M | À faire |
-| TK-13 | Source unique enums SQL + Zod (Trou A) | P2 | M | À faire |
+| TK-12 | Tests d'intégration TK-03 | P2 | M | Fait |
+| TK-13 | Source unique enums SQL + Zod (Trou A) | P2 | S | Fait |
 | TK-14 | Règles de cohérence sémantiques restantes | V2 | — | À faire |
-| TK-15 | Baseline schéma DB + source de vérité | P2 | M | À faire |
-| TK-16 | Gate déploiement : schéma DB ↔ code | P2 | M | À faire |
+| TK-15 | Baseline schéma DB + source de vérité | P2 | M | Fait |
+| TK-16 | Gate déploiement : schéma DB ↔ code | P2 | M | Fait |
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
-| TK-18 | Bug hydratation ShareLink | P2 | S | À faire |
-| TK-20 | Raffiner taxonomie ingrédients (garde déterministe porc/viande-rouge/alcool) | P2 | M | À faire |
-| TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | À faire |
-| TK-22 | Nettoyage zombies vocabulaire DietaryRestrictionSchema / REGIME_LABELS | P2 | S | À faire |
-| TK-23 | Map non sérialisable RSC→Client | P2 | S | À faire |
-| TK-24 | tool input_schema dérivé de Zod | P2 | S | À faire |
-| TK-25 | Sortir buildFilterConstraintsFromSejour des routes | P2 | S | À faire |
-| TK-26 | État d'erreur UI explicite /sejour/[id] | P2 | S | À faire |
-| TK-27 | Dark mode : trancher | P2 | S | À faire |
-| TK-28 | Chargement ciblé du catalogue recettes | V2 | — | À faire |
-| TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | À faire |
-| TK-31 | Convention TK-XX commits (mini-ADR) | P2 | S | À faire |
+| TK-18 | Bug hydratation ShareLink | P2 | S | Fait |
+| TK-20 | [DORMANT] Réouverture conditionnelle garde porc/viande-rouge/alcool | P2 | — | Dormant |
+| TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | Fait |
+| TK-24 | tool input_schema dérivé de Zod | P2 | S | Fait |
+| TK-25 | Sortir buildPlanningConstraints des routes | P2 | S | Fait |
+| TK-27 | Dark mode : trancher | P2 | S | Fait |
+| TK-28 | [DORMANT] Chargement ciblé du catalogue recettes | V2 | — | Dormant |
+| TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | Annulé |
+| TK-31 | Convention TK-XX commits (ADR-020) | P2 | S | Fait |
+| TK-37 | [structurant] Politique de merge unique sur main | P2 | — | À faire |
+| TK-32 | Garde read-contract.ts ↔ selects DAL réels | P2 | S | Fait |
+| TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
+| TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
+| TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
+| TK-36 | Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal | P2 | S/trivial | À faire |
 
-**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → dette data/DAL (TK-09, TK-10, TK-13, TK-12, TK-20) quand le fonctionnel est stable → nettoyage/archi S (TK-21, TK-22, TK-23, TK-24, TK-25, TK-26, TK-27, TK-30) → V2 (TK-08, TK-14, TK-28).
+**Ordre conseillé :** nettoyage/archi S (TK-36) → V2 (TK-08, TK-14). TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
+
+> **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.

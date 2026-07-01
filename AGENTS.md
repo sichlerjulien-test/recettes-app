@@ -15,3 +15,10 @@ Le check TypeScript repo-wide utilise `tsc --noEmit`, **pas** `next build`.
 - Le check TypeScript de qa-engineer (`check #2`) est figé sur `npx tsc --noEmit` — jamais `next build`, jamais `tsc` restreint à `src/`.
 - Le gate CI (.github/workflows/ci.yml) impose trois required status checks indépendants : `typecheck`, `test`, `validate`. Les trois doivent être verts pour un merge.
 <!-- END:ci-gate-rules -->
+
+<!-- BEGIN:test-setup-rules -->
+# Convention harnais de test — setup global vs mock file-local
+
+Polyfills d'environnement jsdom (ResizeObserver, etc.) → `tests/vitest.setup.ts` via `setupFiles` global.
+`vi.mock(module)` → jamais en `setupFiles` (s'appliquerait à toute la suite) : reste file-local. Extraire un helper partagé seulement au 2ᵉ consommateur.
+<!-- END:test-setup-rules -->

@@ -266,8 +266,8 @@ describe('generatePlanning', () => {
     if (!result.ok) {
       expect(result.error.kind).toBe('validation_failed_after_retries');
       if (result.error.kind === 'validation_failed_after_retries') {
-        expect(result.error.lastViolations.length).toBeGreaterThan(0);
-        expect(result.error.lastViolations[0]?.kind).toBe('recette_inconnue');
+        expect(result.error.last_security_violations.length).toBeGreaterThan(0);
+        expect(result.error.last_security_violations[0]?.kind).toBe('recette_inconnue');
       }
     }
   });
@@ -380,7 +380,7 @@ describe('generatePlanning', () => {
     if (!result.ok) {
       expect(result.error.kind).toBe('validation_failed_after_retries');
       if (result.error.kind === 'validation_failed_after_retries') {
-        const unknownViolations = result.error.lastViolations.filter(
+        const unknownViolations = result.error.last_security_violations.filter(
           (v) => v.kind === 'recette_inconnue',
         );
         expect(unknownViolations.length).toBeGreaterThan(0);
@@ -415,12 +415,12 @@ describe('generatePlanning', () => {
     };
 
     // Sorties LLM valides pour chaque profil.
-    // Profil coeliaque : salade-tomate-basilic (pas de gluten) + tajine-agneau-soir (pas de gluten,
+    // Profil coeliaque : salade-tomate-basilic (pas de gluten) + tajine-boeuf-soir (pas de gluten,
     //   ingredient_principal 'boeuf' ≠ 'legumes' → pas de violation consecutif)
     const VALID_COELIAQUE_OUTPUT: GeneratePlanningOutput = {
       entries: [
         { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
-        { jour: 1, repas: 'soir', recette_id: 'tajine-agneau-soir' },
+        { jour: 1, repas: 'soir', recette_id: 'tajine-boeuf-soir' },
       ],
     };
     // Profil vegan : contexte 1 seul slot (midi) pour éviter ingredient_principal_consecutif
@@ -437,11 +437,11 @@ describe('generatePlanning', () => {
       ],
     };
     // Profil allergies multiples : mêmes recettes sans allergène que coeliaque (salade-tomate-basilic
-    // et tajine-agneau-soir n'ont ni gluten, ni lait, ni fruits-coque, ni arachides)
+    // et tajine-boeuf-soir n'ont ni gluten, ni lait, ni fruits-coque, ni arachides)
     const VALID_ALLERGIES_MULTIPLES_OUTPUT: GeneratePlanningOutput = {
       entries: [
         { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
-        { jour: 1, repas: 'soir', recette_id: 'tajine-agneau-soir' },
+        { jour: 1, repas: 'soir', recette_id: 'tajine-boeuf-soir' },
       ],
     };
 
@@ -541,7 +541,7 @@ describe('generatePlanning', () => {
       const violatingOutput: GeneratePlanningOutput = {
         entries: [
           { jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' },
-          { jour: 1, repas: 'soir', recette_id: 'tajine-agneau-soir' },
+          { jour: 1, repas: 'soir', recette_id: 'tajine-boeuf-soir' },
         ],
       };
       const mockClient = createMockClient({
@@ -563,7 +563,7 @@ describe('generatePlanning', () => {
       if (!result.ok) {
         expect(result.error.kind).toBe('validation_failed_after_retries');
         if (result.error.kind === 'validation_failed_after_retries') {
-          const allergenViolations = result.error.lastViolations.filter((v) => v.kind === 'allergen');
+          const allergenViolations = result.error.last_security_violations.filter((v) => v.kind === 'allergen');
           expect(allergenViolations.length).toBeGreaterThan(0);
           // La violation porte bien sur 'gluten' pour participantCoeliaque
           const glutenViolations = allergenViolations.filter(
@@ -574,6 +574,127 @@ describe('generatePlanning', () => {
       }
       // 3 tentatives toutes échouées, le LLM a bien été appelé (≠ pool_empty)
       expect(mockClient.calls).toHaveLength(3);
+    });
+
+    // Violations séparées (TK-21) ──────────────────────────────────────────────
+
+    it('Test A — allergen seul : seul last_security_violations peuplé', async () => {
+      // 1 slot uniquement → pas de violation cohérence ; pates-bolognaise a gluten
+      const violatingOutput: GeneratePlanningOutput = {
+        entries: [{ jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' }],
+      };
+      const mockClient = createMockClient({
+        kind: 'success_after_failures',
+        failuresBefore: [violatingOutput, violatingOutput, violatingOutput],
+        finalSuccess: VALID_COELIAQUE_OUTPUT,
+      });
+
+      const result = await generatePlanning(
+        mockClient,
+        allRecettes(),
+        recettesMap,
+        COELIAQUE_CONSTRAINTS,
+        [participantCoeliaque],
+        SINGLE_MIDI_CONTEXTE,
+      );
+
+      expect(result.ok).toBe(false);
+      if (!result.ok && result.error.kind === 'validation_failed_after_retries') {
+        expect(result.error.last_security_violations.length).toBeGreaterThan(0);
+        expect(result.error.last_exclusion_violations).toHaveLength(0);
+        expect(result.error.last_coherence_violations).toHaveLength(0);
+      }
+    });
+
+    it('Test B — exclusion seule : seul last_exclusion_violations peuplé', async () => {
+      // tajine-boeuf-soir contient de la viande → viole vegan ; aucun allergène pour participantVegan
+      const violatingOutput: GeneratePlanningOutput = {
+        entries: [{ jour: 1, repas: 'midi', recette_id: 'tajine-boeuf-soir' }],
+      };
+      const mockClient = createMockClient({
+        kind: 'success_after_failures',
+        failuresBefore: [violatingOutput, violatingOutput, violatingOutput],
+        finalSuccess: VALID_VEGAN_OUTPUT,
+      });
+
+      const result = await generatePlanning(
+        mockClient,
+        allRecettes(),
+        recettesMap,
+        VEGAN_CONSTRAINTS,
+        [participantVegan],
+        SINGLE_MIDI_CONTEXTE,
+      );
+
+      expect(result.ok).toBe(false);
+      if (!result.ok && result.error.kind === 'validation_failed_after_retries') {
+        expect(result.error.last_security_violations).toHaveLength(0);
+        expect(result.error.last_exclusion_violations.length).toBeGreaterThan(0);
+        expect(result.error.last_coherence_violations).toHaveLength(0);
+      }
+    });
+
+    it('Test C — cohérence seule : seul last_coherence_violations peuplé', async () => {
+      // Même recette deux fois → recette_dupliquee (bloquant) ; aucun allergène ni exclusion
+      const violatingOutput: GeneratePlanningOutput = {
+        entries: [
+          { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
+          { jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic' },
+        ],
+      };
+      const mockClient = createMockClient({
+        kind: 'success_after_failures',
+        failuresBefore: [violatingOutput, violatingOutput, violatingOutput],
+        finalSuccess: VALID_OUTPUT,
+      });
+
+      const result = await generatePlanning(
+        mockClient,
+        allRecettes(),
+        recettesMap,
+        NO_CONSTRAINTS,
+        [participantSansContrainte],
+        BASE_CONTEXTE,
+      );
+
+      expect(result.ok).toBe(false);
+      if (!result.ok && result.error.kind === 'validation_failed_after_retries') {
+        expect(result.error.last_security_violations).toHaveLength(0);
+        expect(result.error.last_exclusion_violations).toHaveLength(0);
+        expect(result.error.last_coherence_violations.length).toBeGreaterThan(0);
+      }
+    });
+
+    it('Test D — mixte allergène+exclusion : zéro fuite entre champs', async () => {
+      // participantCoeliaqueVegan : allergies ['gluten'] + exclusions ['vegan']
+      // pates-bolognaise : gluten (allergen) + viande (non vegan)
+      const violatingOutput: GeneratePlanningOutput = {
+        entries: [{ jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' }],
+      };
+      const mockClient = createMockClient({
+        kind: 'success_after_failures',
+        failuresBefore: [violatingOutput, violatingOutput, violatingOutput],
+        finalSuccess: { entries: [{ jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' }] },
+      });
+
+      const result = await generatePlanning(
+        mockClient,
+        allRecettes(),
+        recettesMap,
+        COELIAQUE_VEGAN_CONSTRAINTS,
+        [participantCoeliaqueVegan],
+        SINGLE_MIDI_CONTEXTE,
+      );
+
+      expect(result.ok).toBe(false);
+      if (!result.ok && result.error.kind === 'validation_failed_after_retries') {
+        expect(result.error.last_security_violations.length).toBeGreaterThan(0);
+        expect(result.error.last_exclusion_violations.length).toBeGreaterThan(0);
+        expect(result.error.last_coherence_violations).toHaveLength(0);
+        // Isolation : aucune fuite de kind entre champs
+        expect(result.error.last_security_violations.every((v) => v.kind === 'allergen' || v.kind === 'recette_inconnue')).toBe(true);
+        expect(result.error.last_exclusion_violations.every((v) => v.kind === 'exclusion')).toBe(true);
+      }
     });
 
     // Le LLM ne reçoit ni allergènes ni participants pour les profils contraints ──────────────────
