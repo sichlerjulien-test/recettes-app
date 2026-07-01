@@ -159,18 +159,6 @@ Aucune règle formelle ne définit si/comment le numéro de ticket doit apparaî
 ### TK-37 — [structurant] Trancher squash-only sur main · à ADR
 **Origine :** cadrage TK-31 (ADR-020). Branch protection déjà active (PR obligatoire + 4 checks, constat terrain 2026-07-01) — le résidu ouvert n'est PAS l'interdiction des pushs directs (faite) mais le durcissement squash-only : désactiver merge-commit + rebase pour homogénéiser l'historique. Blast radius (granularité intra-feature perdue) → ADR dédié avant exécution. Différable : ADR-020 est merge-agnostique et tient sans ça.
 
-### TK-36 — Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal  ·  S/trivial
-**Origine :** fausse violation cohérence dans Test A (TK-21).
-
-Trois informations contradictoires sur le même fixture : nom « agneau », `ingredient_principal`
-`'boeuf'`, et ingrédients sans viande. Un sweep des usages est requis avant le fix : plusieurs
-tests (profils coeliaque / allergies-multiples) s'appuient sur `'boeuf' ≠ 'legumes'` pour ce
-fixture — aligner naïvement le nom sans adapter les assertions les casserait.
-
-**Critères :** `nom`, `ingredient_principal`, et ingrédients du fixture sont cohérents entre eux ;
-CI verte après sweep des tests dépendants.
-
----
 
 ### TK-35 — [DORMANT] canonical.sql : génération pg_dump déterministe cross-machine
 **Origine :** clôture TK-10. schema-replay rouge sur PR #54, cause non traitée.
@@ -267,8 +255,7 @@ avec un trou.
 | TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
 | TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
-| TK-36 | Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal | P2 | S/trivial | À faire |
 
-**Ordre conseillé :** nettoyage/archi S (TK-36) → V2 (TK-08, TK-14). TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
+**Ordre conseillé :** V2 (TK-08, TK-14). TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
 > **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.
