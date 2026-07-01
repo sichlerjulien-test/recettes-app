@@ -104,14 +104,11 @@ chemin rare post-retry : un log de debug indistinguable rend l'analyse d'inciden
 
 **Critères :** `validation_failed_after_retries` expose deux champs séparés ; tests discriminants.
 
-### TK-30 — Cleanup CLAUDE_PROJECT.md : supprimer les règles mécanisées par end-session · S
-**Origine :** clôture session post-TK-29 (gate end-session).
-
-Les règles de discipline couvertes mécaniquement par `npm run end-session` restent documentées en double dans CLAUDE_PROJECT.md. Double comptabilité → risque de divergence si l'une évolue sans l'autre.
-
-**Critères :** les règles couvertes par end-session sont retirées de CLAUDE_PROJECT.md ; la source de vérité est le script, pas le doc.
-
-> Pas de risque comportemental. Tâche côté Project (édition du doc).
+### TK-30 — Cleanup CLAUDE_PROJECT.md · Annulé (2026-07-01)
+Prémisse infirmée : end-session.sh ne mécanise que l'état git final de
+session ; aucune règle de CLAUDE_PROJECT.md §6 n'est en double. La ligne
+« git status avant/après commit » est hors scope du gate (par-commit ≠
+état final) et RESTE. Rien à retirer.
 
 ### TK-32 — Garde read-contract.ts ↔ selects DAL réels · S
 Vérifier que chaque colonne déclarée dans `read-contract.ts` est effectivement lue par une
@@ -254,7 +251,7 @@ avec un trou.
 | TK-25 | Sortir buildPlanningConstraints des routes | P2 | S | Fait |
 | TK-27 | Dark mode : trancher | P2 | S | Fait |
 | TK-28 | Chargement ciblé du catalogue recettes | V2 | — | À faire |
-| TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | À faire |
+| TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | Annulé |
 | TK-31 | Convention TK-XX commits (ADR-020) | P2 | S | Fait |
 | TK-37 | [structurant] Politique de merge unique sur main | P2 | — | À faire |
 | TK-32 | Garde read-contract.ts ↔ selects DAL réels | P2 | S | Fait |
@@ -263,6 +260,6 @@ avec un trou.
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
 | TK-36 | Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal | P2 | S/trivial | À faire |
 
-**Ordre conseillé :** nettoyage/archi S (TK-30, TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
+**Ordre conseillé :** nettoyage/archi S (TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
 > **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.
