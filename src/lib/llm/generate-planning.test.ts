@@ -415,12 +415,12 @@ describe('generatePlanning', () => {
     };
 
     // Sorties LLM valides pour chaque profil.
-    // Profil coeliaque : salade-tomate-basilic (pas de gluten) + tajine-agneau-soir (pas de gluten,
+    // Profil coeliaque : salade-tomate-basilic (pas de gluten) + tajine-boeuf-soir (pas de gluten,
     //   ingredient_principal 'boeuf' ≠ 'legumes' → pas de violation consecutif)
     const VALID_COELIAQUE_OUTPUT: GeneratePlanningOutput = {
       entries: [
         { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
-        { jour: 1, repas: 'soir', recette_id: 'tajine-agneau-soir' },
+        { jour: 1, repas: 'soir', recette_id: 'tajine-boeuf-soir' },
       ],
     };
     // Profil vegan : contexte 1 seul slot (midi) pour éviter ingredient_principal_consecutif
@@ -437,11 +437,11 @@ describe('generatePlanning', () => {
       ],
     };
     // Profil allergies multiples : mêmes recettes sans allergène que coeliaque (salade-tomate-basilic
-    // et tajine-agneau-soir n'ont ni gluten, ni lait, ni fruits-coque, ni arachides)
+    // et tajine-boeuf-soir n'ont ni gluten, ni lait, ni fruits-coque, ni arachides)
     const VALID_ALLERGIES_MULTIPLES_OUTPUT: GeneratePlanningOutput = {
       entries: [
         { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
-        { jour: 1, repas: 'soir', recette_id: 'tajine-agneau-soir' },
+        { jour: 1, repas: 'soir', recette_id: 'tajine-boeuf-soir' },
       ],
     };
 
@@ -541,7 +541,7 @@ describe('generatePlanning', () => {
       const violatingOutput: GeneratePlanningOutput = {
         entries: [
           { jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' },
-          { jour: 1, repas: 'soir', recette_id: 'tajine-agneau-soir' },
+          { jour: 1, repas: 'soir', recette_id: 'tajine-boeuf-soir' },
         ],
       };
       const mockClient = createMockClient({
@@ -607,9 +607,9 @@ describe('generatePlanning', () => {
     });
 
     it('Test B — exclusion seule : seul last_exclusion_violations peuplé', async () => {
-      // tajine-agneau-soir contient de la viande → viole vegan ; aucun allergène pour participantVegan
+      // tajine-boeuf-soir contient de la viande → viole vegan ; aucun allergène pour participantVegan
       const violatingOutput: GeneratePlanningOutput = {
-        entries: [{ jour: 1, repas: 'midi', recette_id: 'tajine-agneau-soir' }],
+        entries: [{ jour: 1, repas: 'midi', recette_id: 'tajine-boeuf-soir' }],
       };
       const mockClient = createMockClient({
         kind: 'success_after_failures',

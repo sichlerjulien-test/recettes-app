@@ -72,18 +72,22 @@ Ne JAMAIS mélanger les deux concepts :
 
 ### Définition de "repas cohérent" (règles dures, testables)
 
-Un planning valide DOIT respecter :
+Un planning valide DOIT respecter (règles réellement appliquées et testées) :
 
 - Structure journalière stricte : exactement 1 petit-déjeuner, 1 midi, 1 soir par jour, dans cet ordre chronologique. Jamais deux midis le même jour.
 - Pas deux fois la même recette dans le séjour.
 - Pas deux fois le même ingrédient principal (protéine ou féculent dominant) en jour calendaire.
 - Respect strict de l'équipement disponible (pas de recette four sans four).
-- Variété des types de cuisine sur le séjour.
 
-> Structure journalière, non-répétition de recette et unicité de l'ingrédient principal/jour
-> sont implémentées et isolées dans `src/lib/coherence/` (validateur déterministe post-LLM,
-> ADR-009). L'équipement est filtré en amont (pool pré-LLM). La variété des types de cuisine
-> reste à faire, reportée V2 (TK-14) : souhaitable, non bloquante.
+> Garanties : les trois premières règles par le validateur déterministe post-LLM isolé
+> dans `src/lib/coherence/` (ADR-009) ; l'équipement par le filtre pré-LLM (pool). Règle
+> affichée ici = règle appliquée dans le code. Ne rien ajouter à cette liste qui ne soit
+> pas enforced — un invariant listé mais non tenu est un piège à fausse confiance.
+
+**Souhaité, NON garanti (ne pas s'y fier) :** variété des types de cuisine sur le séjour.
+Non implémentée à ce jour, reportée V2 (TK-14). Délibérément hors de la liste « DOIT »
+ci-dessus : une règle non appliquée dans le code n'a rien à faire parmi les invariants,
+et aucun lecteur ni sub-agent ne doit la prendre pour acquise.
 
 ### Modèle d'unités d'achat (fait — TK-02)
 
