@@ -159,14 +159,8 @@ Aucune règle formelle ne définit si/comment le numéro de ticket doit apparaî
 
 **Livré (2026-07-01) :** ADR-020 — surface primaire = label PR (`TK-XX` ou `no-ticket`) ; pushs directs sur main → trailer `Refs: TK-XX`. Convention merge-agnostique. Ligne ajoutée dans CLAUDE.md §Convention de référencement ticket ↔ PR. Ticket différable créé : TK-37 (politique de merge).
 
-### TK-37 — [structurant] Politique de merge unique sur main (squash-only + branch protection, interdire pushs directs) · ADR
-**Origine :** session cadrage TK-31 (2026-07-01). Différable.
-
-La présence de pushs directs sur main impose un double oracle dans le gate backlog v2 (API PR + trailers commits). Unifier sur squash-only + branch protection supprimerait ce résidu, mais le blast radius est réel : hotfix directs, granularité intra-feature. Fork structurant → ADR dédié avant exécution.
-
-**Critères :** ADR tranche la politique de merge ; branch protection activée ; pushs directs bloqués.
-
-> La convention TK-31 (ADR-020) est merge-agnostique et survit sans ça. Ouvrir uniquement quand le coût du double oracle devient palpable ou qu'un 2e contributeur arrive.
+### TK-37 — [structurant] Trancher squash-only sur main · à ADR
+**Origine :** cadrage TK-31 (ADR-020). Branch protection déjà active (PR obligatoire + 4 checks, constat terrain 2026-07-01) — le résidu ouvert n'est PAS l'interdiction des pushs directs (faite) mais le durcissement squash-only : désactiver merge-commit + rebase pour homogénéiser l'historique. Blast radius (granularité intra-feature perdue) → ADR dédié avant exécution. Différable : ADR-020 est merge-agnostique et tient sans ça.
 
 ### TK-36 — Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal  ·  S/trivial
 **Origine :** fausse violation cohérence dans Test A (TK-21).
