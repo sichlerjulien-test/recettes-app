@@ -150,14 +150,23 @@ de conformité.
 > Prérequis de TK-32 : la garde DAL ↔ contrat ne peut être fiable que si le parser
 > en amont est couvert. À faire avant ou en même temps que TK-32.
 
-### TK-31 — Convention TK-XX dans les commits : mini-ADR · S
+### TK-31 — Convention TK-XX dans les commits : mini-ADR · S ✅
 **Origine :** clôture session post-TK-29 · préalable au gate backlog v2.
 
 Aucune règle formelle ne définit si/comment le numéro de ticket doit apparaître dans les commits. Le gate backlog v2 ne peut pas vérifier la couverture si la convention est floue.
 
 **Critères :** un mini-ADR tranche la convention (obligatoire/optionnel, format, scope) ; le gate backlog v2 s'y réfère.
 
-> **Préalable au gate backlog v2.** À trancher en session dédiée, avant tout ticket d'exécution qui ajouterait une règle dépendante.
+**Livré (2026-07-01) :** ADR-020 — surface primaire = label PR (`TK-XX` ou `no-ticket`) ; pushs directs sur main → trailer `Refs: TK-XX`. Convention merge-agnostique. Ligne ajoutée dans CLAUDE.md §Convention de référencement ticket ↔ PR. Ticket différable créé : TK-37 (politique de merge).
+
+### TK-37 — [structurant] Politique de merge unique sur main (squash-only + branch protection, interdire pushs directs) · ADR
+**Origine :** session cadrage TK-31 (2026-07-01). Différable.
+
+La présence de pushs directs sur main impose un double oracle dans le gate backlog v2 (API PR + trailers commits). Unifier sur squash-only + branch protection supprimerait ce résidu, mais le blast radius est réel : hotfix directs, granularité intra-feature. Fork structurant → ADR dédié avant exécution.
+
+**Critères :** ADR tranche la politique de merge ; branch protection activée ; pushs directs bloqués.
+
+> La convention TK-31 (ADR-020) est merge-agnostique et survit sans ça. Ouvrir uniquement quand le coût du double oracle devient palpable ou qu'un 2e contributeur arrive.
 
 ### TK-36 — Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal  ·  S/trivial
 **Origine :** fausse violation cohérence dans Test A (TK-21).
@@ -252,13 +261,14 @@ avec un trou.
 | TK-27 | Dark mode : trancher | P2 | S | Fait |
 | TK-28 | Chargement ciblé du catalogue recettes | V2 | — | À faire |
 | TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | À faire |
-| TK-31 | Convention TK-XX commits (mini-ADR) | P2 | S | À faire |
+| TK-31 | Convention TK-XX commits (ADR-020) | P2 | S | Fait |
+| TK-37 | [structurant] Politique de merge unique sur main | P2 | — | À faire |
 | TK-32 | Garde read-contract.ts ↔ selects DAL réels | P2 | S | Fait |
 | TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
 | TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
 | TK-36 | Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal | P2 | S/trivial | À faire |
 
-**Ordre conseillé :** TK-31 d'abord (préalable gate backlog v2) → nettoyage/archi S (TK-30, TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint).
+**Ordre conseillé :** nettoyage/archi S (TK-30, TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
 > **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.

@@ -24,6 +24,10 @@ Avant d'écrire la moindre ligne sur un ticket :
    le corps du ticket (issue GitHub) dans le même commit — pas après, pas dans un
    commit séparé. Si la sous-tâche n'est pas rayée, la clôture est incomplète.
 
+# Convention de référencement ticket ↔ PR (ADR-020)
+
+À l'ouverture d'une PR, poser exactement un label `TK-XX` (ou `no-ticket` si hors ticket). Commit poussé directement sur main hors PR : trailer `Refs: TK-XX` obligatoire.
+
 # Gate de clôture de session
 
 Clôture de session : `npm run end-session` doit afficher OK avant de fermer la conversation. Échec = session non close.
