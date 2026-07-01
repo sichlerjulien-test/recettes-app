@@ -2,7 +2,7 @@
 
 import { PlanningSection } from "./PlanningSection";
 import { ShoppingListSection } from "./ShoppingListSection";
-import type { Recette } from "@/lib/types/domain";
+import type { Recette, Ingredient } from "@/lib/types/domain";
 import type { PlanningState } from "@/lib/planning/resolve-planning-state";
 
 interface Props {
@@ -10,6 +10,7 @@ interface Props {
   token: string;
   planningState: PlanningState;
   recettes: Map<string, Recette>;
+  ingredients: Map<string, Ingredient>;
 }
 
 export function SejourContent({
@@ -17,12 +18,14 @@ export function SejourContent({
   token,
   planningState,
   recettes,
+  ingredients,
 }: Props) {
   return (
     <>
       <PlanningSection
         planningState={planningState}
         recettes={recettes}
+        ingredients={ingredients}
       />
       <ShoppingListSection
         sejourId={sejourId}
