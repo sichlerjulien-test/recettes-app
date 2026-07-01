@@ -202,9 +202,18 @@ ou de version pg_dump locale · prochaine divergence replay non liée au schéma
 
 ## V2 — Hors MVP (noté pour mémoire)
 
-### TK-28 — Chargement ciblé du catalogue recettes · V2
-Page séjour charge le catalogue complet. Jointure SQL / fetch par `recette_id`. Sans objet
-<100 recettes, structurant à 500.
+### TK-28 — [DORMANT] Chargement ciblé du catalogue recettes · V2
+Page séjour charge le catalogue complet (prémisse NON revérifiée — à confirmer côté code
+au réveil). Fix : jointure SQL / fetch par `recette_id`. Purement perf, zéro impact
+correction/sûreté.
+
+Seuil de réveil (un seul suffit) :
+  - catalogue > ~100 recettes, OU
+  - latence page séjour ressentie en conditions réelles.
+En-dessous, sans objet — le catalogue fait quelques dizaines de recettes.
+
+NE PAS CADRER tant que le seuil n'est pas franchi. Au réveil, passe cheap d'abord :
+confirmer que la page charge encore le catalogue complet — le fix peut déjà être caduc.
 
 ### TK-08 — Optimisation réutilisation des ingrédients entre recettes
 **Origine :** feedback 9 · point C validé (report assumé).
@@ -250,7 +259,7 @@ avec un trou.
 | TK-24 | tool input_schema dérivé de Zod | P2 | S | Fait |
 | TK-25 | Sortir buildPlanningConstraints des routes | P2 | S | Fait |
 | TK-27 | Dark mode : trancher | P2 | S | Fait |
-| TK-28 | Chargement ciblé du catalogue recettes | V2 | — | À faire |
+| TK-28 | [DORMANT] Chargement ciblé du catalogue recettes | V2 | — | Dormant |
 | TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | Annulé |
 | TK-31 | Convention TK-XX commits (ADR-020) | P2 | S | Fait |
 | TK-37 | [structurant] Politique de merge unique sur main | P2 | — | À faire |
@@ -260,6 +269,6 @@ avec un trou.
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
 | TK-36 | Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal | P2 | S/trivial | À faire |
 
-**Ordre conseillé :** nettoyage/archi S (TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
+**Ordre conseillé :** nettoyage/archi S (TK-36) → V2 (TK-08, TK-14). TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
 > **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.
