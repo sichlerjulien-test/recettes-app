@@ -353,7 +353,7 @@ const RECETTES_BASE: RecetteBase[] = [
   },
 
   {
-    id: 'tajine-agneau-soir',
+    id: 'tajine-boeuf-soir',
     nom: 'Tajine de bœuf',
     description: 'Tajine parfumé à la viande et aux légumes pour le dîner.',
     portions_base: 4,
