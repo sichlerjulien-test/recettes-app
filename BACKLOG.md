@@ -159,8 +159,34 @@ Aucune règle formelle ne définit si/comment le numéro de ticket doit apparaî
 
 **Livré (2026-07-01) :** ADR-020 — surface primaire = label PR (`TK-XX` ou `no-ticket`) ; pushs directs sur main → trailer `Refs: TK-XX`. Convention merge-agnostique. Ligne ajoutée dans CLAUDE.md §Convention de référencement ticket ↔ PR. Ticket différable créé : TK-37 (politique de merge).
 
-### TK-37 — [structurant] Trancher squash-only sur main · à ADR
-**Origine :** cadrage TK-31 (ADR-020). Branch protection déjà active (PR obligatoire + 4 checks, constat terrain 2026-07-01) — le résidu ouvert n'est PAS l'interdiction des pushs directs (faite) mais le durcissement squash-only : désactiver merge-commit + rebase pour homogénéiser l'historique. Blast radius (granularité intra-feature perdue) → ADR dédié avant exécution. Différable : ADR-020 est merge-agnostique et tient sans ça.
+### TK-37 — [DORMANT] Politique de merge unique sur main (squash-only)
+**Origine :** cadrage TK-31 (ADR-020) · constat terrain 2026-07-01.
+
+NE PART PAS EN EXÉCUTION en l'état. ADR-020 a rendu le gate backlog v2
+merge-agnostique (il lit PR→label via l'API GitHub, indifférent à squash/merge/
+rebase). Squash-only n'est donc requis par aucun mécanisme : son seul bénéfice est
+l'homogénéité de l'historique de `main`. Or cette homogénéité ne sert qu'un
+multi-contributeur, un `git bisect` inter-feature, ou un tooling qui parse
+`git log` — valeur nulle en solo mono-machine. Le coût symétrique (granularité
+intra-feature perdue au squash) est tout aussi théorique dans ce contexte. On
+trancherait un fork à deux plateaux vides. Décision réversible de surcroît (un
+toggle de réglage GitHub) : rien à figer d'avance.
+
+Déjà en place : branch protection active (PR obligatoire + 4 checks), pushs directs
+sur `main` interdits. Le résidu ouvert n'est QUE la désactivation de merge-commit +
+rebase. Non fait délibérément, pas oublié.
+
+**Seuils de réouverture (un seul suffit) :**
+  - un 2e contributeur rejoint le repo (l'homogénéité d'historique acquiert une
+    valeur réelle), OU
+  - le double oracle d'ADR-020 (API PR + trailers des commits directs) devient un
+    coût palpable, OU
+  - l'historique mixte de `main` gêne concrètement une opération réelle (bisect,
+    archéologie git) — pas « ce serait plus net ».
+
+État actuel : solo, mono-machine, aucun seuil franchi. Tant qu'aucun ne tombe, il
+n'y a rien à exécuter. Si un seuil tombe : ouvrir un ADR dédié (squash-only vs
+statu quo) avec la donnée déclenchante — ne pas pousser ce ticket tel quel.
 
 ### TK-36 — Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal  ·  S/trivial
 **Origine :** fausse violation cohérence dans Test A (TK-21).
@@ -256,13 +282,13 @@ avec un trou.
 | TK-28 | Chargement ciblé du catalogue recettes | V2 | — | À faire |
 | TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | À faire |
 | TK-31 | Convention TK-XX commits (ADR-020) | P2 | S | Fait |
-| TK-37 | [structurant] Politique de merge unique sur main | P2 | — | À faire |
+| TK-37 | [DORMANT] Politique de merge unique sur main (squash-only) | P2 | — | Dormant |
 | TK-32 | Garde read-contract.ts ↔ selects DAL réels | P2 | S | Fait |
 | TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
 | TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
 | TK-36 | Fixture tajine-agneau-soir : nom incohérent avec ingredient_principal | P2 | S/trivial | À faire |
 
-**Ordre conseillé :** nettoyage/archi S (TK-30, TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
+**Ordre conseillé :** nettoyage/archi S (TK-30, TK-36) → V2 (TK-08, TK-14, TK-28). TK-20 est DORMANT (seuil de réouverture non atteint). TK-37 est DORMANT (seuils de réouverture non atteints), au même titre que TK-20 et TK-35.
 
 > **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.
