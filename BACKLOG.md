@@ -214,7 +214,7 @@ ou de version pg_dump locale · prochaine divergence replay non liée au schéma
 
 ---
 
-## V2 — Hors MVP (noté pour mémoire)
+## V2 — Hors MVP
 
 ### TK-28 — [DORMANT] Chargement ciblé du catalogue recettes · V2
 Page séjour charge le catalogue complet (prémisse NON revérifiée — à confirmer côté code
@@ -229,24 +229,83 @@ En-dessous, sans objet — le catalogue fait quelques dizaines de recettes.
 NE PAS CADRER tant que le seuil n'est pas franchi. Au réveil, passe cheap d'abord :
 confirmer que la page charge encore le catalogue complet — le fix peut déjà être caduc.
 
+### TK-38 — Afficher les recettes dans le planning
+Afficher les recettes (étapes + ingrédients) dans le planning. Lecture seule, données déjà présentes (`etapes`, `ingredients`), hors pipeline allergènes. Priorité V2 haute : débloque le jugement des repas, prérequis UX de TK-41.
+
+### TK-39 — Recalibrer la non-répétition pour les séjours longs [ADR]
+Recalibrer la non-répétition pour les séjours longs (petit-déj répétables et/ou non-répétition glissante sur N jours). [ADR — touche une règle dure §4 + src/lib/coherence/] Motif : 7 jours = 21 créneaux dont 7 petit-déj, la règle est calibrée pour un week-end. Orthogonal aux allergènes.
+
+### TK-40 — Diagnostic de couverture du catalogue + durcir l'échec de génération
+Mesurer si le catalogue (post-TK-39) tient une semaine créneau par créneau ; distinguer `pool_empty` (retirer une contrainte) de profondeur insuffisante (ajouter des recettes de tel créneau), messages actionnables distincts. Son résultat décide si la « curation lourde » (V3) devient nécessaire.
+
+### TK-41 — Régénération partielle d'un repas [ADR]
+Remplacer un créneau sans régénérer tout le planning. [ADR] Piste à trancher : swap déterministe depuis le pool filtré (moins les recettes retenues), re-validé cohérence contre les repas gardés, sans LLM.
+
+### TK-42 — Créneau « resto / non cuisiné »
+Créneau exclu de la génération et de la liste de courses.
+
+### TK-43 — (optionnel) Feedback in-app loggé Supabase
+Pouce bas sur un repas loggé en Supabase pour instrumenter le test d'août.
+
+### TK-44 — Polish install PWA
+Polish manifest / icônes / add-to-home-screen.
+
+---
+
+## V3
+
 ### TK-08 — Optimisation réutilisation des ingrédients entre recettes
 **Origine :** feedback 9 · point C validé (report assumé).
 
 Orienter le choix des recettes pour que les ingrédients entamés soient réutilisés (le chou-fleur acheté entier mais à moitié utilisé sert ailleurs). Problème d'optimisation combinatoire — terrain à hallucinations LLM, à ne pas mélanger avec la réparation du moteur (TK-01). La part récupérable (affichage du surplus) est déjà adressée gratuitement par TK-02.
 
 ### TK-14 — Règles de cohérence sémantiques restantes
-**Origine :** hors-scope assumé d'ADR-009 · report V2 décidé après le merge de l'extraction.
+**Origine :** hors-scope assumé d'ADR-009 · report V2 décidé après le merge de l'extraction · reclassé V3 (2026-07-01) : le séjour d'août ne requiert pas cette règle.
 
 Structure journalière, non-répétition de recette et unicité de l'ingrédient principal/jour
 sont faites (TK-01) et désormais isolées dans `src/lib/coherence/`. Reste la variété des
 types de cuisine sur le séjour — listée comme règle dure en §4 de CLAUDE_PROJECT.md mais
-jamais implémentée. Reportée V2 : son absence dégrade le confort (séjour monotone), pas la
+jamais implémentée. Reportée V3 : son absence dégrade le confort (séjour monotone), pas la
 sûreté ni la cohérence structurelle.
 
 Hors de ce ticket : le respect de l'équipement est déjà garanti par le filtre pré-LLM
 (pas de four sans four). Le "backstop équipement" post-LLM évoqué en hors-scope d'ADR-009
 n'est qu'une redondance ceinture+bretelles, pas une règle manquante — ne pas le confondre
 avec un trou.
+
+### TK-45 — Auth / comptes [ADR]
+Auth / comptes. [ADR] Lié au store/monétisation ; renverse la décision no-auth (§5). Ne pas ouvrir avant.
+
+### TK-46 — Historique des séjours (server-side)
+Historique des séjours (server-side). Dépend de TK-45.
+
+### TK-47 — Packaging store iOS/Android (TWA / wrapper)
+Packaging store iOS/Android (TWA / wrapper).
+
+### TK-48 — Pondération des portions pour enfants
+Scaling uniforme actuel = sur-achat.
+
+**Curation lourde persona cœliaque + végétarien** — conditionnelle au résultat de TK-40.
+
+---
+
+## V4
+
+### TK-49 — Plafond de fréquence sur exclusions
+Plafond de fréquence sur exclusions (ex : viande rouge max 1×/sem). Objet distinct d'une exclusion binaire.
+
+### TK-50 — Présence partielle par repas
+Convives variables par créneau.
+
+**Non ticketés :**
+- Stratégie pricing + publication store (session dédiée).
+- Sync multi-appareils / multi-contributeur.
+
+---
+
+## Scope écarté
+
+- **UX « construire le planning plat par plat »** (version XL de l'idée 2) : écartée. On corrige un planning existant (TK-41), on ne le bâtit pas créneau par créneau.
 
 ---
 
@@ -260,10 +319,10 @@ avec un trou.
 
 | Ticket | Titre | Priorité | Effort | Statut |
 |--------|-------|----------|--------|--------|
-| TK-08 | Réutilisation ingrédients | V2 | — | À faire |
+| TK-08 | Réutilisation ingrédients | V3 | — | À faire |
 | TK-12 | Tests d'intégration TK-03 | P2 | M | Fait |
 | TK-13 | Source unique enums SQL + Zod (Trou A) | P2 | S | Fait |
-| TK-14 | Règles de cohérence sémantiques restantes | V2 | — | À faire |
+| TK-14 | Règles de cohérence sémantiques restantes | V3 | — | À faire |
 | TK-15 | Baseline schéma DB + source de vérité | P2 | M | Fait |
 | TK-16 | Gate déploiement : schéma DB ↔ code | P2 | M | Fait |
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
@@ -281,7 +340,20 @@ avec un trou.
 | TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
 | TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
+| TK-38 | Afficher les recettes dans le planning | V2 | — | À faire |
+| TK-39 | Recalibrer la non-répétition pour les séjours longs [ADR] | V2 | — | À faire |
+| TK-40 | Diagnostic de couverture du catalogue + durcir l'échec de génération | V2 | — | À faire |
+| TK-41 | Régénération partielle d'un repas [ADR] | V2 | — | À faire |
+| TK-42 | Créneau « resto / non cuisiné » | V2 | — | À faire |
+| TK-43 | (optionnel) Feedback in-app loggé Supabase | V2 | — | À faire |
+| TK-44 | Polish install PWA | V2 | — | À faire |
+| TK-45 | Auth / comptes [ADR] | V3 | — | À faire |
+| TK-46 | Historique des séjours (server-side) | V3 | — | À faire |
+| TK-47 | Packaging store iOS/Android (TWA / wrapper) | V3 | — | À faire |
+| TK-48 | Pondération des portions pour enfants | V3 | — | À faire |
+| TK-49 | Plafond de fréquence sur exclusions | V4 | — | À faire |
+| TK-50 | Présence partielle par repas | V4 | — | À faire |
 
-**Ordre conseillé :** V2 (TK-08, TK-14). TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
+**Ordre conseillé :** V2 — TK-38, puis TK-39 + le diagnostic de TK-40, puis TK-41, puis TK-42/43/44. Filler si trous : TK-17, TK-32/33. TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
 > **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.
