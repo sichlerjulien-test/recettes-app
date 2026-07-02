@@ -226,9 +226,20 @@ La confondre avec la répétition midi/soir dans la même règle est une sur-con
    est inchangé. Le flot retry ADR-009 §4 est inchangé. SEUL le prédicat de
    violation change.
 
-5. **Non-régression week-end** : pour un séjour ≤ N jours (≤ 3 jours), toute
-   paire de jours est à distance < N, donc la fenêtre couvre tout le séjour :
-   l'unicité totale est préservée, comportement Sarah inchangé.
+5. **Unicité intra-créneau (séjour ≤ N jours)** : pour un séjour ≤ N jours (≤ 3 jours),
+   la fenêtre glissante couvre tout le séjour — une recette ne se répète donc pas au
+   même créneau sur la totalité du séjour. L'unicité intra-créneau est préservée.
+
+   **Relâchement assumé — unicité cross-créneau** : le scoping par créneau supprime
+   la garantie d'unicité entre créneaux. Une recette éligible à la fois midi et soir
+   peut apparaître aux deux (jours différents ; le même jour reste bloqué par
+   `ingredient_principal_consecutif`). Ce relâchement est intentionnel.
+
+   - **Observabilité** : nulle tant qu'une recette n'appartient qu'à un seul créneau ;
+     devient réelle si le tagging autorise une recette sur midi ET soir.
+   - **Motif** : le scoping par créneau était nécessaire pour la faisabilité sur
+     pools filtrés minces (cœliaque + végé : midi=4, soir=5). Le gain de faisabilité
+     justifie le relâchement cross-créneau.
 
 ### Précédent
 
