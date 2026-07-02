@@ -241,28 +241,51 @@ Recalibrer la non-répétition pour les séjours longs (petit-déj répétables 
 
 **Livré (2026-07-02) : PR #77 + amendement ADR-009 (scoping `recette_dupliquee` par créneau, fenêtre glissante N=3)**
 
-### TK-40a — Diagnostic de couverture du catalogue · M ✅
+### TK-40a — Diagnostic de couverture du catalogue · M  ✅ Livré
 Mesurer, par créneau, si le catalogue tient une semaine, en appelant les vrais
 validateurs post-TK-39 (zéro réimplémentation de la cohérence). Sortie = rapport +
 verdict "tient / profondeur insuffisante: <créneau>". Ready — brief cadré côté Project.
 Son résultat décide si la curation lourde (V3, cf. TK-48) est nécessaire, et si TK-40b
 vaut la peine.
 
-**Livré (2026-07-02) — résultat : profil Sarah (cœliaque+végétarien, 7j) → tient
-(2 petit-dej / 4 midi / 5 soir). Catalogue suffisant. TK-40b reste quasi théorique.**
+**Livré (2026-07-02) :** profil Sarah (cœliaque + végétarien, 7j) → catalogue tient.
 
-### TK-40b — Durcir l'échec de génération [ADR]
-Distinguer `pool_empty` (retirer une contrainte) de "profondeur insuffisante" (ajouter
-des recettes de tel créneau), messages actionnables distincts. Pas ready — fork
-structurant non tranché : oracle de faisabilité déterministe pré-LLM (nouveau `kind`,
-risque de 2e source de vérité vs src/lib/coherence/) vs classifieur post-retry
-(heuristique, 3 appels LLM gâchés). Touche le contrat d'erreur (generate-planning.ts,
-route.ts, e2e/exclusions.spec.ts, EditSejourClient.tsx). → architect + ADR avant cadrage.
-Bloqué aussi par le résultat de TK-40a : si le catalogue couvre, ce chemin d'échec est
-quasi théorique — ne pas le construire spéculativement.
+### TK-40a — Diagnostic de couverture du catalogue · M  ✅ Livré
+Mesurer, par créneau, si le catalogue tient une semaine, en appelant les vrais
+validateurs post-TK-39 (zéro réimplémentation de la cohérence). Sortie = rapport +
+verdict "tient / profondeur insuffisante: <créneau>". Ready — brief cadré côté Project.
+Son résultat décide si la curation lourde (V3, cf. TK-48) est nécessaire, et si TK-40b
+vaut la peine.
 
-### TK-41 — Régénération partielle d'un repas [ADR]
-Remplacer un créneau sans régénérer tout le planning. [ADR] Piste à trancher : swap déterministe depuis le pool filtré (moins les recettes retenues), re-validé cohérence contre les repas gardés, sans LLM.
+**Livré (2026-07-02) :** profil Sarah (cœliaque + végétarien, 7j) → catalogue tient.
+
+### TK-40b — [DORMANT] Distinguer « profondeur insuffisante » de l'échec de cohérence [ADR]
+**Origine :** cadrage post-TK-40a (2026-07-02).
+
+NE PART PAS EN EXÉCUTION. La jambe `pool_empty` (pool vide post-filtre, cause
+allergène/exclusion, messages actionnables distincts) est livrée et testée
+(route.ts + e2e/exclusions.spec.ts). Seul reste ouvert le diagnostic « profondeur
+insuffisante » : pool non vide mais trop peu profond pour un séjour cohérent —
+aujourd'hui absorbé dans `validation_failed_after_retries` (message générique).
+
+TK-40a a mesuré : profil Sarah (cœliaque + végétarien, 7j) → catalogue tient. Ce
+chemin d'échec ne tire pas pour le persona de référence. Le construire maintenant
+= spéculatif.
+
+**Seuil de réveil (l'un ou l'autre) :**
+- un séjour réel produit un `validation_failed_after_retries` dont le post-mortem
+  montre un pool structurellement trop peu profond (le message générique conseille
+  alors mal l'utilisateur) ;
+- on élargit les profils supportés au-delà de cœliaque + végétarien → re-lancer
+  d'abord le diagnostic TK-40a sur le nouveau profil, ne pas construire à l'aveugle.
+
+**Au réveil, ADR d'abord — mais pas le faux binaire du ticket d'origine** (oracle
+pré-LLM vs classifieur post-retry). Vraie question : la sonde de faisabilité
+peut-elle réutiliser `src/lib/coherence/` sans forker sa logique (2e source de
+vérité) ? Si non, arbitrer heuristique post-retry vs renoncement.
+
+### TK-41 — Régénération partielle d'un repas (ADR-021)
+Remplacer un créneau sans régénérer tout le planning. Picker éligibles, swap déterministe sans LLM (ADR-021).
 
 ### TK-42 — Créneau « resto / non cuisiné »
 Créneau exclu de la génération et de la liste de courses.
@@ -369,8 +392,8 @@ L'overlay d'attente se lève avant que la nav vers /sejour/:id aboutisse : le fo
 | TK-38 | Afficher les recettes dans le planning | V2 | — | Fait |
 | TK-39 | Recalibrer la non-répétition pour les séjours longs [ADR] | V2 | — | Fait |
 | TK-40a | Diagnostic de couverture du catalogue | V2 | M | Fait |
-| TK-40b | Durcir l'échec de génération (profondeur insuffisante) [ADR] | V2 | — | Bloqué · TK-40a + ADR |
-| TK-41 | Régénération partielle d'un repas [ADR] | V2 | — | À faire |
+| TK-40b | [DORMANT] Distinguer « profondeur insuffisante » de l'échec de cohérence [ADR] | V2 | — | Dormant |
+| TK-41 | Régénération partielle d'un repas (ADR-021) | V2 | — | À faire |
 | TK-42 | Créneau « resto / non cuisiné » | V2 | — | À faire |
 | TK-43 | (optionnel) Feedback in-app loggé Supabase | V2 | — | À faire |
 | TK-44 | Polish install PWA | V2 | — | À faire |
@@ -382,6 +405,6 @@ L'overlay d'attente se lève avant que la nav vers /sejour/:id aboutisse : le fo
 | TK-50 | Présence partielle par repas | V4 | — | À faire |
 | TK-51 | Flash retour au formulaire entre génération et affichage du planning | V2 | — | À faire |
 
-**Ordre conseillé :** V2 — TK-40a, puis TK-41, puis TK-42/43/44. (TK-38, TK-39 faits.) TK-40b ne s'ordonnance pas : bloqué par le résultat de TK-40a + ADR. Filler si trous : TK-17, TK-32/33. TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
+**Ordre conseillé :** V2 — TK-40a, puis TK-41, puis TK-42/43/44. (TK-38, TK-39 faits.) TK-40b est DORMANT : `pool_empty` livré, « profondeur insuffisante » spéculatif tant qu'aucun séjour réel ne tire ce chemin. Filler si trous : TK-17, TK-32/33. TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
 > **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.
