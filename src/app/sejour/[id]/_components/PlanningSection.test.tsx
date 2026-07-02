@@ -1,5 +1,10 @@
 // @vitest-environment jsdom
-import { describe, it, expect, afterEach } from 'vitest';
+import { vi, describe, it, expect, afterEach } from 'vitest';
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
+}));
+
 import { render, screen, fireEvent, cleanup, within } from '@testing-library/react';
 import { PlanningSection } from './PlanningSection';
 import type { Recette, Ingredient } from '@/lib/types/domain';
@@ -111,37 +116,37 @@ function mealButton() {
 describe('PlanningSection — TK-38 dépliage recette', () => {
   afterEach(() => cleanup());
   it('affiche le nom de la recette', () => {
-    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} />);
+    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} sejourId="sejour-test" token="tok-test" />);
     expect(screen.getByText('Chili con carne')).toBeDefined();
   });
 
   it('repas replié par défaut — étapes non visibles', () => {
-    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} />);
+    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} sejourId="sejour-test" token="tok-test" />);
     expect(screen.queryByText("Faire revenir l'oignon.")).toBeNull();
   });
 
   it('clic sur le repas → étape visible', () => {
-    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} />);
+    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} sejourId="sejour-test" token="tok-test" />);
     fireEvent.click(mealButton());
     expect(screen.getByText("Faire revenir l'oignon.")).toBeDefined();
     expect(screen.getByText('Ajouter le bœuf haché.')).toBeDefined();
   });
 
   it('ingrédient discret — pluriel (2 oignons mis à échelle 6 pers base 4 → 3 Oignons)', () => {
-    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} />);
+    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} sejourId="sejour-test" token="tok-test" />);
     fireEvent.click(mealButton());
     // 2 * (6/4) = 3 → "3 Oignons"
     expect(screen.getByText('3 Oignons')).toBeDefined();
   });
 
   it('ingrédient continu — grammes mis à échelle (400g base 4 → 600g pour 6 pers)', () => {
-    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} />);
+    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} sejourId="sejour-test" token="tok-test" />);
     fireEvent.click(mealButton());
     expect(screen.getByText('600g de Bœuf haché')).toBeDefined();
   });
 
   it('anti-piège cuillere-soupe — affiché sans conversion en ml/litres', () => {
-    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} />);
+    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} sejourId="sejour-test" token="tok-test" />);
     fireEvent.click(mealButton());
     // 2 * (6/4) = 3 → "3c. à soupe de Cumin moulu"
     const line = screen.getByText('3c. à soupe de Cumin moulu');
@@ -149,7 +154,7 @@ describe('PlanningSection — TK-38 dépliage recette', () => {
   });
 
   it('slug brut absent du DOM après dépliage', () => {
-    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} />);
+    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} sejourId="sejour-test" token="tok-test" />);
     fireEvent.click(mealButton());
     expect(screen.queryByText('oignon')).toBeNull();
     expect(screen.queryByText('boeuf-hache')).toBeNull();
@@ -157,7 +162,7 @@ describe('PlanningSection — TK-38 dépliage recette', () => {
   });
 
   it('étapes — ordre dans le DOM (liste ordonnée, séquence préservée)', () => {
-    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} />);
+    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} sejourId="sejour-test" token="tok-test" />);
     fireEvent.click(mealButton());
     const ol = screen.getAllByRole('list').find(el => el.tagName.toLowerCase() === 'ol')!;
     const [first, second] = within(ol).getAllByRole('listitem');
@@ -166,7 +171,7 @@ describe('PlanningSection — TK-38 dépliage recette', () => {
   });
 
   it('second clic referme le panneau', () => {
-    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} />);
+    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} sejourId="sejour-test" token="tok-test" />);
     fireEvent.click(mealButton());
     expect(screen.getByText("Faire revenir l'oignon.")).toBeDefined();
     fireEvent.click(mealButton());

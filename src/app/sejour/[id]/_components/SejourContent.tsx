@@ -26,6 +26,8 @@ export function SejourContent({
         planningState={planningState}
         recettes={recettes}
         ingredients={ingredients}
+        sejourId={sejourId}
+        token={token}
       />
       <ShoppingListSection
         sejourId={sejourId}

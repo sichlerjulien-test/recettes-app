@@ -13,6 +13,8 @@ export type ApiErrorKind =
   | 'not_found'
   | 'business_error'
   | 'pool_empty'
+  | 'no_alternative_available'
+  | 'invalid_candidate'
   | 'db_error'
   | 'llm_unavailable'
   | 'schema_drift'
