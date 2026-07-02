@@ -1,6 +1,7 @@
 import { getSejourById } from "@/lib/db/sejours";
 import { getPlanningBySejourId } from "@/lib/db/plannings";
 import { getAllRecettesAsMap } from "@/lib/db/recettes";
+import { getAllIngredientsAsMap } from "@/lib/db/ingredients";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SejourContent } from "./_components/SejourContent";
@@ -30,10 +31,11 @@ export default async function SejourPage({
     );
   }
 
-  const [sejourResult, planningResult, recettesResult] = await Promise.all([
+  const [sejourResult, planningResult, recettesResult, ingredientsResult] = await Promise.all([
     getSejourById(id),
     getPlanningBySejourId(id),
     getAllRecettesAsMap(),
+    getAllIngredientsAsMap(),
   ]);
 
   if (!sejourResult.ok) {
@@ -66,6 +68,16 @@ export default async function SejourPage({
       <main className="container max-w-2xl mx-auto p-6">
         <p className="text-destructive">
           Erreur de chargement du catalogue de recettes
+        </p>
+      </main>
+    );
+  }
+
+  if (!ingredientsResult.ok) {
+    return (
+      <main className="container max-w-2xl mx-auto p-6">
+        <p className="text-destructive">
+          Erreur de chargement du catalogue d&apos;ingrédients
         </p>
       </main>
     );
@@ -104,6 +116,7 @@ export default async function SejourPage({
         token={token}
         planningState={planningState}
         recettes={recettesResult.recettes}
+        ingredients={ingredientsResult.ingredients}
       />
 
       <section className="space-y-3 pt-4 border-t">
