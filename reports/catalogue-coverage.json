@@ -1,0 +1,40 @@
+{
+  "coherence_window": 3,
+  "min_depth_rules": {
+    "petit-dejeuner": 1,
+    "midi": 3,
+    "soir": 3
+  },
+  "profiles": [
+    {
+      "id": "vide",
+      "description": "Aucune contrainte",
+      "counts": {
+        "petit-dejeuner": 17,
+        "midi": 20,
+        "soir": 20
+      },
+      "verdict": "tient"
+    },
+    {
+      "id": "sarah",
+      "description": "Cœliaque + végétarien, 6 couverts, 7 jours",
+      "counts": {
+        "petit-dejeuner": 2,
+        "midi": 4,
+        "soir": 5
+      },
+      "verdict": "tient"
+    },
+    {
+      "id": "saturant",
+      "description": "EU14 complet + équipement vide",
+      "counts": {
+        "petit-dejeuner": 0,
+        "midi": 0,
+        "soir": 0
+      },
+      "verdict": "profondeur insuffisante: petit-dejeuner, 0 distinctes; midi, 0 distinctes; soir, 0 distinctes"
+    }
+  ]
+}
