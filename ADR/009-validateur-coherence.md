@@ -186,3 +186,59 @@ Cette décision sera réévaluée si :
 - ADR-004 — Amendé : `generatePlanning` dépend désormais aussi de
   `lib/coherence/` ; le retry s'affine
 - ADR-005 — Extension non-breaking de la branche `ok: true` (`warnings?`)
+
+---
+
+## Amendement — Scoping de `recette_dupliquee` par créneau (TK-39, 2026-07-02)
+
+### Contexte
+
+La règle initiale (`recette_dupliquee`) interdisait qu'une même recette apparaisse
+deux fois dans le séjour, quel que soit le créneau. Sur un séjour court (2–3 jours),
+cette règle garantit l'unicité totale, conformément à l'attendu de Sarah.
+
+Sur un séjour long (10 jours, cible : août), la règle s'avère trop contraignante :
+le pool midi/soir après filtre allergènes + exclusions pour un groupe cœliaque +
+végétarien n'est que de 4–5 recettes. Avec 20 créneaux midi/soir sur 10 jours,
+l'unicité absolue est structurellement impossible : le LLM tourne en boucle et
+échoue sur tous les retries.
+
+Par ailleurs, la répétition au petit-déjeuner est culturellement normale et attendue.
+La confondre avec la répétition midi/soir dans la même règle est une sur-contrainte.
+
+### Décision
+
+**Scoping de `recette_dupliquee` par créneau (fenêtre glissante N=3) :**
+
+1. **Petit-déjeuner** : sort entièrement du périmètre de `recette_dupliquee`.
+   La répétition du petit-déjeuner est libre.
+
+2. **Midi et Soir** : fenêtre glissante **par créneau**, indépendante.
+   Une même recette est interdite au même créneau si elle apparaît dans une
+   fenêtre de N=3 jours calendaires consécutifs.
+   Concrètement : recette X au midi du jour D → interdite midi J+1 et J+2 ;
+   autorisée à partir de J+3. Idem soir, indépendamment du midi.
+
+3. **N=3** est une constante nommée (`RECETTE_DUPLIQUEE_WINDOW_DAYS`) dans
+   `src/lib/coherence/`, tunable sans toucher la logique.
+
+4. **Sévérité** : `recette_dupliquee` reste `'bloquant'`. `COHERENCE_SEVERITY`
+   est inchangé. Le flot retry ADR-009 §4 est inchangé. SEUL le prédicat de
+   violation change.
+
+5. **Non-régression week-end** : pour un séjour ≤ N jours (≤ 3 jours), toute
+   paire de jours est à distance < N, donc la fenêtre couvre tout le séjour :
+   l'unicité totale est préservée, comportement Sarah inchangé.
+
+### Précédent
+
+Cette décision suit le précédent établi à ADR-009 §3 (`ingredient_principal_consecutif`
+scopé par jour calendaire). Le scoping par frontière naturelle (jour, fenêtre, créneau)
+plutôt que par scope global est le pattern délibéré de ce module.
+
+### Mesures préalables (passe cheap TK-39)
+
+Avant implémentation, vérification que le pool midi/soir est suffisant pour
+justifier la relaxation (seuil : ≥ 4 recettes distinctes par créneau) :
+
+- Après filtre `gluten` + `végétarien` (cas le plus contraint) : midi=4, soir=5. ✅

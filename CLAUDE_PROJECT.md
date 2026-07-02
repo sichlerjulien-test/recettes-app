@@ -75,7 +75,7 @@ Ne JAMAIS mélanger les deux concepts :
 Un planning valide DOIT respecter (règles réellement appliquées et testées) :
 
 - Structure journalière stricte : exactement 1 petit-déjeuner, 1 midi, 1 soir par jour, dans cet ordre chronologique. Jamais deux midis le même jour.
-- Pas deux fois la même recette dans le séjour.
+- Pas deux fois la même recette au même créneau dans une fenêtre de 3 jours ; petit-déjeuner exempté.
 - Pas deux fois le même ingrédient principal (protéine ou féculent dominant) en jour calendaire.
 - Respect strict de l'équipement disponible (pas de recette four sans four).
 

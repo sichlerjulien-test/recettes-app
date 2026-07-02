@@ -23,6 +23,11 @@ export const COHERENCE_SEVERITY: Record<CoherenceViolationKind, 'bloquant' | 'qu
   ingredient_principal_consecutif: 'bloquant',
 };
 
+// Fenêtre glissante pour recette_dupliquee (ADR-009 amendement TK-39).
+// Une même recette est interdite au même créneau midi/soir si elle réapparaît
+// dans les N jours suivants. Petit-déjeuner est exempté.
+export const RECETTE_DUPLIQUEE_WINDOW_DAYS = 3;
+
 /**
  * Valide la cohérence structurelle d'un planning (hors sécurité allergènes/régimes).
  *
@@ -52,19 +57,40 @@ export function validateCoherence(
     violations.push(v);
   }
 
-  // ── Règle 2 : pas de recette dupliquée ───────────────────────────────────────
-  const seenIds = new Set<string>();
-  const reportedDuplicates = new Set<string>();
-  for (const entry of planning.entries) {
-    if (seenIds.has(entry.recette_id) && !reportedDuplicates.has(entry.recette_id)) {
-      reportedDuplicates.add(entry.recette_id);
-      const v: RecetteDupliqueeViolation = {
-        kind: 'recette_dupliquee',
-        recette_id: entry.recette_id,
-      };
-      violations.push(v);
+  // ── Règle 2 : pas de recette dupliquée au même créneau dans la fenêtre ───────
+  // Petit-déjeuner exempté (ADR-009 amendement TK-39).
+  // Pour midi et soir : fenêtre glissante de RECETTE_DUPLIQUEE_WINDOW_DAYS jours
+  // par créneau — deux occurrences à distance < N jours → violation bloquante.
+  {
+    const byRecetteSlot = new Map<string, Map<MealType, number[]>>();
+    for (const entry of planning.entries) {
+      if (entry.repas === 'petit-dejeuner') continue;
+      if (!byRecetteSlot.has(entry.recette_id)) {
+        byRecetteSlot.set(entry.recette_id, new Map());
+      }
+      const bySlot = byRecetteSlot.get(entry.recette_id)!;
+      if (!bySlot.has(entry.repas)) bySlot.set(entry.repas, []);
+      bySlot.get(entry.repas)!.push(entry.jour);
     }
-    seenIds.add(entry.recette_id);
+
+    const reportedDuplicates = new Set<string>();
+    for (const [recette_id, bySlot] of byRecetteSlot) {
+      if (reportedDuplicates.has(recette_id)) continue;
+      for (const [, jours] of bySlot) {
+        if (jours.length < 2) continue;
+        const sorted = [...jours].sort((a, b) => a - b);
+        for (let i = 0; i < sorted.length - 1; i++) {
+          const curr = sorted[i] as number;
+          const next = sorted[i + 1] as number;
+          if (next - curr < RECETTE_DUPLIQUEE_WINDOW_DAYS) {
+            reportedDuplicates.add(recette_id);
+            violations.push({ kind: 'recette_dupliquee', recette_id });
+            break;
+          }
+        }
+        if (reportedDuplicates.has(recette_id)) break;
+      }
+    }
   }
 
   // ── Règle 3 : unicité de l'ingredient_principal par jour ─────────────────────
