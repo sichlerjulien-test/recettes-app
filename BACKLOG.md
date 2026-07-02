@@ -232,6 +232,8 @@ confirmer que la page charge encore le catalogue complet — le fix peut déjà 
 ### TK-38 — Afficher les recettes dans le planning
 Afficher les recettes (étapes + ingrédients) dans le planning. Lecture seule, données déjà présentes (`etapes`, `ingredients`), hors pipeline allergènes. Priorité V2 haute : débloque le jugement des repas, prérequis UX de TK-41.
 
+> **Note couverture E2E :** Aucun E2E ne couvre le rendu de la page séjour (Server Component + Supabase direct, non interceptable par page.route). À rouvrir si la page se complexifie : E2E contre dev DB seedée.
+
 ### TK-39 — Recalibrer la non-répétition pour les séjours longs [ADR]
 Recalibrer la non-répétition pour les séjours longs (petit-déj répétables et/ou non-répétition glissante sur N jours). [ADR — touche une règle dure §4 + src/lib/coherence/] Motif : 7 jours = 21 créneaux dont 7 petit-déj, la règle est calibrée pour un week-end. Orthogonal aux allergènes.
 

@@ -107,11 +107,11 @@ describe('formatIngredientRecette', () => {
       expect(formatIngredientRecette(ri, ing, 6, 4)).toBe('5 Œufs');
     });
 
-    it('continu — pas de décimale (120.5 → 121)', () => {
-      const ri = makeRI({ quantite_base: 200, unite: 'ml' });
+    it('continu — arrondi au plus proche (120.5 → 121)', () => {
+      const ri = makeRI({ quantite_base: 241, unite: 'ml' });
       const ing = makeIngredient({ nom_singulier: 'Crème fraîche', nom_pluriel: 'Crème fraîche' });
-      // 200 * (5/8) = 125 — pas de décimale (entier)
-      expect(formatIngredientRecette(ri, ing, 5, 8)).toBe('125ml de Crème fraîche');
+      // 241 * (5/10) = 120.5 → Math.round → 121
+      expect(formatIngredientRecette(ri, ing, 5, 10)).toBe('121ml de Crème fraîche');
     });
 
     it('discret — scaling non entier arrondi (3 * 4/6 = 2)', () => {
