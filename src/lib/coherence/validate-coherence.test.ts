@@ -71,15 +71,16 @@ describe('validateCoherence', () => {
     expect(violations).toHaveLength(0);
   });
 
-  // ── recette_dupliquee ─────────────────────────────────────────────────────────
+  // ── recette_dupliquee — fenêtre glissante par créneau (ADR-009 amendement TK-39) ──
 
-  it('doit emettre recette_dupliquee quand la meme recette_id apparait deux fois', () => {
+  it('doit emettre recette_dupliquee quand la meme recette_id apparait au meme creneau dans la fenetre', () => {
+    // midi J1 + midi J2 : même créneau, |2-1|=1 < 3 → violation (cas week-end)
     const planning: Planning = {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
         { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
-        { jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { jour: 2, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
@@ -92,14 +93,80 @@ describe('validateCoherence', () => {
     }
   });
 
-  it("doit n'emettre qu'une seule recette_dupliquee meme si la recette_id apparait 3 fois", () => {
+  it('ne doit PAS emettre recette_dupliquee quand la meme recette apparait a des creneaux differents', () => {
+    // midi J1 + soir J1 : créneaux distincts → pas de violation (ADR-009 amendement)
     const planning: Planning = {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
-        { jour: 1, repas: 'midi',           recette_id: 'salade-tomate-basilic', portions: 4 },
-        { jour: 1, repas: 'soir',           recette_id: 'salade-tomate-basilic', portions: 4 },
-        { jour: 2, repas: 'midi',           recette_id: 'salade-tomate-basilic', portions: 4 },
+        { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic', portions: 4 },
+      ],
+      genere_le: '2026-04-21T00:00:00Z',
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
+    };
+    const violations = validateCoherence(planning, recettesMap, slotsFrom(planning));
+    expect(violations.filter((v) => v.kind === 'recette_dupliquee')).toHaveLength(0);
+  });
+
+  it('ne doit PAS emettre recette_dupliquee pour le petit-dejeuner meme repete', () => {
+    // petit-déjeuner exempté : répétition libre (ADR-009 amendement TK-39)
+    const planning: Planning = {
+      id: 'planning-test',
+      sejour_id: 'sejour-test',
+      entries: [
+        { jour: 1, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch', portions: 4 },
+        { jour: 2, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch', portions: 4 },
+        { jour: 3, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch', portions: 4 },
+      ],
+      genere_le: '2026-04-21T00:00:00Z',
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
+    };
+    const violations = validateCoherence(planning, recettesMap, slotsFrom(planning));
+    expect(violations.filter((v) => v.kind === 'recette_dupliquee')).toHaveLength(0);
+  });
+
+  it('doit emettre recette_dupliquee pour midi J et J+2 (distance < N=3)', () => {
+    // |J+2 - J| = 2 < 3 → violation
+    const planning: Planning = {
+      id: 'planning-test',
+      sejour_id: 'sejour-test',
+      entries: [
+        { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { jour: 3, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+      ],
+      genere_le: '2026-04-21T00:00:00Z',
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
+    };
+    const violations = validateCoherence(planning, recettesMap, slotsFrom(planning));
+    expect(violations.some((v) => v.kind === 'recette_dupliquee')).toBe(true);
+  });
+
+  it('ne doit PAS emettre recette_dupliquee pour midi J et J+3 (distance = N=3)', () => {
+    // |J+3 - J| = 3 >= 3 → OK
+    const planning: Planning = {
+      id: 'planning-test',
+      sejour_id: 'sejour-test',
+      entries: [
+        { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { jour: 4, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+      ],
+      genere_le: '2026-04-21T00:00:00Z',
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
+    };
+    const violations = validateCoherence(planning, recettesMap, slotsFrom(planning));
+    expect(violations.filter((v) => v.kind === 'recette_dupliquee')).toHaveLength(0);
+  });
+
+  it("doit n'emettre qu'une seule recette_dupliquee meme si la recette_id apparait 3 fois au meme creneau", () => {
+    // midi J1, midi J2, midi J3 : plusieurs paires en violation → une seule violation
+    const planning: Planning = {
+      id: 'planning-test',
+      sejour_id: 'sejour-test',
+      entries: [
+        { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { jour: 2, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { jour: 3, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
@@ -109,13 +176,14 @@ describe('validateCoherence', () => {
     expect(dups).toHaveLength(1);
   });
 
-  it('doit emettre recette_dupliquee meme pour un recette_id inconnu du catalogue', () => {
+  it('doit emettre recette_dupliquee meme pour un recette_id inconnu du catalogue (meme creneau)', () => {
+    // recette inconnue : le catalogue n'est pas consulté pour recette_dupliquee
     const planning: Planning = {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
         { jour: 1, repas: 'midi', recette_id: 'recette-fantome', portions: 4 },
-        { jour: 1, repas: 'soir', recette_id: 'recette-fantome', portions: 4 },
+        { jour: 2, repas: 'midi', recette_id: 'recette-fantome', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },

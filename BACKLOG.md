@@ -299,6 +299,9 @@ Plafond de fréquence sur exclusions (ex : viande rouge max 1×/sem). Objet dist
 ### TK-50 — Présence partielle par repas
 Convives variables par créneau.
 
+### TK-51 — Flash retour au formulaire entre génération et affichage du planning
+L'overlay d'attente se lève avant que la nav vers /sejour/:id aboutisse : le formulaire de création réapparaît ~qq s avant le planning, perçu comme un bug alors que le résultat est correct. Perceived-quality, tombe pile sur le moment-clé (le payoff de la génération). Zéro impact sûreté. Hypothèse à confirmer au cadrage : séquencement overlay ↔ router.push côté nouveau-sejour ; latence destination amplifiée par le chargement catalogue complet (cf TK-28).
+
 **Non ticketés :**
 - Stratégie pricing + publication store (session dédiée).
 - Sync multi-appareils / multi-contributeur.
@@ -355,6 +358,7 @@ Convives variables par créneau.
 | TK-48 | Pondération des portions pour enfants | V3 | — | À faire |
 | TK-49 | Plafond de fréquence sur exclusions | V4 | — | À faire |
 | TK-50 | Présence partielle par repas | V4 | — | À faire |
+| TK-51 | Flash retour au formulaire entre génération et affichage du planning | V2 | — | À faire |
 
 **Ordre conseillé :** V2 — TK-38, puis TK-39 + le diagnostic de TK-40, puis TK-41, puis TK-42/43/44. Filler si trous : TK-17, TK-32/33. TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 

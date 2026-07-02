@@ -1,4 +1,4 @@
-export { validateCoherence, COHERENCE_SEVERITY } from './validate-coherence';
+export { validateCoherence, COHERENCE_SEVERITY, RECETTE_DUPLIQUEE_WINDOW_DAYS } from './validate-coherence';
 export type { CoherenceViolation, CoherenceViolationKind } from './validate-coherence';
 
 // CoherenceWarning désigne les violations cohérence de sévérité 'qualite'.
