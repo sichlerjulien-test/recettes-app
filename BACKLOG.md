@@ -229,16 +229,37 @@ En-dessous, sans objet — le catalogue fait quelques dizaines de recettes.
 NE PAS CADRER tant que le seuil n'est pas franchi. Au réveil, passe cheap d'abord :
 confirmer que la page charge encore le catalogue complet — le fix peut déjà être caduc.
 
-### TK-38 — Afficher les recettes dans le planning
+### TK-38 — Afficher les recettes dans le planning ✅
 Afficher les recettes (étapes + ingrédients) dans le planning. Lecture seule, données déjà présentes (`etapes`, `ingredients`), hors pipeline allergènes. Priorité V2 haute : débloque le jugement des repas, prérequis UX de TK-41.
 
 > **Note couverture E2E :** Aucun E2E ne couvre le rendu de la page séjour (Server Component + Supabase direct, non interceptable par page.route). À rouvrir si la page se complexifie : E2E contre dev DB seedée.
 
-### TK-39 — Recalibrer la non-répétition pour les séjours longs [ADR]
+**Livré (2026-07-02) : PR #76**
+
+### TK-39 — Recalibrer la non-répétition pour les séjours longs [ADR] ✅
 Recalibrer la non-répétition pour les séjours longs (petit-déj répétables et/ou non-répétition glissante sur N jours). [ADR — touche une règle dure §4 + src/lib/coherence/] Motif : 7 jours = 21 créneaux dont 7 petit-déj, la règle est calibrée pour un week-end. Orthogonal aux allergènes.
 
-### TK-40 — Diagnostic de couverture du catalogue + durcir l'échec de génération
-Mesurer si le catalogue (post-TK-39) tient une semaine créneau par créneau ; distinguer `pool_empty` (retirer une contrainte) de profondeur insuffisante (ajouter des recettes de tel créneau), messages actionnables distincts. Son résultat décide si la « curation lourde » (V3) devient nécessaire.
+**Livré (2026-07-02) : PR #77 + amendement ADR-009 (scoping `recette_dupliquee` par créneau, fenêtre glissante N=3)**
+
+### TK-40a — Diagnostic de couverture du catalogue · M ✅
+Mesurer, par créneau, si le catalogue tient une semaine, en appelant les vrais
+validateurs post-TK-39 (zéro réimplémentation de la cohérence). Sortie = rapport +
+verdict "tient / profondeur insuffisante: <créneau>". Ready — brief cadré côté Project.
+Son résultat décide si la curation lourde (V3, cf. TK-48) est nécessaire, et si TK-40b
+vaut la peine.
+
+**Livré (2026-07-02) — résultat : profil Sarah (cœliaque+végétarien, 7j) → tient
+(2 petit-dej / 4 midi / 5 soir). Catalogue suffisant. TK-40b reste quasi théorique.**
+
+### TK-40b — Durcir l'échec de génération [ADR]
+Distinguer `pool_empty` (retirer une contrainte) de "profondeur insuffisante" (ajouter
+des recettes de tel créneau), messages actionnables distincts. Pas ready — fork
+structurant non tranché : oracle de faisabilité déterministe pré-LLM (nouveau `kind`,
+risque de 2e source de vérité vs src/lib/coherence/) vs classifieur post-retry
+(heuristique, 3 appels LLM gâchés). Touche le contrat d'erreur (generate-planning.ts,
+route.ts, e2e/exclusions.spec.ts, EditSejourClient.tsx). → architect + ADR avant cadrage.
+Bloqué aussi par le résultat de TK-40a : si le catalogue couvre, ce chemin d'échec est
+quasi théorique — ne pas le construire spéculativement.
 
 ### TK-41 — Régénération partielle d'un repas [ADR]
 Remplacer un créneau sans régénérer tout le planning. [ADR] Piste à trancher : swap déterministe depuis le pool filtré (moins les recettes retenues), re-validé cohérence contre les repas gardés, sans LLM.
@@ -287,7 +308,7 @@ Packaging store iOS/Android (TWA / wrapper).
 ### TK-48 — Pondération des portions pour enfants
 Scaling uniforme actuel = sur-achat.
 
-**Curation lourde persona cœliaque + végétarien** — conditionnelle au résultat de TK-40.
+**Curation lourde persona cœliaque + végétarien** — conditionnelle au résultat de TK-40a.
 
 ---
 
@@ -345,9 +366,10 @@ L'overlay d'attente se lève avant que la nav vers /sejour/:id aboutisse : le fo
 | TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
 | TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
-| TK-38 | Afficher les recettes dans le planning | V2 | — | À faire |
-| TK-39 | Recalibrer la non-répétition pour les séjours longs [ADR] | V2 | — | À faire |
-| TK-40 | Diagnostic de couverture du catalogue + durcir l'échec de génération | V2 | — | À faire |
+| TK-38 | Afficher les recettes dans le planning | V2 | — | Fait |
+| TK-39 | Recalibrer la non-répétition pour les séjours longs [ADR] | V2 | — | Fait |
+| TK-40a | Diagnostic de couverture du catalogue | V2 | M | Fait |
+| TK-40b | Durcir l'échec de génération (profondeur insuffisante) [ADR] | V2 | — | Bloqué · TK-40a + ADR |
 | TK-41 | Régénération partielle d'un repas [ADR] | V2 | — | À faire |
 | TK-42 | Créneau « resto / non cuisiné » | V2 | — | À faire |
 | TK-43 | (optionnel) Feedback in-app loggé Supabase | V2 | — | À faire |
@@ -360,6 +382,6 @@ L'overlay d'attente se lève avant que la nav vers /sejour/:id aboutisse : le fo
 | TK-50 | Présence partielle par repas | V4 | — | À faire |
 | TK-51 | Flash retour au formulaire entre génération et affichage du planning | V2 | — | À faire |
 
-**Ordre conseillé :** V2 — TK-38, puis TK-39 + le diagnostic de TK-40, puis TK-41, puis TK-42/43/44. Filler si trous : TK-17, TK-32/33. TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
+**Ordre conseillé :** V2 — TK-40a, puis TK-41, puis TK-42/43/44. (TK-38, TK-39 faits.) TK-40b ne s'ordonnance pas : bloqué par le résultat de TK-40a + ADR. Filler si trous : TK-17, TK-32/33. TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
 > **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.
