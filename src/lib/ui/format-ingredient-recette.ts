@@ -14,9 +14,8 @@ function isContinuous(unite: Unit): boolean {
   return (CONTINUOUS_UNITS as readonly string[]).includes(unite);
 }
 
-function scaleQuantity(quantiteBase: number, entryPortions: number, portionsBase: number, continuous: boolean): number {
-  const scaled = quantiteBase * (entryPortions / portionsBase);
-  return continuous ? Math.round(scaled) : Math.round(scaled);
+function scaleQuantity(quantiteBase: number, entryPortions: number, portionsBase: number): number {
+  return Math.round(quantiteBase * (entryPortions / portionsBase));
 }
 
 /**
@@ -32,7 +31,7 @@ export function formatIngredientRecette(
   portionsBase: number,
 ): string {
   const continuous = isContinuous(ri.unite);
-  const q = scaleQuantity(ri.quantite_base, entryPortions, portionsBase, continuous);
+  const q = scaleQuantity(ri.quantite_base, entryPortions, portionsBase);
 
   if (!ingredient) {
     return `${q} ${ri.ingredient_id}`;

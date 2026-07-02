@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, afterEach } from 'vitest';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, within } from '@testing-library/react';
 import { PlanningSection } from './PlanningSection';
 import type { Recette, Ingredient } from '@/lib/types/domain';
 import type { PlanningState } from '@/lib/planning/resolve-planning-state';
@@ -154,6 +154,15 @@ describe('PlanningSection — TK-38 dépliage recette', () => {
     expect(screen.queryByText('oignon')).toBeNull();
     expect(screen.queryByText('boeuf-hache')).toBeNull();
     expect(screen.queryByText('cumin-moulu')).toBeNull();
+  });
+
+  it('étapes — ordre dans le DOM (liste ordonnée, séquence préservée)', () => {
+    render(<PlanningSection planningState={PLANNING_STATE} recettes={RECETTES} ingredients={INGREDIENTS} />);
+    fireEvent.click(mealButton());
+    const ol = screen.getAllByRole('list').find(el => el.tagName.toLowerCase() === 'ol')!;
+    const [first, second] = within(ol).getAllByRole('listitem');
+    expect(first?.textContent).toBe("Faire revenir l'oignon.");
+    expect(second?.textContent).toBe('Ajouter le bœuf haché.');
   });
 
   it('second clic referme le panneau', () => {

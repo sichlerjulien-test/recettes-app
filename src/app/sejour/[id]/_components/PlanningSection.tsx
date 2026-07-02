@@ -61,8 +61,7 @@ function groupByDay(
 ): Record<number, Planning["entries"]> {
   const grouped: Record<number, Planning["entries"]> = {};
   for (const entry of entries) {
-    if (!grouped[entry.jour]) grouped[entry.jour] = [];
-    grouped[entry.jour]!.push(entry);
+    (grouped[entry.jour] ??= []).push(entry);
   }
   return grouped;
 }

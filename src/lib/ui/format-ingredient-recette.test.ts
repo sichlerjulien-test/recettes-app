@@ -107,7 +107,7 @@ describe('formatIngredientRecette', () => {
       expect(formatIngredientRecette(ri, ing, 6, 4)).toBe('5 Œufs');
     });
 
-    it('continu — arrondi au plus proche (120.5 → 121)', () => {
+    it('arrondi au plus proche — ml (120.5 → 121)', () => {
       const ri = makeRI({ quantite_base: 241, unite: 'ml' });
       const ing = makeIngredient({ nom_singulier: 'Crème fraîche', nom_pluriel: 'Crème fraîche' });
       // 241 * (5/10) = 120.5 → Math.round → 121
