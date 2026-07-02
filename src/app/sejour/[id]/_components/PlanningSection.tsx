@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Planning, Recette, Ingredient, MealType } from "@/lib/types/domain";
 import type { PlanningState } from "@/lib/planning/resolve-planning-state";
 import { formatIngredientRecette } from "@/lib/ui/format-ingredient-recette";
@@ -9,9 +10,11 @@ interface Props {
   planningState: PlanningState;
   recettes: Map<string, Recette>;
   ingredients: Map<string, Ingredient>;
+  sejourId: string;
+  token: string;
 }
 
-export function PlanningSection({ planningState, recettes, ingredients }: Props) {
+export function PlanningSection({ planningState, recettes, ingredients, sejourId, token }: Props) {
   if (planningState.status === 'empty') {
     return (
       <section className="space-y-4">
@@ -49,6 +52,8 @@ export function PlanningSection({ planningState, recettes, ingredients }: Props)
             entries={entries}
             recettes={recettes}
             ingredients={ingredients}
+            sejourId={sejourId}
+            token={token}
           />
         ))}
       </div>
@@ -71,11 +76,15 @@ function DayCard({
   entries,
   recettes,
   ingredients,
+  sejourId,
+  token,
 }: {
   jour: number;
   entries: Planning["entries"];
   recettes: Map<string, Recette>;
   ingredients: Map<string, Ingredient>;
+  sejourId: string;
+  token: string;
 }) {
   const sortedEntries = [...entries].sort(
     (a, b) => mealOrder(a.repas) - mealOrder(b.repas),
@@ -93,6 +102,8 @@ function DayCard({
               entry={entry}
               recette={recette}
               ingredients={ingredients}
+              sejourId={sejourId}
+              token={token}
             />
           );
         })}
@@ -101,16 +112,76 @@ function DayCard({
   );
 }
 
+type SwapState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "candidates"; list: Recette[] }
+  | { status: "committing" }
+  | { status: "no_alternative" }
+  | { status: "error"; message: string };
+
 function MealEntry({
   entry,
   recette,
   ingredients,
+  sejourId,
+  token,
 }: {
   entry: Planning["entries"][number];
   recette: Recette | undefined;
   ingredients: Map<string, Ingredient>;
+  sejourId: string;
+  token: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [swap, setSwap] = useState<SwapState>({ status: "idle" });
+  const router = useRouter();
+
+  async function openSwap() {
+    setSwap({ status: "loading" });
+    try {
+      const res = await fetch(
+        `/api/sejours/${sejourId}/planning/swap?jour=${entry.jour}&repas=${entry.repas}`,
+        { headers: { "X-Sejour-Token": token } },
+      );
+      if (res.status === 422) {
+        setSwap({ status: "no_alternative" });
+        return;
+      }
+      if (!res.ok) {
+        setSwap({ status: "error", message: "Impossible de charger les alternatives." });
+        return;
+      }
+      const body = await res.json() as { candidates: Recette[] };
+      setSwap({ status: "candidates", list: body.candidates });
+    } catch {
+      setSwap({ status: "error", message: "Erreur réseau." });
+    }
+  }
+
+  async function commitSwap(recetteId: string) {
+    setSwap({ status: "committing" });
+    try {
+      const res = await fetch(`/api/sejours/${sejourId}/planning/swap`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Sejour-Token": token,
+        },
+        body: JSON.stringify({ jour: entry.jour, repas: entry.repas, recette_id: recetteId }),
+      });
+      if (!res.ok) {
+        const body = await res.json() as { error?: { kind: string } };
+        const kind = body.error?.kind ?? "unknown";
+        setSwap({ status: "error", message: `Échec du swap (${kind}).` });
+        return;
+      }
+      router.refresh();
+      setSwap({ status: "idle" });
+    } catch {
+      setSwap({ status: "error", message: "Erreur réseau lors du swap." });
+    }
+  }
 
   return (
     <li className="space-y-2">
@@ -142,6 +213,82 @@ function MealEntry({
         <div className="ml-19 pl-4 border-l space-y-3 text-sm">
           <RecipeDetail recette={recette} entry={entry} ingredients={ingredients} />
         </div>
+      )}
+
+      {/* Swap picker */}
+      {swap.status === "idle" && (
+        <div className="ml-19 pl-4">
+          <button
+            type="button"
+            onClick={openSwap}
+            className="text-xs text-muted-foreground underline hover:text-foreground"
+          >
+            Remplacer ce repas
+          </button>
+        </div>
+      )}
+
+      {swap.status === "loading" && (
+        <p className="ml-19 pl-4 text-xs text-muted-foreground">Chargement des alternatives…</p>
+      )}
+
+      {swap.status === "no_alternative" && (
+        <div className="ml-19 pl-4 space-y-1">
+          <p className="text-xs text-muted-foreground">Aucune alternative disponible pour ce créneau.</p>
+          <button
+            type="button"
+            onClick={() => setSwap({ status: "idle" })}
+            className="text-xs underline text-muted-foreground hover:text-foreground"
+          >
+            Annuler
+          </button>
+        </div>
+      )}
+
+      {swap.status === "error" && (
+        <div className="ml-19 pl-4 space-y-1">
+          <p className="text-xs text-destructive">{swap.message}</p>
+          <button
+            type="button"
+            onClick={() => setSwap({ status: "idle" })}
+            className="text-xs underline text-muted-foreground hover:text-foreground"
+          >
+            Fermer
+          </button>
+        </div>
+      )}
+
+      {swap.status === "candidates" && (
+        <div className="ml-19 pl-4 space-y-2 border-l">
+          <p className="text-xs font-medium text-muted-foreground">Choisissez une alternative :</p>
+          <ul className="space-y-1">
+            {swap.list.map((candidate) => (
+              <li key={candidate.id}>
+                <button
+                  type="button"
+                  onClick={() => commitSwap(candidate.id)}
+                  className="text-left w-full text-sm hover:underline"
+                >
+                  <span className="font-medium">{candidate.nom}</span>
+                  <span className="text-muted-foreground text-xs ml-2">
+                    {candidate.duree_minutes} min · {candidate.type_cuisine}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            onClick={() => setSwap({ status: "idle" })}
+            className="text-xs underline text-muted-foreground hover:text-foreground"
+          >
+            Annuler
+          </button>
+        </div>
+      )}
+
+      {swap.status === "committing" && (
+        <p className="ml-19 pl-4 text-xs text-muted-foreground">Remplacement en cours…</p>
       )}
     </li>
   );
