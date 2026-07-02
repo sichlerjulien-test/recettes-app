@@ -14,7 +14,45 @@
         "midi": 20,
         "soir": 20
       },
-      "verdict": "tient"
+      "verdict": "tient",
+      "mains": {
+        "midi": {
+          "mains_distincts": 7,
+          "mains_list": [
+            "boeuf",
+            "fromage",
+            "legumes",
+            "legumineuses",
+            "oeufs",
+            "poisson",
+            "poulet"
+          ]
+        },
+        "soir": {
+          "mains_distincts": 6,
+          "mains_list": [
+            "boeuf",
+            "fromage",
+            "legumes",
+            "oeufs",
+            "poisson",
+            "poulet"
+          ]
+        },
+        "midi_soir_union": {
+          "mains_distincts": 7,
+          "mains_list": [
+            "boeuf",
+            "fromage",
+            "legumes",
+            "legumineuses",
+            "oeufs",
+            "poisson",
+            "poulet"
+          ]
+        }
+      },
+      "unicite_jour": "satisfiable"
     },
     {
       "id": "sarah",
@@ -24,7 +62,35 @@
         "midi": 4,
         "soir": 5
       },
-      "verdict": "tient"
+      "verdict": "tient",
+      "mains": {
+        "midi": {
+          "mains_distincts": 3,
+          "mains_list": [
+            "fromage",
+            "legumineuses",
+            "oeufs"
+          ]
+        },
+        "soir": {
+          "mains_distincts": 3,
+          "mains_list": [
+            "fromage",
+            "legumes",
+            "oeufs"
+          ]
+        },
+        "midi_soir_union": {
+          "mains_distincts": 4,
+          "mains_list": [
+            "fromage",
+            "legumes",
+            "legumineuses",
+            "oeufs"
+          ]
+        }
+      },
+      "unicite_jour": "satisfiable"
     },
     {
       "id": "saturant",
@@ -34,7 +100,22 @@
         "midi": 0,
         "soir": 0
       },
-      "verdict": "profondeur insuffisante: petit-dejeuner, 0 distinctes; midi, 0 distinctes; soir, 0 distinctes"
+      "verdict": "profondeur insuffisante: petit-dejeuner, 0 distinctes; midi, 0 distinctes; soir, 0 distinctes",
+      "mains": {
+        "midi": {
+          "mains_distincts": 0,
+          "mains_list": []
+        },
+        "soir": {
+          "mains_distincts": 0,
+          "mains_list": []
+        },
+        "midi_soir_union": {
+          "mains_distincts": 0,
+          "mains_list": []
+        }
+      },
+      "unicite_jour": "impossible"
     }
   ]
 }
