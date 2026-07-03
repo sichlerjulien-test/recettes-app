@@ -110,7 +110,7 @@ session ; aucune règle de CLAUDE_PROJECT.md §6 n'est en double. La ligne
 « git status avant/après commit » est hors scope du gate (par-commit ≠
 état final) et RESTE. Rien à retirer.
 
-### TK-32 — Garde read-contract.ts ↔ selects DAL réels · S
+### TK-32 — Garde read-contract.ts ↔ selects DAL réels · S  ✅ Livré
 Vérifier que chaque colonne déclarée dans `read-contract.ts` est effectivement lue par une
 requête du DAL, et que chaque colonne lue par le DAL figure dans `read-contract.ts`. Contrat
 statique seul (TK-16 Modèle A) : si une colonne disparaît du DAL sans être retirée du contrat,
@@ -127,7 +127,7 @@ aucun gate ne le détecte.
 > le parser peut manquer des colonnes silencieusement. TK-33 couvre le durcissement du parser ;
 > TK-32 peut ensuite s'appuyer dessus pour la garde DAL ↔ contrat.
 
-### TK-33 — Durcir + tester le parser canonical.sql de check-read-contract.ts · S
+### TK-33 — Durcir + tester le parser canonical.sql de check-read-contract.ts · S  ✅ Livré
 **Origine :** note de fin de session TK-16 / TK-32.
 
 Le parser de `check-read-contract.ts` extrait les colonnes des blocs `CREATE TABLE` de
@@ -250,15 +250,6 @@ vaut la peine.
 
 **Livré (2026-07-02) :** profil Sarah (cœliaque + végétarien, 7j) → catalogue tient.
 
-### TK-40a — Diagnostic de couverture du catalogue · M  ✅ Livré
-Mesurer, par créneau, si le catalogue tient une semaine, en appelant les vrais
-validateurs post-TK-39 (zéro réimplémentation de la cohérence). Sortie = rapport +
-verdict "tient / profondeur insuffisante: <créneau>". Ready — brief cadré côté Project.
-Son résultat décide si la curation lourde (V3, cf. TK-48) est nécessaire, et si TK-40b
-vaut la peine.
-
-**Livré (2026-07-02) :** profil Sarah (cœliaque + végétarien, 7j) → catalogue tient.
-
 ### TK-40b — [DORMANT] Distinguer « profondeur insuffisante » de l'échec de cohérence [ADR]
 **Origine :** cadrage post-TK-40a (2026-07-02).
 
@@ -298,6 +289,33 @@ Pouce bas sur un repas loggé en Supabase pour instrumenter le test d'août.
 
 ### TK-44 — Polish install PWA
 Polish manifest / icônes / add-to-home-screen.
+
+---
+
+## VS — Sécurité
+
+> Origine : audit sécurité 2026-07-03. VS-bloquant = à faire avant tout élargissement d'audience au-delà du cercle de test.
+
+### TK-54 — Drop des policies RLS allow_all_mvp · S · VS-bloquant [READY]
+
+Les policies `allow_all_mvp` (USING true / WITH CHECK true) sur sejours, participants, plannings ne servent à rien aujourd'hui (l'app passe par service_role qui bypasse le RLS) mais rendent les trois tables publiques en lecture/écriture pour quiconque obtient l'anon key — tokens et allergies inclus. Deny-by-default gratuit : RLS reste ENABLE, on supprime les policies.
+
+**Critères d'acceptation :** migration `013-drop-allow-all-policies.sql` (3 × DROP POLICY, idempotente) appliquée dev + prod ; `canonical.sql` régénéré sans les policies ; gate schema-replay CI vert ; suite E2E inchangée et verte (preuve que l'app n'en dépendait pas).
+
+**Localisation (pari à confirmer) :** `scripts/migrations/013-*.sql`, `schema/canonical.sql`. Aucun fichier TypeScript.
+
+**Effort :** S.
+
+Respecter ADR-008/013 : migration committée, appliquée aux DEUX instances, jamais d'édition d'historique.
+
+### Tickets une-ligne (à rédiger quand tirés, pas maintenant)
+
+- **TK-55** — Rate limiting + plafond de générations par séjour [ADR — choix du mécanisme structurant : Upstash vs compteur DB vs autre]. POST /sejours et POST /planning sont ouverts et déclenchent un appel LLM payant sans borne. Action manuelle hors code à noter dans le ticket : budget cap console Anthropic.
+- **TK-56** — Suppression de séjour (DELETE + token) et/ou purge des séjours expirés. Motif : allergies = donnée de santé RGPD, aucune rétention définie. Le ON DELETE CASCADE existant fait le travail côté DB.
+- **TK-57** — Amendement ADR-006 (une ligne) : expliciter que le token unique est un droit de LECTURE ET D'ÉCRITURE ; la séparation lecteur/organisateur se tranchera dans TK-45 (auth). Doc seulement.
+- **TK-58** — Corriger le commentaire mensonger de SejourSchema (« signé HMAC » alors que crypto.randomUUID). XS. Viole « règle affichée = règle appliquée ».
+- **TK-59** — Vérifier que dbErrorToResponse / error-mapping.ts ne renvoie pas les messages Supabase bruts dans les réponses 500 (fuite d'internals). S.
+- **TK-60** — Headers de sécurité de base (CSP minimale) dans next.config. Motif : token en URL ⇒ un XSS vaut vol de token. S.
 
 ---
 
@@ -425,7 +443,14 @@ une branche morte = fausse confiance, à corriger opportunistement, pas urgent.
 | TK-51 | Flash retour au formulaire entre génération et affichage du planning | V2 | — | À faire |
 | TK-52 | Test RTL empty-state picker (chemin mort) | P2 | S | À faire |
 | TK-53 | Micro-cleanup assertion cross-device restoSlots (index nu) | P2 | XS | À faire |
+| TK-54 | Drop policies RLS allow_all_mvp | VS | S | À faire |
+| TK-55 | Rate limiting + plafond générations par séjour [ADR] | VS | — | À faire |
+| TK-56 | Suppression de séjour + purge séjours expirés (RGPD) | VS | — | À faire |
+| TK-57 | Amendement ADR-006 : token = lecture + écriture | VS | — | À faire |
+| TK-58 | Corriger commentaire mensonger SejourSchema (HMAC vs UUID) | VS | XS | À faire |
+| TK-59 | dbErrorToResponse : fuite messages Supabase bruts en 500 | VS | S | À faire |
+| TK-60 | Headers de sécurité de base (CSP minimale) | VS | S | À faire |
 
-**Ordre conseillé :** V2 — TK-40a, puis TK-41, puis TK-42/43/44. (TK-38, TK-39 faits.) TK-40b est DORMANT : `pool_empty` livré, « profondeur insuffisante » spéculatif tant qu'aucun séjour réel ne tire ce chemin. Filler si trous : TK-17, TK-32/33. TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
+**Ordre conseillé :** **TK-54 en tête absolue** (VS-bloquant, S, sans dépendance — ferme le trou RLS avant tout élargissement d'audience). Puis V2 restant — TK-43/44 (TK-38, TK-39, TK-40a, TK-41, TK-42 faits). TK-55 à TK-60 à rédiger et séquencer après TK-54 (budget cap console Anthropic à poser dès TK-55). Filler si trous : TK-17, TK-52/53. TK-40b, TK-20, TK-28 DORMANT (seuils de réveil non atteints). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
 > **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.
