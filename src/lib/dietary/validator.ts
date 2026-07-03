@@ -21,6 +21,7 @@ export function validateExclusions(
   const violations: ExclusionViolation[] = [];
 
   for (const entry of planning.entries) {
+    if (entry.kind === 'resto') continue;
     const recette = recettesMap.get(entry.recette_id);
     if (recette === undefined) continue;
 
