@@ -205,6 +205,22 @@ export const SejourParametresSchema = z.object({
   temps_disponible: TimeAvailableSchema,
 });
 
+/** Schéma d'un slot resto stocké dans repartition_repas (ADR-022). */
+export const SlotRestoSchema = z.object({
+  jour: z.number().int().positive(),
+  repas: MealTypeSchema,
+});
+
+/** Répartition des repas par jour, avec marquage des slots non culinaires (ADR-022). */
+export const RepartitionRepasSchema = z.object({
+  premier_repas: z.enum(['matin', 'midi', 'soir']),
+  midis: z.number().int().nonnegative(),
+  soirs: z.number().int().nonnegative(),
+  brunchs: z.number().int().nonnegative(),
+  /** Slots marqués « resto / non cuisiné » au formulaire (ADR-022). Persisté dans le JSONB séjour. */
+  slots_resto: z.array(SlotRestoSchema).default([]),
+});
+
 /** Entité Sejour complète (post-création, avec id et token). */
 export const SejourSchema = z.object({
   id: z.string(),
@@ -214,12 +230,7 @@ export const SejourSchema = z.object({
   date_debut: z.string().optional(),
   nb_jours: z.number().int().min(1).max(7),
   /** Répartition des repas par jour */
-  repartition_repas: z.object({
-    premier_repas: z.enum(['matin', 'midi', 'soir']),
-    midis: z.number().int().nonnegative(),
-    soirs: z.number().int().nonnegative(),
-    brunchs: z.number().int().nonnegative(),
-  }),
+  repartition_repas: RepartitionRepasSchema,
   participants: z.array(ParticipantSchema),
   parametres: SejourParametresSchema,
   cree_le: z.string(),
@@ -244,11 +255,41 @@ export const LLMPlanningOutputSchema = z.object({
   planning: z.array(PlanningEntrySchema).min(1),
 });
 
-/** Entité PlanningEntry complète (avec portions calculées à partir des participants). */
-export const PlanningEntryFullSchema = PlanningEntrySchema.extend({
+/** Variante recette d'une entrée de planning (avec portions). */
+export const RecettePlanningEntryFullSchema = z.object({
+  kind: z.literal('recette'),
+  jour: z.number().int().positive(),
+  repas: MealTypeSchema,
+  recette_id: SlugSchema,
   /** Calculé à partir du nombre de participants du séjour */
   portions: z.number().int().positive(),
 });
+
+/** Variante resto : créneau non cuisiné (ADR-022). */
+export const RestoPlanningEntrySchema = z.object({
+  kind: z.literal('resto'),
+  jour: z.number().int().positive(),
+  repas: MealTypeSchema,
+});
+
+/**
+ * Entité PlanningEntry complète — union discriminée (ADR-022).
+ *
+ * Les entrées existantes en DB sans champ `kind` sont traitées comme `kind: 'recette'`
+ * via preprocess pour assurer la rétrocompatibilité.
+ */
+export const PlanningEntryFullSchema = z.preprocess(
+  (input) => {
+    if (typeof input === 'object' && input !== null && !('kind' in input)) {
+      return { ...(input as object), kind: 'recette' };
+    }
+    return input;
+  },
+  z.discriminatedUnion('kind', [
+    RecettePlanningEntryFullSchema,
+    RestoPlanningEntrySchema,
+  ]),
+);
 
 /** Entité Planning complète. */
 export const PlanningSchema = z.object({
@@ -372,14 +413,11 @@ export const GeneratePlanningInputSchema = z.object({
   pool: z.array(RecetteSchema),
   contexte: z.object({
     nb_jours: z.number().int().min(1).max(7),
-    repartition_repas: z.object({
-      premier_repas: z.enum(['matin', 'midi', 'soir']),
-      midis: z.number().int().nonnegative(),
-      soirs: z.number().int().nonnegative(),
-      brunchs: z.number().int().nonnegative(),
-    }),
+    repartition_repas: RepartitionRepasSchema,
     niveau_cuisine: z.enum(['facile', 'normal']),
     temps_disponible: z.enum(['rapide', 'standard']),
+    /** Slots explicites à couvrir par le LLM (exclut les slots resto). Si absent, buildSequence est utilisé. */
+    slots_a_couvrir: z.array(z.object({ jour: z.number().int().positive(), repas: MealTypeSchema })).optional(),
   }),
 });
 
@@ -448,12 +486,7 @@ export const CreateSejourBodySchema = z.object({
   nom: z.string().min(1).max(100).optional(),
   date_debut: z.string().date().optional(),
   nb_jours: z.number().int().min(1).max(7),
-  repartition_repas: z.object({
-    premier_repas: z.enum(['matin', 'midi', 'soir']),
-    midis: z.number().int().nonnegative(),
-    soirs: z.number().int().nonnegative(),
-    brunchs: z.number().int().nonnegative(),
-  }),
+  repartition_repas: RepartitionRepasSchema,
   parametres: SejourParametresSchema,
   participants: z.array(z.object({
     nom: z.string().min(1).max(50),

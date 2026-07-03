@@ -25,6 +25,8 @@ import type {
   SejourParametresSchema,
   SejourSchema,
   PlanningEntryFullSchema,
+  RecettePlanningEntryFullSchema,
+  RestoPlanningEntrySchema,
   PlanningSchema,
   ShoppingItemSchema,
   ShoppingListSchema,
@@ -92,6 +94,12 @@ export type Participant = z.infer<typeof ParticipantSchema>;
 // ============================================================================
 
 export type PlanningEntry = z.infer<typeof PlanningEntryFullSchema>;
+
+/** Variante recette d'une entrée de planning (avec recette_id et portions). */
+export type RecettePlanningEntry = z.infer<typeof RecettePlanningEntryFullSchema>;
+
+/** Variante resto : créneau non cuisiné, sans recette (ADR-022). */
+export type RestoPlanningEntry = z.infer<typeof RestoPlanningEntrySchema>;
 
 export type Planning = z.infer<typeof PlanningSchema>;
 
