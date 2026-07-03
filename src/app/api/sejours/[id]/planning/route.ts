@@ -79,6 +79,8 @@ export async function POST(
     temps_disponible: sejour.parametres.temps_disponible,
   };
 
+  const restoSlots = sejour.repartition_repas.slots_resto;
+
   const client = createAnthropicClient(apiKey);
 
   const planningResult = await generatePlanning(
@@ -88,6 +90,7 @@ export async function POST(
     constraints,
     sejour.participants,
     contexte,
+    restoSlots,
   );
 
   if (!planningResult.ok) {
