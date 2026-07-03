@@ -79,6 +79,7 @@ export function buildShoppingList(
   }
 
   for (const entry of planning.entries) {
+    if (entry.kind === 'resto') continue;
     const recette = recettes.get(entry.recette_id);
     if (recette === undefined) {
       return { ok: false, error: { kind: 'recette_inconnue', recette_id: entry.recette_id } };
@@ -101,6 +102,7 @@ export function buildShoppingList(
   const aggr = new Map<string, AggregItem>();
 
   for (const entry of planning.entries) {
+    if (entry.kind === 'resto') continue;
     const recette = recettes.get(entry.recette_id)!;
     const facteur = nbParticipants / recette.portions_base;
 
