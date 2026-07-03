@@ -15,7 +15,6 @@ function makePlanning(recetteIds: string[]): Planning {
     id: 'planning-test',
     sejour_id: 'sejour-test',
     entries: recetteIds.map((recette_id, i) => ({
-      kind: 'recette' as const,
       jour: Math.floor(i / 2) + 1,
       repas: i % 2 === 0 ? ('midi' as const) : ('soir' as const),
       recette_id,
@@ -99,7 +98,7 @@ describe('validateExclusions', () => {
       id: 'planning-intensif',
       sejour_id: 'sejour-intensif',
       entries: veganRecettes.map((r, i) => ({
-        kind: 'recette' as const, jour: i + 1, repas: 'midi' as const, recette_id: r.id, portions: 2,
+        jour: i + 1, repas: 'midi' as const, recette_id: r.id, portions: 2,
       })),
       genere_le: '2026-06-10T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: ['vegan'], equipement: [] },
@@ -118,7 +117,7 @@ describe('validateExclusions', () => {
       id: 'planning-intensif-veg',
       sejour_id: 'sejour-intensif',
       entries: vegRecettes.map((r, i) => ({
-        kind: 'recette' as const, jour: i + 1, repas: 'midi' as const, recette_id: r.id, portions: 2,
+        jour: i + 1, repas: 'midi' as const, recette_id: r.id, portions: 2,
       })),
       genere_le: '2026-06-10T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: ['vegetarien'], equipement: [] },

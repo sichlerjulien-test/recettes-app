@@ -1,4 +1,4 @@
-import type { MealType, Participant, PlanningEntry, Recette, ValidationViolation } from '../types/domain';
+import type { MealType, Participant, Planning, PlanningSlot, RecettePlanningEntry, RestoPlanningEntry, Recette, StoredPlanning, ValidationViolation } from '../types/domain';
 import { filterRecipes, type FilterConstraints } from '../allergens/filter';
 import { filterByExclusions, type ExclusionConstraints } from '../dietary/filter';
 import { validatePlanning } from '../allergens/validator';
@@ -47,7 +47,7 @@ export async function generatePlanning(
   participants: readonly Participant[],
   sejourContexte: GeneratePlanningInput['contexte'],
   restoSlots: readonly { jour: number; repas: MealType }[] = [],
-): Promise<{ ok: true; entries: PlanningEntry[]; warnings?: CoherenceWarning[] } | { ok: false; error: LLMError }> {
+): Promise<{ ok: true; entries: PlanningSlot[]; warnings?: CoherenceWarning[] } | { ok: false; error: LLMError }> {
   const allergenPool = filterRecipes(catalogue, constraints);
   if (allergenPool.length === 0) {
     return { ok: false, error: { kind: 'pool_empty', cause: 'allergen' } };
@@ -66,7 +66,7 @@ export async function generatePlanning(
   const llmSlots = allSlots.filter((s) => !restoSet.has(`${s.jour}:${s.repas}`));
 
   // Entrées resto à injecter après la génération LLM (ADR-022)
-  const restoEntries: PlanningEntry[] = restoSlots.map((s) => ({
+  const restoEntries: RestoPlanningEntry[] = restoSlots.map((s) => ({
     kind: 'resto' as const,
     jour: s.jour,
     repas: s.repas,
@@ -86,28 +86,40 @@ export async function generatePlanning(
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       const output = await client.generate({ pool, contexte: llmContexte });
 
-      const recetteEntries: PlanningEntry[] = output.entries.map((entry) => ({
+      const recetteEntries: RecettePlanningEntry[] = output.entries.map((entry) => ({
         kind: 'recette' as const,
         ...entry,
         portions,
       }));
-      const planningEntries: PlanningEntry[] = [...recetteEntries, ...restoEntries];
+      const planningEntries: PlanningSlot[] = [...recetteEntries, ...restoEntries];
 
-      const planningForValidation = {
+      const contraintes_utilisees = {
+        allergenes: constraints.allergenes_groupe,
+        exclusions: constraints.exclusions_groupe,
+        equipement: constraints.equipement_disponible,
+      };
+
+      // Projection recette-only → sanctuaire allergens/dietary (ADR-022 §composition)
+      const projectedPlanning: Planning = {
+        id: 'draft',
+        sejour_id: 'draft',
+        entries: recetteEntries,
+        genere_le: new Date().toISOString(),
+        contraintes_utilisees,
+      };
+
+      // Planning complet (recette + resto) → slots_mismatch (ADR-022 §2)
+      const storedPlanning: StoredPlanning = {
         id: 'draft',
         sejour_id: 'draft',
         entries: planningEntries,
-        genere_le: new Date().toISOString(),
-        contraintes_utilisees: {
-          allergenes: constraints.allergenes_groupe,
-          exclusions: constraints.exclusions_groupe,
-          equipement: constraints.equipement_disponible,
-        },
+        genere_le: projectedPlanning.genere_le,
+        contraintes_utilisees,
       };
 
-      const securityResult = validatePlanning(planningForValidation, recettesMap, participants);
-      const dietaryViolations = validateExclusions(planningForValidation, recettesMap, participants);
-      const coherenceViolations = validateCoherence(planningForValidation, recettesMap, allSlots);
+      const securityResult = validatePlanning(projectedPlanning, recettesMap, participants);
+      const dietaryViolations = validateExclusions(projectedPlanning, recettesMap, participants);
+      const coherenceViolations = validateCoherence(storedPlanning, recettesMap, allSlots);
 
       const bloquantCoherence = coherenceViolations.filter(
         (v) => COHERENCE_SEVERITY[v.kind] === 'bloquant',

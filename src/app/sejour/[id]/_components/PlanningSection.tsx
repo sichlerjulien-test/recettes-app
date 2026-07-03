@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Planning, RecettePlanningEntry, Recette, Ingredient, MealType } from "@/lib/types/domain";
+import type { StoredPlanning, RecettePlanningEntry, Recette, Ingredient, MealType } from "@/lib/types/domain";
 import type { PlanningState } from "@/lib/planning/resolve-planning-state";
 import { formatIngredientRecette } from "@/lib/ui/format-ingredient-recette";
 
@@ -38,7 +38,7 @@ export function PlanningSection({ planningState, recettes, ingredients, sejourId
     );
   }
 
-  const planning = planningState.planning;
+  const planning: StoredPlanning = planningState.planning;
   const entriesByDay = groupByDay(planning.entries);
 
   return (
@@ -62,9 +62,9 @@ export function PlanningSection({ planningState, recettes, ingredients, sejourId
 }
 
 function groupByDay(
-  entries: Planning["entries"],
-): Record<number, Planning["entries"]> {
-  const grouped: Record<number, Planning["entries"]> = {};
+  entries: StoredPlanning["entries"],
+): Record<number, StoredPlanning["entries"]> {
+  const grouped: Record<number, StoredPlanning["entries"]> = {};
   for (const entry of entries) {
     (grouped[entry.jour] ??= []).push(entry);
   }
@@ -80,7 +80,7 @@ function DayCard({
   token,
 }: {
   jour: number;
-  entries: Planning["entries"];
+  entries: StoredPlanning["entries"];
   recettes: Map<string, Recette>;
   ingredients: Map<string, Ingredient>;
   sejourId: string;

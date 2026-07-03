@@ -1,6 +1,6 @@
 import { IngredientCategorySchema, DISCRETE_UNITS } from '../types/schemas';
 import type {
-  Planning,
+  StoredPlanning,
   Recette,
   Ingredient,
   ShoppingItem,
@@ -69,7 +69,7 @@ const finalize = (q: number, u: Unit): number => {
  * // tomates.quantite_totale => 1.5, tomates.unite_affichee => 'kg'
  */
 export function buildShoppingList(
-  planning: Planning,
+  planning: StoredPlanning,
   recettes: Map<string, Recette>,
   ingredients: Map<string, Ingredient>,
   nbParticipants: number,

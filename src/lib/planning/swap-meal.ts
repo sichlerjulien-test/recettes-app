@@ -1,4 +1,4 @@
-import type { MealType, Participant, Planning, PlanningEntry, Recette, ValidationViolation } from '../types/domain';
+import type { MealType, Participant, Planning, PlanningSlot, RecettePlanningEntry, Recette, StoredPlanning, ValidationViolation } from '../types/domain';
 import { filterRecipes } from '../allergens/filter';
 import { filterByExclusions } from '../dietary/filter';
 import { validatePlanning } from '../allergens/validator';
@@ -22,7 +22,7 @@ export type SwapError =
  * La recette courante au créneau est systématiquement exclue.
  */
 export function getEligibleCandidates(params: {
-  planning: Planning;
+  planning: StoredPlanning;
   targetSlot: SwapSlot;
   catalogue: readonly Recette[];
   recettesMap: Map<string, Recette>;
@@ -47,13 +47,13 @@ export function getEligibleCandidates(params: {
   for (const recette of pool) {
     if (recette.id === currentRecetteId) continue;
 
-    const hypotheticalEntries: PlanningEntry[] = planning.entries.map((e) =>
+    const hypotheticalEntries: PlanningSlot[] = planning.entries.map((e) =>
       e.kind === 'recette' && e.jour === targetSlot.jour && e.repas === targetSlot.repas
         ? { ...e, recette_id: recette.id }
         : e,
     );
 
-    const hypotheticalPlanning: Planning = {
+    const hypotheticalPlanning: StoredPlanning = {
       ...planning,
       entries: hypotheticalEntries,
     };
@@ -81,7 +81,7 @@ export function getEligibleCandidates(params: {
  * (validatePlanning + validateExclusions + validateCoherence) sur le résultat.
  */
 export function computeSwapResult(params: {
-  planning: Planning;
+  planning: StoredPlanning;
   targetSlot: SwapSlot;
   chosenRecetteId: string;
   catalogue: readonly Recette[];
@@ -89,7 +89,7 @@ export function computeSwapResult(params: {
   constraints: PlanningConstraints;
   participants: readonly Participant[];
   expectedSlots: readonly SwapSlot[];
-}): { ok: true; entries: PlanningEntry[] } | { ok: false; error: SwapError } {
+}): { ok: true; entries: PlanningSlot[] } | { ok: false; error: SwapError } {
   const { planning, targetSlot, chosenRecetteId, catalogue, recettesMap, constraints, participants, expectedSlots } = params;
 
   // Re-compute eligibility serveur — confiance zéro client
@@ -119,18 +119,24 @@ export function computeSwapResult(params: {
     ? targetEntry.portions
     : Math.max(participants.length, 1);
 
-  const newEntries: PlanningEntry[] = planning.entries.map((e) =>
+  const newEntries: PlanningSlot[] = planning.entries.map((e) =>
     e.kind === 'recette' && e.jour === targetSlot.jour && e.repas === targetSlot.repas
       ? { ...e, recette_id: chosenRecetteId, portions }
       : e,
   );
 
-  const newPlanning: Planning = { ...planning, entries: newEntries };
+  const newStoredPlanning: StoredPlanning = { ...planning, entries: newEntries };
+
+  // Projection recette-only → sanctuaire allergens/dietary (ADR-022 §composition)
+  const recetteEntriesForValidation = newEntries.filter(
+    (e): e is RecettePlanningEntry => e.kind === 'recette',
+  );
+  const projectedPlanning: Planning = { ...planning, entries: recetteEntriesForValidation };
 
   // Pile complète de validateurs (ADR-001 / ADR-021)
-  const securityResult = validatePlanning(newPlanning, recettesMap, participants);
-  const exclusionViolations = validateExclusions(newPlanning, recettesMap, participants);
-  const coherenceViolations = validateCoherence(newPlanning, recettesMap, expectedSlots);
+  const securityResult = validatePlanning(projectedPlanning, recettesMap, participants);
+  const exclusionViolations = validateExclusions(projectedPlanning, recettesMap, participants);
+  const coherenceViolations = validateCoherence(newStoredPlanning, recettesMap, expectedSlots);
 
   const blockers: ValidationViolation[] = [
     ...(securityResult.valid ? [] : securityResult.violations),

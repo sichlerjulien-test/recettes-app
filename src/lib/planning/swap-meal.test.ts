@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Participant, Planning, PlanningEntry, Recette } from '../types/domain';
+import type { Participant, PlanningEntry, StoredPlanning, Recette } from '../types/domain';
 import type { PlanningConstraints } from '../llm/generate-planning';
 import { computeSwapResult, getEligibleCandidates } from './swap-meal';
 
@@ -35,7 +35,7 @@ function makeRecette(partial: {
   };
 }
 
-function makePlanning(entries: { kind: 'recette'; jour: number; repas: PlanningEntry['repas']; recette_id: string }[]): Planning {
+function makePlanning(entries: { kind: 'recette'; jour: number; repas: PlanningEntry['repas']; recette_id: string }[]): StoredPlanning {
   return {
     id: 'p-test',
     sejour_id: 'sejour-test',

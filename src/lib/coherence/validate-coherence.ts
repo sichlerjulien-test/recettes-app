@@ -1,7 +1,7 @@
 import type {
   IngredientConsecutifViolation,
   MealType,
-  Planning,
+  StoredPlanning,
   Recette,
   RecetteDupliqueeViolation,
   SlotsMismatchViolation,
@@ -39,7 +39,7 @@ export const RECETTE_DUPLIQUEE_WINDOW_DAYS = 3;
  * Les recette_id inconnus sont ignorés silencieusement (recette_inconnue est émis par validatePlanning).
  */
 export function validateCoherence(
-  planning: Planning,
+  planning: StoredPlanning,
   recettesMap: Map<string, Recette>,
   expectedSlots: readonly { jour: number; repas: MealType }[],
 ): CoherenceViolation[] {

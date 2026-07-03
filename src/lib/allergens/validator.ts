@@ -39,8 +39,6 @@ export function validatePlanning(
   const reportedUnknownIds = new Set<string>();
 
   for (const entry of planning.entries) {
-    if (entry.kind === 'resto') continue;
-
     const recette = recettesMap.get(entry.recette_id);
 
     if (recette === undefined) {

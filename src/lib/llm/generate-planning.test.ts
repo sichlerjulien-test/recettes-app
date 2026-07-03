@@ -1,5 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { filterRecipes } from '../allergens/filter';
+import * as allergensValidator from '../allergens/validator';
+import * as dietaryValidator from '../dietary/validator';
 import type { LLMClient } from './client';
 import { generatePlanning, type PlanningConstraints } from './generate-planning';
 import type { GeneratePlanningInput, GeneratePlanningOutput } from './types';
@@ -842,6 +844,94 @@ describe('generatePlanning', () => {
     }
     // Le LLM n'est appelé qu'une fois (pas de retry car pas de violation)
     expect(mockClient.calls).toHaveLength(1);
+  });
+
+  it('CA-6 — border : validatePlanning et validateExclusions ne reçoivent aucune entry kind=resto', async () => {
+    // Garantit que la projection recette-only est effective : les validators du sanctuaire
+    // (ADR-001) ne voient jamais d'entrée resto, même quand restoSlots est non-vide.
+    const spyVP = vi.spyOn(allergensValidator, 'validatePlanning');
+    const spyVE = vi.spyOn(dietaryValidator, 'validateExclusions');
+
+    const contexte: GeneratePlanningInput['contexte'] = {
+      nb_jours: 1,
+      repartition_repas: { premier_repas: 'midi', midis: 1, soirs: 1, brunchs: 0, slots_resto: [] },
+      niveau_cuisine: 'facile',
+      temps_disponible: 'standard',
+    };
+    const mockClient = createMockClient({
+      kind: 'success',
+      output: { entries: [{ jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' }] },
+    });
+
+    const result = await generatePlanning(
+      mockClient,
+      allRecettes(),
+      recettesMap,
+      NO_CONSTRAINTS,
+      [participantSansContrainte],
+      contexte,
+      [{ jour: 1, repas: 'soir' }], // soir J1 = resto
+    );
+
+    expect(result.ok).toBe(true);
+
+    // Les deux validators du sanctuaire ont bien été appelés
+    expect(spyVP).toHaveBeenCalled();
+    expect(spyVE).toHaveBeenCalled();
+
+    // Aucun appel ne reçoit une entry avec kind='resto'
+    for (const [planningArg] of spyVP.mock.calls) {
+      const hasResto = planningArg.entries.some(
+        (e: Record<string, unknown>) => (e as { kind?: string }).kind === 'resto',
+      );
+      expect(hasResto).toBe(false);
+    }
+    for (const [planningArg] of spyVE.mock.calls) {
+      const hasResto = planningArg.entries.some(
+        (e: Record<string, unknown>) => (e as { kind?: string }).kind === 'resto',
+      );
+      expect(hasResto).toBe(false);
+    }
+
+    spyVP.mockRestore();
+    spyVE.mockRestore();
+  });
+
+  it('CA-7 — slots_mismatch : planning mixte recette+resto contre expectedSlots incluant le slot resto ne génère pas de violation', async () => {
+    // Vérifie que validateCoherence reçoit les entries complètes (recette + resto) et que
+    // l'injection post-LLM du slot resto satisfait le expected-slot correspondant (ADR-022 §2).
+    const contexte: GeneratePlanningInput['contexte'] = {
+      nb_jours: 1,
+      repartition_repas: { premier_repas: 'midi', midis: 1, soirs: 1, brunchs: 0, slots_resto: [] },
+      niveau_cuisine: 'facile',
+      temps_disponible: 'standard',
+    };
+    const mockClient = createMockClient({
+      kind: 'success',
+      output: { entries: [{ jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' }] },
+    });
+
+    const result = await generatePlanning(
+      mockClient,
+      allRecettes(),
+      recettesMap,
+      NO_CONSTRAINTS,
+      [participantSansContrainte],
+      contexte,
+      [{ jour: 1, repas: 'soir' }], // soir J1 = resto → injecté post-LLM
+    );
+
+    // Aucune violation bloquante : le slot resto est bien compté dans les entries complètes
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      // Pas de warning slots_mismatch (le slot resto est couvert par l'entry injectée)
+      const hasMismatch = (result.warnings ?? []).some((w) => w.kind === 'slots_mismatch');
+      expect(hasMismatch).toBe(false);
+      // Les deux entrées sont présentes dans le résultat
+      expect(result.entries).toHaveLength(2);
+      expect(result.entries.some((e) => e.kind === 'recette' && e.repas === 'midi')).toBe(true);
+      expect(result.entries.some((e) => e.kind === 'resto' && e.repas === 'soir')).toBe(true);
+    }
   });
 
 });

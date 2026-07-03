@@ -2,21 +2,21 @@ import 'server-only';
 import { getSupabaseClient } from './supabase';
 import { assertSchema } from './schema-guard';
 import { PlanningSchema } from '../types/schemas';
-import type { Planning, PlanningEntry } from '../types/domain';
+import type { PlanningSlot, StoredPlanning } from '../types/domain';
 import type { DbError } from '../types/domain';
 
 export type CreatePlanningInput = {
   sejour_id: string;
-  entries: PlanningEntry[];
-  contraintes_utilisees: Planning['contraintes_utilisees'];
+  entries: PlanningSlot[];
+  contraintes_utilisees: StoredPlanning['contraintes_utilisees'];
 };
 
 type PlanningResult =
-  | { ok: true; planning: Planning }
+  | { ok: true; planning: StoredPlanning }
   | { ok: false; error: DbError };
 
 export type GetPlanningResult =
-  | { ok: true; planning: Planning }
+  | { ok: true; planning: StoredPlanning }
   | { ok: false; error: DbError };
 
 /**

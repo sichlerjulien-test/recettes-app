@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { buildShoppingList } from './build-list';
 import { recettesMap } from '../../../tests/fixtures/recettes';
 import { ingredientsMap } from '../../../tests/fixtures/ingredients';
-import type { Planning, Recette, Ingredient, MealType, ExclusionTag } from '../types/domain';
+import type { StoredPlanning, Recette, Ingredient, MealType, ExclusionTag } from '../types/domain';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function makePlanning(
   entries: Array<{ kind: 'recette'; jour: number; repas: MealType; recette_id: string }>,
-): Planning {
+): StoredPlanning {
   return {
     id: 'test-planning',
     sejour_id: 'test-sejour',
@@ -745,7 +745,7 @@ describe('buildShoppingList', () => {
   // ── TK-42 : slots resto (ADR-022) ──────────────────────────────────────────
 
   it('CA-4 : planning avec un slot resto au soir — zéro ingrédient depuis ce slot', () => {
-    const planning: Planning = {
+    const planning: StoredPlanning = {
       id: 'test-planning',
       sejour_id: 'test-sejour',
       entries: [
@@ -768,7 +768,7 @@ describe('buildShoppingList', () => {
   });
 
   it('CA-5 : séjour tout-resto → liste de courses vide, pas de crash', () => {
-    const planning: Planning = {
+    const planning: StoredPlanning = {
       id: 'test-planning',
       sejour_id: 'test-sejour',
       entries: [
