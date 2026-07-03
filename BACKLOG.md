@@ -284,8 +284,14 @@ pré-LLM vs classifieur post-retry). Vraie question : la sonde de faisabilité
 peut-elle réutiliser `src/lib/coherence/` sans forker sa logique (2e source de
 vérité) ? Si non, arbitrer heuristique post-retry vs renoncement.
 
-### TK-41 — Régénération partielle d'un repas (ADR-021)
-Remplacer un créneau sans régénérer tout le planning. Picker éligibles, swap déterministe sans LLM (ADR-021).
+### TK-41 — Régénération partielle d'un repas ✅
+Remplacer un créneau sans régénérer le planning. Swap déterministe depuis le pool
+filtré, éligibilité via validateCoherence hypothétique (zéro réimplémentation),
+confiance zéro client (re-compute serveur), snapshot immuable (nouvelle ligne).
+Picker : Sarah choisit parmi les éligibles. La liste de courses se recalcule sur
+le swap (callback swapVersion, pas router.refresh).
+
+**Livré (2026-07-02) : PR #79 + ADR-021**
 
 ### TK-42 — Créneau « resto / non cuisiné »
 Créneau exclu de la génération et de la liste de courses.
@@ -346,6 +352,19 @@ Convives variables par créneau.
 ### TK-51 — Flash retour au formulaire entre génération et affichage du planning
 L'overlay d'attente se lève avant que la nav vers /sejour/:id aboutisse : le formulaire de création réapparaît ~qq s avant le planning, perçu comme un bug alors que le résultat est correct. Perceived-quality, tombe pile sur le moment-clé (le payoff de la génération). Zéro impact sûreté. Hypothèse à confirmer au cadrage : séquencement overlay ↔ router.push côté nouveau-sejour ; latence destination amplifiée par le chargement catalogue complet (cf TK-28).
 
+> Résidu perf lié : le swap (TK-41) déclenche router.refresh() qui recharge le
+> catalogue complet (cf TK-28 dormant) — même famille de latence perçue que le
+> flash ci-dessus. Différable ; à traiter avec TK-51/TK-28 si ressenti à l'usage,
+> pas de ticket séparé.
+
+### TK-52 — Test RTL empty-state du picker frappe un chemin mort · S
+Le test empty-state de PlanningSection mocke { ok:true, status:200, candidates:[] } —
+réponse que le serveur ne produit jamais (422 dès candidates.length===0). Il ne passe
+que via un guard défensif `if (list.length===0)` ; le vrai chemin `res.status===422 →
+no_alternative` n'a aucune assertion RTL. Corriger le mock en 422 quand le picker est
+retouché ; au passage, trancher si le guard mort reste ou saute. Test qui verrouille
+une branche morte = fausse confiance, à corriger opportunistement, pas urgent.
+
 **Non ticketés :**
 - Stratégie pricing + publication store (session dédiée).
 - Sync multi-appareils / multi-contributeur.
@@ -393,7 +412,7 @@ L'overlay d'attente se lève avant que la nav vers /sejour/:id aboutisse : le fo
 | TK-39 | Recalibrer la non-répétition pour les séjours longs [ADR] | V2 | — | Fait |
 | TK-40a | Diagnostic de couverture du catalogue | V2 | M | Fait |
 | TK-40b | [DORMANT] Distinguer « profondeur insuffisante » de l'échec de cohérence [ADR] | V2 | — | Dormant |
-| TK-41 | Régénération partielle d'un repas (ADR-021) | V2 | — | À faire |
+| TK-41 | Régénération partielle d'un repas | V2 | L | Fait |
 | TK-42 | Créneau « resto / non cuisiné » | V2 | — | À faire |
 | TK-43 | (optionnel) Feedback in-app loggé Supabase | V2 | — | À faire |
 | TK-44 | Polish install PWA | V2 | — | À faire |
@@ -404,6 +423,7 @@ L'overlay d'attente se lève avant que la nav vers /sejour/:id aboutisse : le fo
 | TK-49 | Plafond de fréquence sur exclusions | V4 | — | À faire |
 | TK-50 | Présence partielle par repas | V4 | — | À faire |
 | TK-51 | Flash retour au formulaire entre génération et affichage du planning | V2 | — | À faire |
+| TK-52 | Test RTL empty-state picker (chemin mort) | P2 | S | À faire |
 
 **Ordre conseillé :** V2 — TK-40a, puis TK-41, puis TK-42/43/44. (TK-38, TK-39 faits.) TK-40b est DORMANT : `pool_empty` livré, « profondeur insuffisante » spéculatif tant qu'aucun séjour réel ne tire ce chemin. Filler si trous : TK-17, TK-32/33. TK-20 et TK-28 sont DORMANT (seuil de réveil non atteint). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
