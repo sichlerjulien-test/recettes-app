@@ -87,6 +87,7 @@ URI par instance : Supabase → Settings → Database → Connection string (URI
 | 011 | RPC create_sejour_with_participants (RETURNS jsonb) | ✓ 2026-06-29 | ✓ 2026-06-29 |
 | 012 | RPC update_sejour_with_participants RETURNS void → jsonb | ✓ 2026-06-29 | ✓ 2026-06-29 |
 | 013 | Table feedback (signal négatif append-only, RLS deny-by-default) | ✓ 2026-07-04 | ✓ 2026-07-04 |
+| 014 | Drop policies allow_all_mvp (deny-by-default RLS) | | |
 
 ## Dette connue
 
