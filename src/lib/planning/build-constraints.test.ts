@@ -7,7 +7,7 @@ const BASE_SEJOUR: Sejour = {
   token: 'tok',
   nom: 'Test',
   nb_jours: 2,
-  repartition_repas: { premier_repas: 'midi', midis: 2, soirs: 2, brunchs: 0 },
+  repartition_repas: { premier_repas: 'midi', midis: 2, soirs: 2, brunchs: 0, slots_resto: [] },
   participants: [],
   parametres: {
     niveau_cuisine: 'facile',

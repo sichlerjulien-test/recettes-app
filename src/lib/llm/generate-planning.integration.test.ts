@@ -33,7 +33,7 @@ const hasApiKey = (): boolean => Boolean(process.env.ANTHROPIC_API_KEY);
 
 const SEJOUR_3_JOURS: GeneratePlanningInput['contexte'] = {
   nb_jours: 3,
-  repartition_repas: { premier_repas: 'matin', midis: 3, soirs: 3, brunchs: 0 },
+  repartition_repas: { premier_repas: 'matin', midis: 3, soirs: 3, brunchs: 0, slots_resto: [] },
   niveau_cuisine: 'facile',
   temps_disponible: 'standard',
 };
@@ -84,6 +84,7 @@ describe('generatePlanning — intégration API Anthropic réelle', () => {
       expect(result.entries).toHaveLength(6);
 
       for (const entry of result.entries) {
+        if (entry.kind !== 'recette') continue;
         const recette = recettesMap.get(entry.recette_id);
         expect(
           recette,

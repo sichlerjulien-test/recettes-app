@@ -26,7 +26,7 @@ const SEJOUR: Sejour = {
   token: TOKEN,
   nom: 'Chalet été',
   nb_jours: 3,
-  repartition_repas: { premier_repas: 'matin', midis: 3, soirs: 3, brunchs: 0 },
+  repartition_repas: { premier_repas: 'matin', midis: 3, soirs: 3, brunchs: 0, slots_resto: [] },
   parametres: {
     niveau_cuisine: 'facile',
     equipement_disponible: ['plaque'],

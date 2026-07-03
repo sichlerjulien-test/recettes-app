@@ -8,6 +8,7 @@ function makePlanning(recetteIds: string[]): Planning {
     id: 'planning-test',
     sejour_id: 'sejour-test',
     entries: recetteIds.map((recette_id, i) => ({
+      kind: 'recette' as const,
       jour: Math.floor(i / 2) + 1,
       repas: i % 2 === 0 ? ('midi' as const) : ('soir' as const),
       recette_id,
@@ -19,7 +20,7 @@ function makePlanning(recetteIds: string[]): Planning {
 }
 
 function slotsFrom(planning: Planning) {
-  return planning.entries.map((e) => ({ jour: e.jour, repas: e.repas }));
+  return planning.entries.map((e) => ({ kind: 'recette' as const, jour: e.jour, repas: e.repas }));
 }
 
 describe('validateCoherence', () => {
@@ -35,8 +36,8 @@ describe('validateCoherence', () => {
   it('doit emettre slots_mismatch quand le planning a moins de slots que attendu', () => {
     const planning = makePlanning(['salade-tomate-basilic']);
     const expectedSlots = [
-      { jour: 1, repas: 'midi' as const },
-      { jour: 1, repas: 'soir' as const },
+      { kind: 'recette' as const, jour: 1, repas: 'midi' as const },
+      { kind: 'recette' as const, jour: 1, repas: 'soir' as const },
     ];
     const violations = validateCoherence(planning, recettesMap, expectedSlots);
     expect(violations.some((v) => v.kind === 'slots_mismatch')).toBe(true);
@@ -45,8 +46,8 @@ describe('validateCoherence', () => {
   it('doit emettre slots_mismatch quand le planning a plus de slots que attendu', () => {
     const planning = makePlanning(['salade-tomate-basilic', 'omelette-legumes', 'tajine-boeuf-soir']);
     const expectedSlots = [
-      { jour: 1, repas: 'midi' as const },
-      { jour: 1, repas: 'soir' as const },
+      { kind: 'recette' as const, jour: 1, repas: 'midi' as const },
+      { kind: 'recette' as const, jour: 1, repas: 'soir' as const },
     ];
     const violations = validateCoherence(planning, recettesMap, expectedSlots);
     expect(violations.some((v) => v.kind === 'slots_mismatch')).toBe(true);
@@ -56,11 +57,11 @@ describe('validateCoherence', () => {
     const planning: Planning = {
       id: 'planning-test',
       sejour_id: 'sejour-test',
-      entries: [{ jour: 2, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 }],
+      entries: [{ kind: 'recette' as const, jour: 2, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 }],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     };
-    const expectedSlots = [{ jour: 1, repas: 'midi' as const }];
+    const expectedSlots = [{ kind: 'recette' as const, jour: 1, repas: 'midi' as const }];
     const violations = validateCoherence(planning, recettesMap, expectedSlots);
     expect(violations.some((v) => v.kind === 'slots_mismatch')).toBe(true);
   });
@@ -79,8 +80,8 @@ describe('validateCoherence', () => {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
-        { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
-        { jour: 2, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'recette' as const, jour: 2, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
@@ -99,8 +100,8 @@ describe('validateCoherence', () => {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
-        { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
-        { jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
@@ -115,9 +116,9 @@ describe('validateCoherence', () => {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
-        { jour: 1, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch', portions: 4 },
-        { jour: 2, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch', portions: 4 },
-        { jour: 3, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch', portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch', portions: 4 },
+        { kind: 'recette' as const, jour: 2, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch', portions: 4 },
+        { kind: 'recette' as const, jour: 3, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
@@ -132,8 +133,8 @@ describe('validateCoherence', () => {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
-        { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
-        { jour: 3, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'recette' as const, jour: 3, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
@@ -148,8 +149,8 @@ describe('validateCoherence', () => {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
-        { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
-        { jour: 4, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'recette' as const, jour: 4, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
@@ -164,9 +165,9 @@ describe('validateCoherence', () => {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
-        { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
-        { jour: 2, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
-        { jour: 3, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'recette' as const, jour: 2, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'recette' as const, jour: 3, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
@@ -182,8 +183,8 @@ describe('validateCoherence', () => {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
-        { jour: 1, repas: 'midi', recette_id: 'recette-fantome', portions: 4 },
-        { jour: 2, repas: 'midi', recette_id: 'recette-fantome', portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-fantome', portions: 4 },
+        { kind: 'recette' as const, jour: 2, repas: 'midi', recette_id: 'recette-fantome', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
@@ -208,14 +209,14 @@ describe('validateCoherence', () => {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
-        { jour: 1, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch',   portions: 4 },
-        { jour: 1, repas: 'midi',           recette_id: 'pates-bolognaise',  portions: 4 },
-        { jour: 1, repas: 'soir',           recette_id: 'omelette-legumes',  portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch',   portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'midi',           recette_id: 'pates-bolognaise',  portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'soir',           recette_id: 'omelette-legumes',  portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     };
-    const expectedSlots = planning.entries.map((e) => ({ jour: e.jour, repas: e.repas }));
+    const expectedSlots = planning.entries.map((e) => ({ kind: 'recette' as const, jour: e.jour, repas: e.repas }));
     const violations = validateCoherence(planning, recettesMap, expectedSlots);
     const v = violations.find((v) => v.kind === 'ingredient_principal_consecutif');
     expect(v).toBeDefined();
@@ -232,13 +233,13 @@ describe('validateCoherence', () => {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
-        { jour: 1, repas: 'soir',           recette_id: 'omelette-legumes', portions: 4 },
-        { jour: 2, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch',  portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'soir',           recette_id: 'omelette-legumes', portions: 4 },
+        { kind: 'recette' as const, jour: 2, repas: 'petit-dejeuner', recette_id: 'pancakes-brunch',  portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     };
-    const expectedSlots = planning.entries.map((e) => ({ jour: e.jour, repas: e.repas }));
+    const expectedSlots = planning.entries.map((e) => ({ kind: 'recette' as const, jour: e.jour, repas: e.repas }));
     const violations = validateCoherence(planning, recettesMap, expectedSlots);
     expect(violations.filter((v) => v.kind === 'ingredient_principal_consecutif')).toHaveLength(0);
   });
@@ -249,8 +250,8 @@ describe('validateCoherence', () => {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
-        { jour: 1, repas: 'midi', recette_id: 'recette-fantome', portions: 4 },
-        { jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-fantome', portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
@@ -266,13 +267,13 @@ describe('validateCoherence', () => {
       id: 'planning-test',
       sejour_id: 'sejour-test',
       entries: [
-        { jour: 1, repas: 'midi', recette_id: 'fantome-a', portions: 4 },
-        { jour: 1, repas: 'soir', recette_id: 'fantome-b', portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'fantome-a', portions: 4 },
+        { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'fantome-b', portions: 4 },
       ],
       genere_le: '2026-04-21T00:00:00Z',
       contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     };
-    const expectedSlots = [{ jour: 1, repas: 'midi' as const }, { jour: 1, repas: 'soir' as const }];
+    const expectedSlots = [{ kind: 'recette' as const, jour: 1, repas: 'midi' as const }, { kind: 'recette' as const, jour: 1, repas: 'soir' as const }];
     const violations = validateCoherence(planning, recettesMap, expectedSlots);
     // slots_mismatch ne se déclenche pas (slots correspondent exactement)
     expect(violations.filter((v) => v.kind === 'slots_mismatch')).toHaveLength(0);
@@ -280,6 +281,63 @@ describe('validateCoherence', () => {
     expect(violations.filter((v) => v.kind === 'ingredient_principal_consecutif')).toHaveLength(0);
     // recette_dupliquee ne se déclenche pas (deux IDs distincts)
     expect(violations.filter((v) => v.kind === 'recette_dupliquee')).toHaveLength(0);
+  });
+
+  // ── TK-42 : slots resto (ADR-022) ────────────────────────────────────────────
+
+  it('CA-1 : planning avec un slot resto ne lève pas slots_mismatch', () => {
+    const planning: Planning = {
+      id: 'planning-test',
+      sejour_id: 'sejour-test',
+      entries: [
+        { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'resto' as const, jour: 1, repas: 'soir' },
+      ],
+      genere_le: '2026-04-21T00:00:00Z',
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
+    };
+    const allSlots = [{ jour: 1, repas: 'midi' as const }, { jour: 1, repas: 'soir' as const }];
+    const violations = validateCoherence(planning, recettesMap, allSlots);
+    expect(violations.filter((v) => v.kind === 'slots_mismatch')).toHaveLength(0);
+  });
+
+  it('CA-2a : recette_dupliquee ignore les slots resto', () => {
+    const planning: Planning = {
+      id: 'planning-test',
+      sejour_id: 'sejour-test',
+      entries: [
+        { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'resto' as const, jour: 1, repas: 'soir' },
+      ],
+      genere_le: '2026-04-21T00:00:00Z',
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
+    };
+    const allSlots = [{ jour: 1, repas: 'midi' as const }, { jour: 1, repas: 'soir' as const }];
+    const violations = validateCoherence(planning, recettesMap, allSlots);
+    expect(violations.filter((v) => v.kind === 'recette_dupliquee')).toHaveLength(0);
+  });
+
+  it('CA-2b : ingredient_principal_consecutif ignore les slots resto — le slot resto coupe la séquence', () => {
+    // salade (légumes) midi J1 → resto soir J1 → salade (légumes) midi J2
+    // Le slot resto coupe la séquence : pas de violation ingredient_principal_consecutif
+    const planning: Planning = {
+      id: 'planning-test',
+      sejour_id: 'sejour-test',
+      entries: [
+        { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'resto' as const, jour: 1, repas: 'soir' },
+        { kind: 'recette' as const, jour: 2, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+      ],
+      genere_le: '2026-04-21T00:00:00Z',
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
+    };
+    const allSlots = [
+      { jour: 1, repas: 'midi' as const },
+      { jour: 1, repas: 'soir' as const },
+      { jour: 2, repas: 'midi' as const },
+    ];
+    const violations = validateCoherence(planning, recettesMap, allSlots);
+    expect(violations.filter((v) => v.kind === 'ingredient_principal_consecutif')).toHaveLength(0);
   });
 
 });

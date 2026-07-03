@@ -98,6 +98,7 @@ const PLANNING_STATE: PlanningState = {
     contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
     entries: [
       {
+        kind: 'recette' as const,
         jour: 1,
         repas: 'soir',
         recette_id: 'chili-con-carne',

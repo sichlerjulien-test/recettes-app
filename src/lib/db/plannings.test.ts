@@ -49,7 +49,7 @@ function createMockSupabase(tableQueues: Record<string, MockResult[]>): ReturnTy
 
 const PLANNING_INPUT: CreatePlanningInput = {
   sejour_id: 'sejour-uuid',
-  entries: [{ jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 }],
+  entries: [{ kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 }],
   contraintes_utilisees: {
     allergenes: [],
     exclusions: [],
@@ -60,7 +60,7 @@ const PLANNING_INPUT: CreatePlanningInput = {
 const RAW_PLANNING_ROW = {
   id: 'planning-uuid',
   sejour_id: 'sejour-uuid',
-  entries: [{ jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 }],
+  entries: [{ kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 }],
   contraintes_utilisees: {
     allergenes: [],
     exclusions: [],
@@ -142,7 +142,7 @@ describe('plannings DAL', () => {
         expect(result.planning.id).toBe('planning-uuid');
         expect(result.planning.sejour_id).toBe('sejour-uuid');
         expect(result.planning.entries).toHaveLength(1);
-        expect(result.planning.entries[0]?.recette_id).toBe('salade-tomate-basilic');
+        expect(result.planning.entries[0]).toMatchObject({ kind: 'recette', recette_id: 'salade-tomate-basilic' });
       }
     });
 

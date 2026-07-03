@@ -72,11 +72,10 @@ export async function generatePlanning(
     repas: s.repas,
   }));
 
-  // Contexte transmis au LLM : slots explicites filtrés (hors resto)
-  const llmContexte: GeneratePlanningInput['contexte'] = {
-    ...sejourContexte,
-    slots_a_couvrir: llmSlots,
-  };
+  // Contexte transmis au LLM : slots explicites filtrés (hors resto) — uniquement si des slots resto sont présents
+  const llmContexte: GeneratePlanningInput['contexte'] = restoSlots.length > 0
+    ? { ...sejourContexte, slots_a_couvrir: llmSlots }
+    : sejourContexte;
 
   const portions = Math.max(participants.length, 1);
   let lastSecurityViolations: ValidationViolation[] = [];

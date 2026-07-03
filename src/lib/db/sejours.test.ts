@@ -61,7 +61,7 @@ function asMockClient(
 const SEJOUR_INPUT: SejourDALInput = {
   nom: 'Séjour test',
   nb_jours: 3,
-  repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0 },
+  repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0, slots_resto: [] },
   parametres: {
     niveau_cuisine: 'facile',
     equipement_disponible: ['four'],
@@ -83,7 +83,7 @@ const SEJOUR_DB_ROW = {
   nom: 'Séjour test',
   date_debut: null,
   nb_jours: 3,
-  repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0 },
+  repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0, slots_resto: [] },
   participants: [],
   parametres: {
     niveau_cuisine: 'facile',
@@ -305,7 +305,7 @@ describe('sejours DAL', () => {
       const body = CreateSejourBodySchema.parse({
         nom: 'Camp été',
         nb_jours: 3,
-        repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0 },
+        repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0, slots_resto: [] },
         parametres: { niveau_cuisine: 'facile', equipement_disponible: ['four'], temps_disponible: 'standard' },
         participants: [{ nom: 'Alice', allergies: [], exclusions: [], aime: [], n_aime_pas: [] }],
       });
@@ -317,7 +317,7 @@ describe('sejours DAL', () => {
     it('rejette une entrée sans nom (nom requis dans SejourDALInputSchema, contrairement au body)', () => {
       const result = SejourDALInputSchema.safeParse({
         nb_jours: 3,
-        repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0 },
+        repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0, slots_resto: [] },
         parametres: { niveau_cuisine: 'facile', equipement_disponible: ['four'], temps_disponible: 'standard' },
       });
       expect(result.success).toBe(false);

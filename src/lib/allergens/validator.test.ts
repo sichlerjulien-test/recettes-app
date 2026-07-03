@@ -15,6 +15,7 @@ function makePlanning(recetteIds: string[]): Planning {
     id: 'planning-test',
     sejour_id: 'sejour-test',
     entries: recetteIds.map((recette_id, i) => ({
+      kind: 'recette' as const,
       jour: Math.floor(i / 2) + 1,
       repas: i % 2 === 0 ? ('midi' as const) : ('soir' as const),
       recette_id,

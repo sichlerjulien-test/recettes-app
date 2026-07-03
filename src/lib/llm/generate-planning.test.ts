@@ -27,7 +27,7 @@ const NO_CONSTRAINTS: PlanningConstraints = {
 
 const BASE_CONTEXTE: GeneratePlanningInput['contexte'] = {
   nb_jours: 1,
-  repartition_repas: { premier_repas: 'matin', midis: 1, soirs: 1, brunchs: 0 },
+  repartition_repas: { premier_repas: 'matin', midis: 1, soirs: 1, brunchs: 0, slots_resto: [] },
   niveau_cuisine: 'facile',
   temps_disponible: 'standard',
 };
@@ -112,7 +112,8 @@ describe('generatePlanning', () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.entries).toHaveLength(2);
-      expect(result.entries[0]?.recette_id).toBe('salade-tomate-basilic');
+      const first = result.entries[0];
+      expect(first?.kind === 'recette' && first.recette_id).toBe('salade-tomate-basilic');
     }
   });
 
@@ -427,7 +428,7 @@ describe('generatePlanning', () => {
     // car toutes les recettes vegan du catalogue de fixture ont ingredient_principal 'legumes'.
     const SINGLE_MIDI_CONTEXTE: GeneratePlanningInput['contexte'] = {
       nb_jours: 1,
-      repartition_repas: { premier_repas: 'midi', midis: 1, soirs: 0, brunchs: 0 },
+      repartition_repas: { premier_repas: 'midi', midis: 1, soirs: 0, brunchs: 0, slots_resto: [] },
       niveau_cuisine: 'facile',
       temps_disponible: 'standard',
     };
@@ -460,6 +461,7 @@ describe('generatePlanning', () => {
       expect(result.ok).toBe(true);
       if (result.ok) {
         for (const entry of result.entries) {
+          if (entry.kind !== 'recette') continue;
           const recette = recettesMap.get(entry.recette_id)!;
           expect(recette.allergenes_calcules).not.toContain('gluten');
         }
@@ -481,6 +483,7 @@ describe('generatePlanning', () => {
       expect(result.ok).toBe(true);
       if (result.ok) {
         for (const entry of result.entries) {
+          if (entry.kind !== 'recette') continue;
           const recette = recettesMap.get(entry.recette_id)!;
           expect(recette.exclusions_compatibles).toContain('vegan');
         }
@@ -497,12 +500,13 @@ describe('generatePlanning', () => {
         recettesMap,
         COELIAQUE_VEGAN_CONSTRAINTS,
         [participantCoeliaqueVegan],
-        { nb_jours: 1, repartition_repas: { premier_repas: 'midi', midis: 1, soirs: 0, brunchs: 0 }, niveau_cuisine: 'facile', temps_disponible: 'standard' },
+        { nb_jours: 1, repartition_repas: { premier_repas: 'midi', midis: 1, soirs: 0, brunchs: 0, slots_resto: [] }, niveau_cuisine: 'facile', temps_disponible: 'standard' },
       );
 
       expect(result.ok).toBe(true);
       if (result.ok) {
         for (const entry of result.entries) {
+          if (entry.kind !== 'recette') continue;
           const recette = recettesMap.get(entry.recette_id)!;
           expect(recette.exclusions_compatibles).toContain('vegan');
           expect(recette.allergenes_calcules).not.toContain('gluten');
@@ -525,6 +529,7 @@ describe('generatePlanning', () => {
       expect(result.ok).toBe(true);
       if (result.ok) {
         for (const entry of result.entries) {
+          if (entry.kind !== 'recette') continue;
           const recette = recettesMap.get(entry.recette_id)!;
           for (const allergen of participantAllergiesMultiples.allergies) {
             expect(recette.allergenes_calcules).not.toContain(allergen);
@@ -771,6 +776,72 @@ describe('generatePlanning', () => {
     }
     // Garantie ADR-001 : le LLM n'est JAMAIS appelé si le pool est vide
     expect(mockClient.calls).toHaveLength(0);
+  });
+
+  // ── TK-42 : slots resto (ADR-022) ────────────────────────────────────────────
+
+  it('CA-3 : le LLM reçoit N−#resto slots dans slots_a_couvrir quand restoSlots est non-vide', async () => {
+    // Contexte : 1 jour, midi + soir ; 1 slot resto (soir J1) → LLM ne reçoit que midi J1
+    const contexte: GeneratePlanningInput['contexte'] = {
+      nb_jours: 1,
+      repartition_repas: { premier_repas: 'midi', midis: 1, soirs: 1, brunchs: 0, slots_resto: [] },
+      niveau_cuisine: 'facile',
+      temps_disponible: 'standard',
+    };
+    const mockClient = createMockClient({ kind: 'success', output: { entries: [{ jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' }] } });
+
+    const result = await generatePlanning(
+      mockClient,
+      allRecettes(),
+      recettesMap,
+      NO_CONSTRAINTS,
+      [participantSansContrainte],
+      contexte,
+      [{ jour: 1, repas: 'soir' }],
+    );
+
+    expect(result.ok).toBe(true);
+    expect(mockClient.calls).toHaveLength(1);
+    const callInput = mockClient.calls[0]!;
+    // Le LLM reçoit slots_a_couvrir avec seulement midi J1 (pas soir J1 qui est resto)
+    expect(callInput.contexte.slots_a_couvrir).toHaveLength(1);
+    expect(callInput.contexte.slots_a_couvrir?.[0]).toMatchObject({ jour: 1, repas: 'midi' });
+    // Le résultat inclut les deux entrées : recette midi + resto soir
+    if (result.ok) {
+      expect(result.entries).toHaveLength(2);
+      expect(result.entries.some((e) => e.kind === 'resto' && e.repas === 'soir')).toBe(true);
+      expect(result.entries.some((e) => e.kind === 'recette' && e.repas === 'midi')).toBe(true);
+    }
+  });
+
+  it('CA-5 : séjour tout-resto → génération réussit avec uniquement des entrées resto, pas de crash', async () => {
+    // Contexte : 1 jour, midi + soir ; les deux slots sont resto → LLM ne reçoit aucun slot
+    const contexte: GeneratePlanningInput['contexte'] = {
+      nb_jours: 1,
+      repartition_repas: { premier_repas: 'midi', midis: 1, soirs: 1, brunchs: 0, slots_resto: [] },
+      niveau_cuisine: 'facile',
+      temps_disponible: 'standard',
+    };
+    // Le mock LLM reçoit un pool vide de slots → retourne un planning vide (valide : aucun slot à couvrir)
+    const mockClient = createMockClient({ kind: 'success', output: { entries: [] } });
+
+    const result = await generatePlanning(
+      mockClient,
+      allRecettes(),
+      recettesMap,
+      NO_CONSTRAINTS,
+      [participantSansContrainte],
+      contexte,
+      [{ jour: 1, repas: 'midi' }, { jour: 1, repas: 'soir' }],
+    );
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.entries).toHaveLength(2);
+      expect(result.entries.every((e) => e.kind === 'resto')).toBe(true);
+    }
+    // Le LLM n'est appelé qu'une fois (pas de retry car pas de violation)
+    expect(mockClient.calls).toHaveLength(1);
   });
 
 });

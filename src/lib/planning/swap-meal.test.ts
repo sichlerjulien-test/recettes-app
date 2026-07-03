@@ -35,7 +35,7 @@ function makeRecette(partial: {
   };
 }
 
-function makePlanning(entries: { jour: number; repas: PlanningEntry['repas']; recette_id: string }[]): Planning {
+function makePlanning(entries: { kind: 'recette'; jour: number; repas: PlanningEntry['repas']; recette_id: string }[]): Planning {
   return {
     id: 'p-test',
     sejour_id: 'sejour-test',
@@ -89,8 +89,8 @@ describe('getEligibleCandidates', () => {
     //   rD : gluten → filtré par filterRecipes
     //   rE : fromage au soir J1, aucune collision → ÉLIGIBLE
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-a' },
-      { jour: 1, repas: 'soir', recette_id: 'recette-b' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-a' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-b' },
     ]);
 
     const result = getEligibleCandidates({
@@ -117,8 +117,8 @@ describe('getEligibleCandidates', () => {
     // J1 midi = rA (legumes), J1 soir = rB (oeufs) ← à swapper
     // Catalogue réduit : seulement rA (collision legumes) et rB (courante)
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-a' },
-      { jour: 1, repas: 'soir', recette_id: 'recette-b' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-a' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-b' },
     ]);
 
     const result = getEligibleCandidates({
@@ -138,8 +138,8 @@ describe('getEligibleCandidates', () => {
 
   it('retourne no_alternative_available quand catalogue vide après filtrage', () => {
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-d' },
-      { jour: 1, repas: 'soir', recette_id: 'recette-d' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-d' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-d' },
     ]);
 
     // Seuls rC et rD dans le catalogue : rC exclu (végé), rD exclu (gluten)
@@ -166,8 +166,8 @@ describe('getEligibleCandidates', () => {
       type_repas: ['midi'],
     });
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-a' },
-      { jour: 1, repas: 'soir', recette_id: 'recette-b' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-a' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-b' },
     ]);
 
     const result = getEligibleCandidates({
@@ -192,8 +192,8 @@ describe('getEligibleCandidates', () => {
     const rOther = makeRecette({ id: 'recette-other', ingredient_principal: 'legumineuses' });
 
     const planning = makePlanning([
-      { jour: 1, repas: 'soir', recette_id: 'recette-e' },  // rE au soir J1
-      { jour: 2, repas: 'soir', recette_id: 'recette-other' }, // à swapper
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-e' },  // rE au soir J1
+      { kind: 'recette' as const, jour: 2, repas: 'soir', recette_id: 'recette-other' }, // à swapper
     ]);
 
     const result = getEligibleCandidates({
@@ -219,8 +219,8 @@ describe('computeSwapResult', () => {
   it('retourne les nouvelles entries quand le choix est éligible', () => {
     // Swap soir J1 : courante=rB → choisit rE
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-a' },
-      { jour: 1, repas: 'soir', recette_id: 'recette-b' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-a' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-b' },
     ]);
 
     const result = computeSwapResult({
@@ -237,16 +237,16 @@ describe('computeSwapResult', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     const swapped = result.entries.find((e) => e.jour === 1 && e.repas === 'soir');
-    expect(swapped?.recette_id).toBe('recette-e');
+    expect(swapped).toMatchObject({ recette_id: 'recette-e' });
     // Les autres entrées sont intactes
     const intact = result.entries.find((e) => e.jour === 1 && e.repas === 'midi');
-    expect(intact?.recette_id).toBe('recette-a');
+    expect(intact).toMatchObject({ recette_id: 'recette-a' });
   });
 
   it("rejette un recette_id non éligible envoyé par le client (cas d'attaque explicite)", () => {
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-a' },
-      { jour: 1, repas: 'soir', recette_id: 'recette-b' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-a' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-b' },
     ]);
 
     // rC non-végétarien → non dans l'ensemble éligible
@@ -268,8 +268,8 @@ describe('computeSwapResult', () => {
 
   it('rejette un recette_id bien formé mais inconnu du catalogue', () => {
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-a' },
-      { jour: 1, repas: 'soir', recette_id: 'recette-b' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-a' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-b' },
     ]);
 
     const result = computeSwapResult({
@@ -292,8 +292,8 @@ describe('computeSwapResult', () => {
   it('retourne no_alternative_available quand aucun éligible', () => {
     // Catalogue réduit : seul rA (collision legumes) et rB (courante)
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-a' },
-      { jour: 1, repas: 'soir', recette_id: 'recette-b' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-a' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-b' },
     ]);
 
     const result = computeSwapResult({
@@ -317,8 +317,8 @@ describe('computeSwapResult', () => {
     // Un pick naïf de rA (legumes) provoquerait ingredient_principal_consecutif
     // computeSwapResult doit rejeter rA et accepter rE
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-a' },
-      { jour: 1, repas: 'soir', recette_id: 'recette-b' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-a' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-b' },
     ]);
 
     const naif = computeSwapResult({
@@ -355,10 +355,10 @@ describe('computeSwapResult', () => {
       { jour: 2, repas: 'soir' as const },
     ];
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-a' },
-      { jour: 1, repas: 'soir', recette_id: 'recette-b' },
-      { jour: 2, repas: 'midi', recette_id: 'recette-e' },
-      { jour: 2, repas: 'soir', recette_id: 'recette-a' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-a' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-b' },
+      { kind: 'recette' as const, jour: 2, repas: 'midi', recette_id: 'recette-e' },
+      { kind: 'recette' as const, jour: 2, repas: 'soir', recette_id: 'recette-a' },
     ]);
 
     for (const slot of expectedSlots) {
@@ -392,6 +392,7 @@ describe('computeSwapResult', () => {
 
         // Vérifier : aucune entrée ne contient un allergène gluten
         for (const entry of result.entries) {
+          if (entry.kind !== 'recette') continue;
           const r = recettesMap.get(entry.recette_id);
           if (r) {
             expect(r.allergenes_calcules).not.toContain('gluten');
