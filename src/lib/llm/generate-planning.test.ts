@@ -846,7 +846,7 @@ describe('generatePlanning', () => {
     expect(mockClient.calls).toHaveLength(1);
   });
 
-  it('CA-6 — border : validatePlanning et validateExclusions ne reçoivent aucune entry kind=resto', async () => {
+  it('ADR022-§3 — border projection : validatePlanning et validateExclusions ne reçoivent aucune entry kind=resto', async () => {
     // Garantit que la projection recette-only est effective : les validators du sanctuaire
     // (ADR-001) ne voient jamais d'entrée resto, même quand restoSlots est non-vide.
     const spyVP = vi.spyOn(allergensValidator, 'validatePlanning');
@@ -897,7 +897,7 @@ describe('generatePlanning', () => {
     spyVE.mockRestore();
   });
 
-  it('CA-7 — slots_mismatch : planning mixte recette+resto contre expectedSlots incluant le slot resto ne génère pas de violation', async () => {
+  it('ADR022-§2 — border cohérence : planning mixte recette+resto contre expectedSlots incluant le slot resto ne génère pas de violation', async () => {
     // Vérifie que validateCoherence reçoit les entries complètes (recette + resto) et que
     // l'injection post-LLM du slot resto satisfait le expected-slot correspondant (ADR-022 §2).
     const contexte: GeneratePlanningInput['contexte'] = {

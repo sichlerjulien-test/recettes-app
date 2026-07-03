@@ -346,6 +346,40 @@ describe('computeSwapResult', () => {
     expect(safe.ok).toBe(true); // accepté
   });
 
+  it('slot kind=resto : computeSwapResult ne flip pas le kind, le slot reste resto', () => {
+    // Planning : J1 midi = rA (recette), J1 soir = kind='resto'
+    const planningWithResto: StoredPlanning = {
+      id: 'p-test',
+      sejour_id: 'sejour-test',
+      entries: [
+        { kind: 'recette', jour: 1, repas: 'midi', recette_id: 'recette-a', portions: 4 },
+        { kind: 'resto', jour: 1, repas: 'soir' },
+      ],
+      genere_le: '2026-07-02T00:00:00Z',
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: ['plaque'] },
+    };
+
+    const result = computeSwapResult({
+      planning: planningWithResto,
+      targetSlot: { jour: 1, repas: 'soir' },
+      chosenRecetteId: 'recette-e',
+      catalogue,
+      recettesMap,
+      constraints: constraintsSarah,
+      participants: [sarah],
+      expectedSlots: [{ jour: 1, repas: 'midi' }, { jour: 1, repas: 'soir' }],
+    });
+
+    if (result.ok) {
+      // Le slot soir J1 doit rester kind='resto', sans flip vers kind='recette'
+      const slot = result.entries.find((e) => e.jour === 1 && e.repas === 'soir');
+      expect(slot?.kind).toBe('resto');
+    } else {
+      // no_alternative_available est aussi acceptable — dans les deux cas, aucun kind flip
+      expect(result.error.kind).toBe('no_alternative_available');
+    }
+  });
+
   it('boucle sûreté Sarah : tous les swaps éligibles sont allergène-safe et cohérents', () => {
     // Planning 2 jours, swap chaque créneau, vérifier que chaque résultat valide est sûr
     const expectedSlots = [
