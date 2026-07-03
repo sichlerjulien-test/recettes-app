@@ -35,7 +35,7 @@ export function getEligibleCandidates(params: {
   const currentEntry = planning.entries.find(
     (e) => e.jour === targetSlot.jour && e.repas === targetSlot.repas,
   );
-  const currentRecetteId = currentEntry?.recette_id;
+  const currentRecetteId = currentEntry?.kind === 'recette' ? currentEntry.recette_id : undefined;
 
   const pool = filterByExclusions(
     filterRecipes([...catalogue], { ...constraints, type_repas_requis: targetSlot.repas }),
@@ -48,7 +48,7 @@ export function getEligibleCandidates(params: {
     if (recette.id === currentRecetteId) continue;
 
     const hypotheticalEntries: PlanningEntry[] = planning.entries.map((e) =>
-      e.jour === targetSlot.jour && e.repas === targetSlot.repas
+      e.kind === 'recette' && e.jour === targetSlot.jour && e.repas === targetSlot.repas
         ? { ...e, recette_id: recette.id }
         : e,
     );
@@ -112,12 +112,15 @@ export function computeSwapResult(params: {
     return { ok: false, error: { kind: 'invalid_candidate', recette_id: chosenRecetteId } };
   }
 
-  const portions = planning.entries.find(
+  const targetEntry = planning.entries.find(
     (e) => e.jour === targetSlot.jour && e.repas === targetSlot.repas,
-  )?.portions ?? Math.max(participants.length, 1);
+  );
+  const portions = targetEntry?.kind === 'recette'
+    ? targetEntry.portions
+    : Math.max(participants.length, 1);
 
   const newEntries: PlanningEntry[] = planning.entries.map((e) =>
-    e.jour === targetSlot.jour && e.repas === targetSlot.repas
+    e.kind === 'recette' && e.jour === targetSlot.jour && e.repas === targetSlot.repas
       ? { ...e, recette_id: chosenRecetteId, portions }
       : e,
   );
