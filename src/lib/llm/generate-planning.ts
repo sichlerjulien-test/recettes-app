@@ -1,4 +1,4 @@
-import type { Participant, PlanningEntry, Recette, ValidationViolation } from '../types/domain';
+import type { MealType, Participant, PlanningEntry, Recette, ValidationViolation } from '../types/domain';
 import { filterRecipes, type FilterConstraints } from '../allergens/filter';
 import { filterByExclusions, type ExclusionConstraints } from '../dietary/filter';
 import { validatePlanning } from '../allergens/validator';
@@ -37,6 +37,7 @@ export type PlanningConstraints = FilterConstraints & ExclusionConstraints;
  * @param constraints     - Contraintes extraites du groupe (allergènes, régimes, équipement)
  * @param participants    - Participants du séjour (pour la validation post-LLM)
  * @param sejourContexte  - Paramètres du séjour transmis au LLM
+ * @param restoSlots      - Slots marqués « resto » dans le séjour (ADR-022) : injectés dans le planning post-LLM
  */
 export async function generatePlanning(
   client: LLMClient,
@@ -45,6 +46,7 @@ export async function generatePlanning(
   constraints: PlanningConstraints,
   participants: readonly Participant[],
   sejourContexte: GeneratePlanningInput['contexte'],
+  restoSlots: readonly { jour: number; repas: MealType }[] = [],
 ): Promise<{ ok: true; entries: PlanningEntry[]; warnings?: CoherenceWarning[] } | { ok: false; error: LLMError }> {
   const allergenPool = filterRecipes(catalogue, constraints);
   if (allergenPool.length === 0) {
@@ -56,7 +58,26 @@ export async function generatePlanning(
     return { ok: false, error: { kind: 'pool_empty', cause: 'exclusion' } };
   }
 
-  const expectedSlots = buildSequence(sejourContexte.repartition_repas);
+  // Tous les slots du séjour (resto + LLM) — expectedSlots pour validateCoherence (ADR-022)
+  const allSlots = buildSequence(sejourContexte.repartition_repas);
+
+  // Slots que le LLM doit couvrir (tous sauf les slots resto)
+  const restoSet = new Set(restoSlots.map((s) => `${s.jour}:${s.repas}`));
+  const llmSlots = allSlots.filter((s) => !restoSet.has(`${s.jour}:${s.repas}`));
+
+  // Entrées resto à injecter après la génération LLM (ADR-022)
+  const restoEntries: PlanningEntry[] = restoSlots.map((s) => ({
+    kind: 'resto' as const,
+    jour: s.jour,
+    repas: s.repas,
+  }));
+
+  // Contexte transmis au LLM : slots explicites filtrés (hors resto)
+  const llmContexte: GeneratePlanningInput['contexte'] = {
+    ...sejourContexte,
+    slots_a_couvrir: llmSlots,
+  };
+
   const portions = Math.max(participants.length, 1);
   let lastSecurityViolations: ValidationViolation[] = [];
   let lastExclusionViolations: ValidationViolation[] = [];
@@ -64,12 +85,14 @@ export async function generatePlanning(
 
   try {
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      const output = await client.generate({ pool, contexte: sejourContexte });
+      const output = await client.generate({ pool, contexte: llmContexte });
 
-      const planningEntries: PlanningEntry[] = output.entries.map((entry) => ({
+      const recetteEntries: PlanningEntry[] = output.entries.map((entry) => ({
+        kind: 'recette' as const,
         ...entry,
         portions,
       }));
+      const planningEntries: PlanningEntry[] = [...recetteEntries, ...restoEntries];
 
       const planningForValidation = {
         id: 'draft',
@@ -85,7 +108,7 @@ export async function generatePlanning(
 
       const securityResult = validatePlanning(planningForValidation, recettesMap, participants);
       const dietaryViolations = validateExclusions(planningForValidation, recettesMap, participants);
-      const coherenceViolations = validateCoherence(planningForValidation, recettesMap, expectedSlots);
+      const coherenceViolations = validateCoherence(planningForValidation, recettesMap, allSlots);
 
       const bloquantCoherence = coherenceViolations.filter(
         (v) => COHERENCE_SEVERITY[v.kind] === 'bloquant',
