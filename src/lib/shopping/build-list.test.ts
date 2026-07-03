@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { buildShoppingList } from './build-list';
 import { recettesMap } from '../../../tests/fixtures/recettes';
 import { ingredientsMap } from '../../../tests/fixtures/ingredients';
-import type { Planning, Recette, Ingredient, MealType, ExclusionTag } from '../types/domain';
+import type { StoredPlanning, Recette, Ingredient, MealType, ExclusionTag } from '../types/domain';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function makePlanning(
-  entries: Array<{ jour: number; repas: MealType; recette_id: string }>,
-): Planning {
+  entries: Array<{ kind: 'recette'; jour: number; repas: MealType; recette_id: string }>,
+): StoredPlanning {
   return {
     id: 'test-planning',
     sejour_id: 'test-sejour',
@@ -61,8 +61,8 @@ describe('buildShoppingList', () => {
     // portions_base=4, nbParticipants=4 → facteur=1
     // total tomate : ceil(400)+ceil(600) = 1000g → 1000/1000 = 1 kg
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' },
-      { jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
@@ -110,8 +110,8 @@ describe('buildShoppingList', () => {
     ]);
     const localIngredients = new Map<string, Ingredient>([['sauce-locale', ingredientLocal]]);
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-sauce-ml' },
-      { jour: 1, repas: 'soir', recette_id: 'recette-sauce-cuillere' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-sauce-ml' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-sauce-cuillere' },
     ]);
     const result = buildShoppingList(planning, localRecettes, localIngredients, 4);
     expect(result.ok).toBe(true);
@@ -125,7 +125,7 @@ describe('buildShoppingList', () => {
     // omelette-legumes : portions_base=2, oeuf-entier 4 piece
     // nbParticipants=6 → facteur=3 → ceil(4*3)=12 pieces
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'omelette-legumes' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'omelette-legumes' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 6);
     expect(result.ok).toBe(true);
@@ -140,7 +140,7 @@ describe('buildShoppingList', () => {
     // quiche-lorraine : portions_base=6, oeuf-entier 4 piece
     // nbParticipants=4 → facteur=4/6 → ceil(4 * 4/6) = ceil(2.67) = 3 (pas 2)
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'quiche-lorraine' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'quiche-lorraine' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
@@ -154,7 +154,7 @@ describe('buildShoppingList', () => {
     // quiche-lorraine : portions_base=6, lait-entier 200ml
     // nbParticipants=4 → ceil(200 * 4/6) = ceil(133.33) = 134ml → 134/1000 = 0.134 → round2 = 0.13
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'quiche-lorraine' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'quiche-lorraine' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
@@ -170,7 +170,7 @@ describe('buildShoppingList', () => {
   it('should mark item as optional when ingredient is optional in all recipes', () => {
     // carbonara-sans-parmesan : parmesan optionnel=true
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'carbonara-sans-parmesan' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'carbonara-sans-parmesan' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
@@ -185,8 +185,8 @@ describe('buildShoppingList', () => {
     // carbonara-sans-parmesan : parmesan optionnel=true
     // → la version non-optionnelle l'emporte
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'carbonara-classique' },
-      { jour: 1, repas: 'soir', recette_id: 'carbonara-sans-parmesan' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'carbonara-classique' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'carbonara-sans-parmesan' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
@@ -199,7 +199,7 @@ describe('buildShoppingList', () => {
   it('should include optional ingredients in the list and not exclude them', () => {
     // curry-poulet-sans-cacahuetes : cacahuetes optionnel=true → présent dans la liste
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'curry-poulet-sans-cacahuetes' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'curry-poulet-sans-cacahuetes' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
@@ -216,7 +216,7 @@ describe('buildShoppingList', () => {
     // pad-thai : crevettes (viandes-poissons), cacahuetes (epicerie-salee),
     //            sauce-soja (condiments-epices), riz-basmati (feculents-pates-riz)
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'pad-thai' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'pad-thai' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
@@ -231,7 +231,7 @@ describe('buildShoppingList', () => {
   it('should include all 11 categories in the output even when empty', () => {
     // salade-tomate-basilic n'utilise que des fruits-légumes
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
@@ -247,7 +247,7 @@ describe('buildShoppingList', () => {
     // salade-tomate-basilic → fruits-legumes : Tomate, Oignon, Carotte
     // ordre attendu après tri : Carotte < Oignon < Tomate
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
@@ -265,8 +265,8 @@ describe('buildShoppingList', () => {
   it('should populate utilise_dans with deduplicated recette_id list', () => {
     // tomate utilisée dans pates-bolognaise ET salade-tomate-basilic
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' },
-      { jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
@@ -286,7 +286,7 @@ describe('buildShoppingList', () => {
     // gratin-dauphinois : lait-entier 400ml (unite_base='ml', unite_achat='l', conversion=1000)
     // portions_base=4, nbParticipants=4 → facteur=1 → 400ml / 1000 = 0.4 l
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'gratin-dauphinois' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'gratin-dauphinois' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(true);
@@ -323,7 +323,7 @@ describe('buildShoppingList', () => {
     const localRecettes = new Map<string, Recette>([['recette-huile-cuillere', recette]]);
     const localIngredients = new Map<string, Ingredient>([['huile-locale', ingredient]]);
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-huile-cuillere' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-huile-cuillere' },
     ]);
     const result = buildShoppingList(planning, localRecettes, localIngredients, 4);
     expect(result.ok).toBe(true);
@@ -360,7 +360,7 @@ describe('buildShoppingList', () => {
     };
     const localRecettes = new Map<string, Recette>([['recette-chou', recette]]);
     const localIngredients = new Map<string, Ingredient>([['chou-fleur', ingredient]]);
-    const planning = makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-chou' }]);
+    const planning = makePlanning([{ kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-chou' }]);
     const result = buildShoppingList(planning, localRecettes, localIngredients, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -397,8 +397,8 @@ describe('buildShoppingList', () => {
     const localRecettes = new Map<string, Recette>([['recette-chou-2', recette]]);
     const localIngredients = new Map<string, Ingredient>([['chou-fleur-b', ingredient]]);
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-chou-2' },
-      { jour: 1, repas: 'soir', recette_id: 'recette-chou-2' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-chou-2' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-chou-2' },
     ]);
     const result = buildShoppingList(planning, localRecettes, localIngredients, 4);
     expect(result.ok).toBe(true);
@@ -415,7 +415,7 @@ describe('buildShoppingList', () => {
     // omelette-legumes : portions_base=2, oeuf-entier=4 piece
     // nbParticipants=6 → facteur=3 → 4*3=12 → quantite_totale=12 > 1 → nom_pluriel
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'omelette-legumes' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'omelette-legumes' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 6);
     expect(result.ok).toBe(true);
@@ -452,7 +452,7 @@ describe('buildShoppingList', () => {
     };
     const localRecettes = new Map<string, Recette>([['recette-oeuf-singulier', recette]]);
     const localIngredients = new Map<string, Ingredient>([['oeuf-test-singulier', ingredient]]);
-    const planning = makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-oeuf-singulier' }]);
+    const planning = makePlanning([{ kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-oeuf-singulier' }]);
     const result = buildShoppingList(planning, localRecettes, localIngredients, 4);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -469,8 +469,8 @@ describe('buildShoppingList', () => {
     // total brut = (400+600)*2 = 2000g → round2(2000/1000) = 2 kg
     // 2 kg > 1 MAIS unite_affichee='kg' ∉ DISCRETE_UNITS → toujours nom_singulier
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' },
-      { jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'pates-bolognaise' },
+      { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'salade-tomate-basilic' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 8);
     expect(result.ok).toBe(true);
@@ -505,7 +505,7 @@ describe('buildShoppingList', () => {
     };
     // facteur=1, ceil(2)=2 > 1 → nom_pluriel attendu
     const result = buildShoppingList(
-      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-chou-d' }]),
+      makePlanning([{ kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-chou-d' }]),
       new Map([['recette-chou-d', recette]]),
       new Map([['chou-fleur-d', ingredient]]),
       4,
@@ -544,7 +544,7 @@ describe('buildShoppingList', () => {
     };
     // nbParticipants=8 → facteur=2 → 600*2=1200g → round2(1200/1000)=1.2 kg > 1 → nom_singulier
     const result = buildShoppingList(
-      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-riz-inv' }]),
+      makePlanning([{ kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-riz-inv' }]),
       new Map([['recette-riz-inv', recette]]),
       new Map([['riz-inv', ingredient]]),
       8,
@@ -573,7 +573,7 @@ describe('buildShoppingList', () => {
       ingredients: [{ ingredient_id: 'epice-g', quantite_base: 150, unite: 'g', optionnel: false, groupe: undefined }],
     };
     const result = buildShoppingList(
-      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-epice-g' }]),
+      makePlanning([{ kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-epice-g' }]),
       new Map([['recette-epice-g', recette]]),
       new Map([['epice-g', ingredient]]),
       5,
@@ -598,7 +598,7 @@ describe('buildShoppingList', () => {
       ingredients: [{ ingredient_id: 'epice-g-s', quantite_base: 25, unite: 'g', optionnel: false, groupe: undefined }],
     };
     const result = buildShoppingList(
-      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-epice-g-s' }]),
+      makePlanning([{ kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-epice-g-s' }]),
       new Map([['recette-epice-g-s', recette]]),
       new Map([['epice-g-s', ingredient]]),
       4,
@@ -622,7 +622,7 @@ describe('buildShoppingList', () => {
       ingredients: [{ ingredient_id: 'epice-g-l', quantite_base: 620, unite: 'g', optionnel: false, groupe: undefined }],
     };
     const result = buildShoppingList(
-      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-epice-g-l' }]),
+      makePlanning([{ kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-epice-g-l' }]),
       new Map([['recette-epice-g-l', recette]]),
       new Map([['epice-g-l', ingredient]]),
       4,
@@ -649,7 +649,7 @@ describe('buildShoppingList', () => {
       ingredients: [{ ingredient_id: 'sauce-ml', quantite_base: 150, unite: 'ml', optionnel: false, groupe: undefined }],
     };
     const result = buildShoppingList(
-      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-sauce-ml-r' }]),
+      makePlanning([{ kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-sauce-ml-r' }]),
       new Map([['recette-sauce-ml-r', recette]]),
       new Map([['sauce-ml', ingredient]]),
       5,
@@ -675,7 +675,7 @@ describe('buildShoppingList', () => {
       ingredients: [{ ingredient_id: 'huile-cuil', quantite_base: 4, unite: 'cuillere-soupe', optionnel: false, groupe: undefined }],
     };
     const result = buildShoppingList(
-      makePlanning([{ jour: 1, repas: 'midi', recette_id: 'recette-cuil' }]),
+      makePlanning([{ kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-cuil' }]),
       new Map([['recette-cuil', recette]]),
       new Map([['huile-cuil', ingredient]]),
       4,
@@ -692,7 +692,7 @@ describe('buildShoppingList', () => {
 
   it('should return error invalid_participants when nbParticipants is zero or negative', () => {
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' },
     ]);
     const resultZero = buildShoppingList(planning, recettesMap, ingredientsMap, 0);
     expect(resultZero.ok).toBe(false);
@@ -709,7 +709,7 @@ describe('buildShoppingList', () => {
 
   it('should return error recette_inconnue when planning references unknown recette', () => {
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-inexistante-xyz' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-inexistante-xyz' },
     ]);
     const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
     expect(result.ok).toBe(false);
@@ -730,7 +730,7 @@ describe('buildShoppingList', () => {
     };
     const localRecettes = new Map<string, Recette>([['recette-ingredient-fantome', recette]]);
     const planning = makePlanning([
-      { jour: 1, repas: 'midi', recette_id: 'recette-ingredient-fantome' },
+      { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'recette-ingredient-fantome' },
     ]);
     const result = buildShoppingList(planning, localRecettes, ingredientsMap, 4);
     expect(result.ok).toBe(false);
@@ -739,6 +739,53 @@ describe('buildShoppingList', () => {
     if (result.error.kind === 'ingredient_inconnu') {
       expect(result.error.ingredient_id).toBe('ingredient-fantome-xyz');
       expect(result.error.recette_id).toBe('recette-ingredient-fantome');
+    }
+  });
+
+  // ── TK-42 : slots resto (ADR-022) ──────────────────────────────────────────
+
+  it('CA-4 : planning avec un slot resto au soir — zéro ingrédient depuis ce slot', () => {
+    const planning: StoredPlanning = {
+      id: 'test-planning',
+      sejour_id: 'test-sejour',
+      entries: [
+        { kind: 'recette' as const, jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic', portions: 4 },
+        { kind: 'resto' as const, jour: 1, repas: 'soir' },
+      ],
+      genere_le: '2026-04-27T12:00:00Z',
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
+    };
+    const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    // Liste identique à un planning avec seulement salade-tomate-basilic au midi
+    const planningMidiOnly = makePlanning([{ kind: 'recette', jour: 1, repas: 'midi', recette_id: 'salade-tomate-basilic' }]);
+    const resultMidiOnly = buildShoppingList(planningMidiOnly, recettesMap, ingredientsMap, 4);
+    expect(resultMidiOnly.ok).toBe(true);
+    if (!resultMidiOnly.ok) return;
+    // Les deux listes doivent être identiques (le slot resto n'ajoute aucun ingrédient)
+    expect(result.items_par_categorie).toEqual(resultMidiOnly.items_par_categorie);
+  });
+
+  it('CA-5 : séjour tout-resto → liste de courses vide, pas de crash', () => {
+    const planning: StoredPlanning = {
+      id: 'test-planning',
+      sejour_id: 'test-sejour',
+      entries: [
+        { kind: 'resto' as const, jour: 1, repas: 'midi' },
+        { kind: 'resto' as const, jour: 1, repas: 'soir' },
+        { kind: 'resto' as const, jour: 2, repas: 'midi' },
+        { kind: 'resto' as const, jour: 2, repas: 'soir' },
+      ],
+      genere_le: '2026-04-27T12:00:00Z',
+      contraintes_utilisees: { allergenes: [], exclusions: [], equipement: [] },
+    };
+    const result = buildShoppingList(planning, recettesMap, ingredientsMap, 4);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    // Toutes les catégories sont vides
+    for (const items of Object.values(result.items_par_categorie)) {
+      expect(items).toHaveLength(0);
     }
   });
 

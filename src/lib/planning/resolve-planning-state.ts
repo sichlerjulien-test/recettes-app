@@ -1,10 +1,10 @@
 import type { GetPlanningResult } from '@/lib/db/plannings';
-import type { Planning } from '@/lib/types/domain';
+import type { StoredPlanning } from '@/lib/types/domain';
 
 export type PlanningState =
   | { status: 'empty' }
   | { status: 'error' }
-  | { status: 'ok'; planning: Planning };
+  | { status: 'ok'; planning: StoredPlanning };
 
 export function resolvePlanningState(result: GetPlanningResult): PlanningState {
   if (result.ok) return { status: 'ok', planning: result.planning };

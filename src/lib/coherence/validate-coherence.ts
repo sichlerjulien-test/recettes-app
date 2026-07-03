@@ -1,7 +1,7 @@
 import type {
   IngredientConsecutifViolation,
   MealType,
-  Planning,
+  StoredPlanning,
   Recette,
   RecetteDupliqueeViolation,
   SlotsMismatchViolation,
@@ -39,7 +39,7 @@ export const RECETTE_DUPLIQUEE_WINDOW_DAYS = 3;
  * Les recette_id inconnus sont ignorés silencieusement (recette_inconnue est émis par validatePlanning).
  */
 export function validateCoherence(
-  planning: Planning,
+  planning: StoredPlanning,
   recettesMap: Map<string, Recette>,
   expectedSlots: readonly { jour: number; repas: MealType }[],
 ): CoherenceViolation[] {
@@ -59,11 +59,13 @@ export function validateCoherence(
 
   // ── Règle 2 : pas de recette dupliquée au même créneau dans la fenêtre ───────
   // Petit-déjeuner exempté (ADR-009 amendement TK-39).
+  // Slots resto ignorés explicitement (ADR-022) — ils n'ont pas de recette_id.
   // Pour midi et soir : fenêtre glissante de RECETTE_DUPLIQUEE_WINDOW_DAYS jours
   // par créneau — deux occurrences à distance < N jours → violation bloquante.
   {
     const byRecetteSlot = new Map<string, Map<MealType, number[]>>();
     for (const entry of planning.entries) {
+      if (entry.kind === 'resto') continue;
       if (entry.repas === 'petit-dejeuner') continue;
       if (!byRecetteSlot.has(entry.recette_id)) {
         byRecetteSlot.set(entry.recette_id, new Map());
@@ -95,8 +97,10 @@ export function validateCoherence(
 
   // ── Règle 3 : unicité de l'ingredient_principal par jour ─────────────────────
   // Frontière = jour calendaire (ADR-009 §3). Les recette_id inconnus sont ignorés.
+  // Slots resto ignorés explicitement (ADR-022) — ils n'ont pas de recette_id.
   const byJour = new Map<number, Array<{ repas: MealType; recette: Recette }>>();
   for (const entry of planning.entries) {
+    if (entry.kind === 'resto') continue;
     const recette = recettesMap.get(entry.recette_id);
     if (recette === undefined) continue;
     if (!byJour.has(entry.jour)) byJour.set(entry.jour, []);

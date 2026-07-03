@@ -54,9 +54,9 @@ Tu dois appeler l'outil compose_planning avec exactement ${totalRepas} entrées 
 
 function buildUserMessage(input: GeneratePlanningInput): string {
   const { pool, contexte } = input;
-  const { nb_jours, repartition_repas, niveau_cuisine, temps_disponible } = contexte;
+  const { nb_jours, repartition_repas, niveau_cuisine, temps_disponible, slots_a_couvrir } = contexte;
 
-  const slots = buildSequence(repartition_repas);
+  const slots = slots_a_couvrir ?? buildSequence(repartition_repas);
   const slotsLines = slots.map((s) => `- Jour ${s.jour}, ${s.repas}`).join('\n');
 
   const poolLines = pool
@@ -93,7 +93,7 @@ export function createAnthropicClient(apiKey: string): LLMClient {
 
   return {
     async generate(input: GeneratePlanningInput): Promise<GeneratePlanningOutput> {
-      const slots = buildSequence(input.contexte.repartition_repas);
+      const slots = input.contexte.slots_a_couvrir ?? buildSequence(input.contexte.repartition_repas);
       const totalRepas = slots.length;
 
       const response = await anthropic.messages.create(

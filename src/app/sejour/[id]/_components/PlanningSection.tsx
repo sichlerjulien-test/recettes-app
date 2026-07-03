@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Planning, Recette, Ingredient, MealType } from "@/lib/types/domain";
+import type { StoredPlanning, RecettePlanningEntry, Recette, Ingredient, MealType } from "@/lib/types/domain";
 import type { PlanningState } from "@/lib/planning/resolve-planning-state";
 import { formatIngredientRecette } from "@/lib/ui/format-ingredient-recette";
 
@@ -38,7 +38,7 @@ export function PlanningSection({ planningState, recettes, ingredients, sejourId
     );
   }
 
-  const planning = planningState.planning;
+  const planning: StoredPlanning = planningState.planning;
   const entriesByDay = groupByDay(planning.entries);
 
   return (
@@ -62,9 +62,9 @@ export function PlanningSection({ planningState, recettes, ingredients, sejourId
 }
 
 function groupByDay(
-  entries: Planning["entries"],
-): Record<number, Planning["entries"]> {
-  const grouped: Record<number, Planning["entries"]> = {};
+  entries: StoredPlanning["entries"],
+): Record<number, StoredPlanning["entries"]> {
+  const grouped: Record<number, StoredPlanning["entries"]> = {};
   for (const entry of entries) {
     (grouped[entry.jour] ??= []).push(entry);
   }
@@ -80,7 +80,7 @@ function DayCard({
   token,
 }: {
   jour: number;
-  entries: Planning["entries"];
+  entries: StoredPlanning["entries"];
   recettes: Map<string, Recette>;
   ingredients: Map<string, Ingredient>;
   sejourId: string;
@@ -95,6 +95,18 @@ function DayCard({
       <h3 className="font-semibold">Jour {jour}</h3>
       <ul className="space-y-2">
         {sortedEntries.map((entry, idx) => {
+          if (entry.kind === 'resto') {
+            return (
+              <li key={`${entry.jour}-${entry.repas}-${idx}`} className="space-y-2">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-sm font-medium text-muted-foreground w-16 shrink-0">
+                    {mealLabel(entry.repas)}
+                  </span>
+                  <div className="font-medium text-muted-foreground italic">Resto / non cuisiné</div>
+                </div>
+              </li>
+            );
+          }
           const recette = recettes.get(entry.recette_id);
           return (
             <MealEntry
@@ -127,7 +139,7 @@ function MealEntry({
   sejourId,
   token,
 }: {
-  entry: Planning["entries"][number];
+  entry: RecettePlanningEntry;
   recette: Recette | undefined;
   ingredients: Map<string, Ingredient>;
   sejourId: string;
@@ -300,7 +312,7 @@ function RecipeDetail({
   ingredients,
 }: {
   recette: Recette;
-  entry: Planning["entries"][number];
+  entry: RecettePlanningEntry;
   ingredients: Map<string, Ingredient>;
 }) {
   return (

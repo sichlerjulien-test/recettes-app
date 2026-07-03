@@ -84,7 +84,7 @@ const EMPTY_PARTICIPANT = {
 const DEFAULT_FORM_VALUES: SejourFormData = {
   nom: "",
   nb_jours: 2,
-  repartition_repas: { premier_repas: "matin", midis: 2, soirs: 2, brunchs: 0 },
+  repartition_repas: { premier_repas: "matin", midis: 2, soirs: 2, brunchs: 0, slots_resto: [] },
   parametres: {
     niveau_cuisine: "facile",
     equipement_disponible: ["plaque", "four"],

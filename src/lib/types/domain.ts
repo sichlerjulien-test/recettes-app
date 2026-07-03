@@ -25,6 +25,8 @@ import type {
   SejourParametresSchema,
   SejourSchema,
   PlanningEntryFullSchema,
+  RecettePlanningEntryFullSchema,
+  RestoPlanningEntrySchema,
   PlanningSchema,
   ShoppingItemSchema,
   ShoppingListSchema,
@@ -91,9 +93,42 @@ export type Participant = z.infer<typeof ParticipantSchema>;
 // PLANNING
 // ============================================================================
 
-export type PlanningEntry = z.infer<typeof PlanningEntryFullSchema>;
+/**
+ * Entrée de planning porteuse de recette — forme historique (pré-TK-42).
+ * C'est le seul type que consomme le sanctuaire allergens/dietary.
+ * Pas de champ `kind` : toutes les entries d'un Planning sont des recettes.
+ */
+export type PlanningEntry = {
+  jour: number;
+  repas: MealType;
+  recette_id: string;
+  portions: number;
+};
 
-export type Planning = z.infer<typeof PlanningSchema>;
+/** Variante recette d'une entrée de planning stockée (avec discriminant `kind`). */
+export type RecettePlanningEntry = z.infer<typeof RecettePlanningEntryFullSchema>;
+
+/** Variante resto : créneau non cuisiné, sans recette (ADR-022). */
+export type RestoPlanningEntry = z.infer<typeof RestoPlanningEntrySchema>;
+
+/**
+ * Union discriminée des slots de planning — pour stockage DB, affichage et cohérence.
+ * NE PAS utiliser comme type d'entrée du sanctuaire allergens/dietary.
+ */
+export type PlanningSlot = RecettePlanningEntry | RestoPlanningEntry;
+
+/**
+ * Planning tel que retourné par la DB — entries contient les deux kinds (ADR-022).
+ * Utiliser pour : affichage, cohérence (slots_mismatch), swap, liste de courses.
+ */
+export type StoredPlanning = z.infer<typeof PlanningSchema>;
+
+/**
+ * Planning recette-only — ce que consomme le sanctuaire allergens/dietary.
+ * entries ne contient jamais de slot resto.
+ * Assignable depuis StoredPlanning via projection (filter kind='recette').
+ */
+export type Planning = Omit<StoredPlanning, 'entries'> & { entries: PlanningEntry[] };
 
 // ============================================================================
 // SHOPPING LIST

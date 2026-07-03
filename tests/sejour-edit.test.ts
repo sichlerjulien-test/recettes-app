@@ -18,7 +18,7 @@ describe('determineRegenerationAction', () => {
 
 const VALID_BODY = {
   nb_jours: 3,
-  repartition_repas: { premier_repas: 'matin', midis: 3, soirs: 3, brunchs: 1 },
+  repartition_repas: { premier_repas: 'matin', midis: 3, soirs: 3, brunchs: 1, slots_resto: [] },
   parametres: {
     niveau_cuisine: 'facile',
     equipement_disponible: ['plaque'],

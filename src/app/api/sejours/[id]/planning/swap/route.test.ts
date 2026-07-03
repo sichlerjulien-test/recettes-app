@@ -35,7 +35,7 @@ const SEJOUR = {
   token: VALID_TOKEN,
   nom: 'Séjour test',
   nb_jours: 2,
-  repartition_repas: { premier_repas: 'midi' as const, midis: 2, soirs: 2, brunchs: 0 },
+  repartition_repas: { premier_repas: 'midi' as const, midis: 2, soirs: 2, brunchs: 0, slots_resto: [] },
   participants: [],
   parametres: {
     niveau_cuisine: 'facile' as const,
@@ -49,10 +49,10 @@ const PLANNING = {
   id: 'plan-1',
   sejour_id: 'sejour-1',
   entries: [
-    { jour: 1, repas: 'midi' as const, recette_id: 'recette-a', portions: 4 },
-    { jour: 1, repas: 'soir' as const, recette_id: 'recette-b', portions: 4 },
-    { jour: 2, repas: 'midi' as const, recette_id: 'recette-c', portions: 4 },
-    { jour: 2, repas: 'soir' as const, recette_id: 'recette-d', portions: 4 },
+    { kind: 'recette' as const, jour: 1, repas: 'midi' as const, recette_id: 'recette-a', portions: 4 },
+    { kind: 'recette' as const, jour: 1, repas: 'soir' as const, recette_id: 'recette-b', portions: 4 },
+    { kind: 'recette' as const, jour: 2, repas: 'midi' as const, recette_id: 'recette-c', portions: 4 },
+    { kind: 'recette' as const, jour: 2, repas: 'soir' as const, recette_id: 'recette-d', portions: 4 },
   ],
   genere_le: '2026-07-02T00:00:00Z',
   contraintes_utilisees: { allergenes: [], exclusions: [], equipement: ['plaque' as const] },
@@ -159,7 +159,7 @@ describe('GET /planning/swap', () => {
 
 describe('POST /planning/swap', () => {
   it('retourne 401 sans token', async () => {
-    const res = await POST(makePostRequest('sejour-1', { jour: 1, repas: 'soir', recette_id: 'r-e' }), params('sejour-1'));
+    const res = await POST(makePostRequest('sejour-1', { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'r-e' }), params('sejour-1'));
     expect(res.status).toBe(401);
   });
 
@@ -175,13 +175,13 @@ describe('POST /planning/swap', () => {
   });
 
   it('retourne 400 si corps manque des champs requis', async () => {
-    const res = await POST(makePostRequest('sejour-1', { jour: 1 }, VALID_TOKEN), params('sejour-1'));
+    const res = await POST(makePostRequest('sejour-1', { kind: 'recette' as const, jour: 1 }, VALID_TOKEN), params('sejour-1'));
     expect(res.status).toBe(400);
   });
 
   it('retourne 201 et la nouvelle ligne planning en cas de succès', async () => {
     const res = await POST(
-      makePostRequest('sejour-1', { jour: 1, repas: 'soir', recette_id: 'recette-e' }, VALID_TOKEN),
+      makePostRequest('sejour-1', { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-e' }, VALID_TOKEN),
       params('sejour-1'),
     );
     expect(res.status).toBe(201);
@@ -196,7 +196,7 @@ describe('POST /planning/swap', () => {
       error: { kind: 'invalid_candidate', recette_id: 'recette-x' },
     });
     const res = await POST(
-      makePostRequest('sejour-1', { jour: 1, repas: 'soir', recette_id: 'recette-x' }, VALID_TOKEN),
+      makePostRequest('sejour-1', { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-x' }, VALID_TOKEN),
       params('sejour-1'),
     );
     expect(res.status).toBe(422);
@@ -210,7 +210,7 @@ describe('POST /planning/swap', () => {
       error: { kind: 'no_alternative_available' },
     });
     const res = await POST(
-      makePostRequest('sejour-1', { jour: 1, repas: 'soir', recette_id: 'recette-e' }, VALID_TOKEN),
+      makePostRequest('sejour-1', { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-e' }, VALID_TOKEN),
       params('sejour-1'),
     );
     expect(res.status).toBe(422);
@@ -220,7 +220,7 @@ describe('POST /planning/swap', () => {
 
   it('appelle createPlanning exactement une fois et retourne 201 (snapshot immuable)', async () => {
     await POST(
-      makePostRequest('sejour-1', { jour: 1, repas: 'soir', recette_id: 'recette-e' }, VALID_TOKEN),
+      makePostRequest('sejour-1', { kind: 'recette' as const, jour: 1, repas: 'soir', recette_id: 'recette-e' }, VALID_TOKEN),
       params('sejour-1'),
     );
     expect(vi.mocked(createPlanning)).toHaveBeenCalledTimes(1);

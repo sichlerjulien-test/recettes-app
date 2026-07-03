@@ -18,7 +18,7 @@ const SEJOUR_FIXTURE = {
   token: VALID_TOKEN,
   nom: 'Séjour test',
   nb_jours: 3,
-  repartition_repas: { premier_repas: 'matin' as const, midis: 2, soirs: 2, brunchs: 0 },
+  repartition_repas: { premier_repas: 'matin' as const, midis: 2, soirs: 2, brunchs: 0, slots_resto: [] },
   participants: [],
   parametres: {
     niveau_cuisine: 'facile' as const,
@@ -30,7 +30,7 @@ const SEJOUR_FIXTURE = {
 
 const VALID_BODY = {
   nb_jours: 3,
-  repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0 },
+  repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0, slots_resto: [] },
   parametres: {
     niveau_cuisine: 'facile',
     equipement_disponible: ['plaque'],

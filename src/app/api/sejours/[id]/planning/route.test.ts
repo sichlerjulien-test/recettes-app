@@ -39,7 +39,7 @@ const SEJOUR_FIXTURE = {
   token: VALID_TOKEN,
   nom: 'Séjour test',
   nb_jours: 3,
-  repartition_repas: { premier_repas: 'matin' as const, midis: 2, soirs: 2, brunchs: 0 },
+  repartition_repas: { premier_repas: 'matin' as const, midis: 2, soirs: 2, brunchs: 0, slots_resto: [] },
   participants: [],
   parametres: {
     niveau_cuisine: 'facile' as const,
@@ -148,7 +148,7 @@ describe('POST /api/sejours/[id]/planning', () => {
 
   describe('délégation des contraintes', () => {
     const STUB_ENTRIES = [
-      { jour: 1, repas: 'midi' as const, recette_id: 'recette-test', portions: 0 },
+      { kind: 'recette' as const, jour: 1, repas: 'midi' as const, recette_id: 'recette-test', portions: 0 },
     ];
     const STUB_CONSTRAINTS = {
       allergenes_groupe: ['arachides' as const],
@@ -180,6 +180,24 @@ describe('POST /api/sejours/[id]/planning', () => {
       expect(persistCall.entries).toEqual(STUB_ENTRIES);
       expect(persistCall.contraintes_utilisees.allergenes).toContain('arachides');
       expect(persistCall.contraintes_utilisees.exclusions).toContain('vegetarien');
+    });
+
+    it('cross-device : restoSlots lu depuis le séjour DB, transmis à generatePlanning sans param body', async () => {
+      // Séjour en DB avec un slot resto ; le body POST ne contient aucun paramètre resto
+      const restoSlot = { jour: 1, repas: 'midi' as const };
+      vi.mocked(getSejourById).mockResolvedValueOnce({
+        ok: true,
+        sejour: {
+          ...SEJOUR_FIXTURE,
+          repartition_repas: { ...SEJOUR_FIXTURE.repartition_repas, slots_resto: [restoSlot] },
+        },
+      });
+
+      await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
+
+      // 7ème argument (index 6) = restoSlots
+      const call = vi.mocked(generatePlanning).mock.calls[0]!;
+      expect(call[6]).toEqual([restoSlot]);
     });
   });
 });

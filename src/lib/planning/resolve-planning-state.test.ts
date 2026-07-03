@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { resolvePlanningState } from './resolve-planning-state';
-import type { Planning } from '@/lib/types/domain';
+import type { StoredPlanning } from '@/lib/types/domain';
 
-const stubPlanning: Planning = {
+const stubPlanning: StoredPlanning = {
   id: 'plan-1',
   sejour_id: 'sejour-1',
   entries: [],
