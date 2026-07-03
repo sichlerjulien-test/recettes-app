@@ -349,7 +349,7 @@ sur le fix. `EditSejourClient.tsx` (même bug) reste hors scope, ticketé en TK-
 
 Les policies `allow_all_mvp` (USING true / WITH CHECK true) sur sejours, participants, plannings ne servent à rien aujourd'hui (l'app passe par service_role qui bypasse le RLS) mais rendent les trois tables publiques en lecture/écriture pour quiconque obtient l'anon key — tokens et allergies inclus. Deny-by-default gratuit : RLS reste ENABLE, on supprime les policies.
 
-**Critères d'acceptation :** migration `013-drop-allow-all-policies.sql` (3 × DROP POLICY, idempotente) appliquée dev + prod ; `canonical.sql` régénéré sans les policies ; gate schema-replay CI vert ; suite E2E inchangée et verte (preuve que l'app n'en dépendait pas).
+**Critères d'acceptation :** migration `013-drop-allow-all-policies.sql` (3 × DROP POLICY, idempotente) appliquée dev + prod ; `canonical.sql` régénéré sans les policies ; gate schema-replay CI vert ; suite E2E inchangée et verte contre dev post-migration (preuve que l'app n'en dépendait pas) ; vérif anon key sur prod : `curl REST /sejours` avec l'anon key renvoie `[]` ou 401/403 et un POST équivalent échoue — commande et résultat consignés dans la PR avant merge (seule preuve que le trou est effectivement fermé).
 
 **Localisation (pari à confirmer) :** `scripts/migrations/013-*.sql`, `schema/canonical.sql`. Aucun fichier TypeScript.
 
