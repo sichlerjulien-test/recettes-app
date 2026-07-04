@@ -482,6 +482,14 @@ export const DbErrorSchema = z.discriminatedUnion('kind', [
 // API INPUT SCHEMAS
 // ============================================================================
 
+export const FeedbackBodySchema = z.object({
+  sejour_id: z.string().uuid(),
+  planning_id: z.string().min(1),
+  jour: z.number().int().positive(),
+  repas: MealTypeSchema,
+  recette_id: z.string().min(1),
+});
+
 export const CreateSejourBodySchema = z.object({
   nom: z.string().min(1).max(100).optional(),
   date_debut: z.string().date().optional(),

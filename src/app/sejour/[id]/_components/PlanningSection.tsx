@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { StoredPlanning, RecettePlanningEntry, Recette, Ingredient, MealType } from "@/lib/types/domain";
 import type { PlanningState } from "@/lib/planning/resolve-planning-state";
@@ -53,6 +53,7 @@ export function PlanningSection({ planningState, recettes, ingredients, sejourId
             recettes={recettes}
             ingredients={ingredients}
             sejourId={sejourId}
+            planningId={planning.id}
             token={token}
           />
         ))}
@@ -77,6 +78,7 @@ function DayCard({
   recettes,
   ingredients,
   sejourId,
+  planningId,
   token,
 }: {
   jour: number;
@@ -84,6 +86,7 @@ function DayCard({
   recettes: Map<string, Recette>;
   ingredients: Map<string, Ingredient>;
   sejourId: string;
+  planningId: string;
   token: string;
 }) {
   const sortedEntries = [...entries].sort(
@@ -115,6 +118,7 @@ function DayCard({
               recette={recette}
               ingredients={ingredients}
               sejourId={sejourId}
+              planningId={planningId}
               token={token}
             />
           );
@@ -132,21 +136,52 @@ type SwapState =
   | { status: "no_alternative" }
   | { status: "error"; message: string };
 
+type FeedbackState = "idle" | "sending" | "done" | "error";
+
 function MealEntry({
   entry,
   recette,
   ingredients,
   sejourId,
+  planningId,
   token,
 }: {
   entry: RecettePlanningEntry;
   recette: Recette | undefined;
   ingredients: Map<string, Ingredient>;
   sejourId: string;
+  planningId: string;
   token: string;
 }) {
   const [open, setOpen] = useState(false);
   const [swap, setSwap] = useState<SwapState>({ status: "idle" });
+  const [feedback, setFeedback] = useState<FeedbackState>("idle");
+  const sendingRef = useRef(false);
+
+  async function sendDislike() {
+    if (sendingRef.current) return;
+    sendingRef.current = true;
+    setFeedback("sending");
+    try {
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Sejour-Token": token,
+        },
+        body: JSON.stringify({
+          sejour_id: sejourId,
+          planning_id: planningId,
+          jour: entry.jour,
+          repas: entry.repas,
+          recette_id: entry.recette_id,
+        }),
+      });
+      setFeedback(res.ok ? "done" : "error");
+    } catch {
+      setFeedback("error");
+    }
+  }
   const router = useRouter();
 
   async function openSwap() {
@@ -226,6 +261,36 @@ function MealEntry({
           <RecipeDetail recette={recette} entry={entry} ingredients={ingredients} />
         </div>
       )}
+
+      {/* Feedback pouce bas */}
+      <div className="ml-19 pl-4">
+        {feedback === "idle" && (
+          <button
+            type="button"
+            onClick={sendDislike}
+            aria-label="Ce repas ne me convient pas"
+            className="text-xs text-muted-foreground hover:text-foreground"
+          >
+            👎
+          </button>
+        )}
+        {feedback === "sending" && (
+          <span className="text-xs text-muted-foreground">…</span>
+        )}
+        {feedback === "done" && (
+          <span className="text-xs text-muted-foreground" aria-label="Avis enregistré">✓</span>
+        )}
+        {feedback === "error" && (
+          <button
+            type="button"
+            onClick={sendDislike}
+            aria-label="Réessayer"
+            className="text-xs text-destructive hover:underline"
+          >
+            👎 Réessayer
+          </button>
+        )}
+      </div>
 
       {/* Swap picker */}
       {swap.status === "idle" && (
