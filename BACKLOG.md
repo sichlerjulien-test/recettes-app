@@ -284,8 +284,10 @@ le swap (callback swapVersion, pas router.refresh).
 
 **Livré (2026-07-02) : PR #79 + ADR-021**
 
-### TK-43 — (optionnel) Feedback in-app loggé Supabase
+### TK-43 — (optionnel) Feedback in-app loggé Supabase ✅
 Pouce bas sur un repas loggé en Supabase pour instrumenter le test d'août.
+
+**Livré (2026-07-04) : PR #83 + #84 — table `feedback` (migration 013, RLS deny-by-default), signal négatif append-only.**
 
 ### TK-44 — Polish install PWA
 Polish manifest / icônes / add-to-home-screen.
@@ -432,7 +434,7 @@ une branche morte = fausse confiance, à corriger opportunistement, pas urgent.
 | TK-40b | [DORMANT] Distinguer « profondeur insuffisante » de l'échec de cohérence [ADR] | V2 | — | Dormant |
 | TK-41 | Régénération partielle d'un repas | V2 | L | Fait |
 | TK-42 | Créneau « resto / non cuisiné » | V2 | — | Fait |
-| TK-43 | (optionnel) Feedback in-app loggé Supabase | V2 | — | À faire |
+| TK-43 | (optionnel) Feedback in-app loggé Supabase | V2 | — | Fait |
 | TK-44 | Polish install PWA | V2 | — | À faire |
 | TK-45 | Auth / comptes [ADR] | V3 | — | À faire |
 | TK-46 | Historique des séjours (server-side) | V3 | — | À faire |
