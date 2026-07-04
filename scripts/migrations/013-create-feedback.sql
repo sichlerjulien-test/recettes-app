@@ -3,7 +3,7 @@
 -- (chaque swap crée un nouveau planning) ; une FK ON DELETE CASCADE détruirait
 -- les feedbacks d'audit si un vieux planning était purgé.
 
-CREATE TABLE public.feedback (
+CREATE TABLE IF NOT EXISTS public.feedback (
   id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   sejour_id   uuid        NOT NULL REFERENCES public.sejours(id) ON DELETE CASCADE,
   planning_id text        NOT NULL,
