@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS public.feedback (
   sejour_id   uuid        NOT NULL REFERENCES public.sejours(id) ON DELETE CASCADE,
   planning_id text        NOT NULL,
   jour        integer     NOT NULL CHECK (jour > 0),
-  repas       text        NOT NULL CHECK (repas IN ('midi', 'soir', 'petit-dejeuner')),
   recette_id  text        NOT NULL,
+  repas       text        NOT NULL CHECK (repas IN ('midi', 'soir', 'petit-dejeuner')),
   created_at  timestamptz NOT NULL DEFAULT now()
 );
 
