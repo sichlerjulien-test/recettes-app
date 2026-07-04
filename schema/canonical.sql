@@ -176,6 +176,24 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: feedback; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.feedback (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    sejour_id uuid NOT NULL,
+    planning_id text NOT NULL,
+    jour integer NOT NULL,
+    recette_id text NOT NULL,
+    repas text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT feedback_jour_check CHECK ((jour > 0)),
+    CONSTRAINT feedback_repas_check CHECK ((repas = ANY (ARRAY['midi'::text, 'soir'::text, 'petit-dejeuner'::text])))
+);
+
+ALTER TABLE public.feedback OWNER TO postgres;
+
+--
 -- Name: ingredients; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -318,6 +336,13 @@ CREATE TABLE public.sejours (
 ALTER TABLE public.sejours OWNER TO postgres;
 
 --
+-- Name: feedback feedback_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.feedback
+    ADD CONSTRAINT feedback_pkey PRIMARY KEY (id);
+
+--
 -- Name: ingredients ingredients_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -403,6 +428,13 @@ CREATE TRIGGER trg_ingredients_updated_at BEFORE UPDATE ON public.ingredients FO
 CREATE TRIGGER trg_recettes_updated_at BEFORE UPDATE ON public.recettes FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
 --
+-- Name: feedback feedback_sejour_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.feedback
+    ADD CONSTRAINT feedback_sejour_id_fkey FOREIGN KEY (sejour_id) REFERENCES public.sejours(id) ON DELETE CASCADE;
+
+--
 -- Name: participants participants_sejour_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -447,6 +479,12 @@ CREATE POLICY allow_all_mvp ON public.plannings USING (true) WITH CHECK (true);
 --
 
 CREATE POLICY allow_all_mvp ON public.sejours USING (true) WITH CHECK (true);
+
+--
+-- Name: feedback; Type: ROW SECURITY; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.feedback ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: ingredients; Type: ROW SECURITY; Schema: public; Owner: postgres
