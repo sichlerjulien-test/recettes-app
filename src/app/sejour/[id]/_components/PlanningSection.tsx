@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { StoredPlanning, RecettePlanningEntry, Recette, Ingredient, MealType } from "@/lib/types/domain";
 import type { PlanningState } from "@/lib/planning/resolve-planning-state";
@@ -156,8 +156,11 @@ function MealEntry({
   const [open, setOpen] = useState(false);
   const [swap, setSwap] = useState<SwapState>({ status: "idle" });
   const [feedback, setFeedback] = useState<FeedbackState>("idle");
+  const sendingRef = useRef(false);
 
   async function sendDislike() {
+    if (sendingRef.current) return;
+    sendingRef.current = true;
     setFeedback("sending");
     try {
       const res = await fetch("/api/feedback", {
