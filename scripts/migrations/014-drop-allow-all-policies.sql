@@ -1,5 +1,5 @@
 -- =============================================================================
--- 013-drop-allow-all-policies.sql
+-- 014-drop-allow-all-policies.sql
 -- Supprime les policies allow_all_mvp sur sejours, participants, plannings.
 --
 -- Ces policies (USING true / WITH CHECK true) rendaient les trois tables
