@@ -1,0 +1,10 @@
+id: mais
+nom_singulier: Épi de maïs
+nom_pluriel: Épis de maïs
+categorie: fruits-legumes
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []

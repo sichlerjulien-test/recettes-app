@@ -1,0 +1,56 @@
+id: travers-porc-bbq
+nom: Travers de porc sauce BBQ maison
+description: "Travers de porc longuement marinés dans une sauce barbecue maison tomate-miel-épices, grillés au barbecue jusqu'à caramélisation. Généreux et fondant."
+portions_base: 4
+duree_minutes: 60
+duree_active: 20
+difficulte: normale
+equipement:
+  - barbecue
+type_repas:
+  - soir
+type_cuisine: americaine
+saison:
+  - ete
+ingredient_principal: porc
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: travers-porc
+    quantite_base: 1200
+    unite: g
+  - ingredient_id: coulis-tomate
+    quantite_base: 200
+    unite: g
+  - ingredient_id: miel
+    quantite_base: 40
+    unite: g
+  - ingredient_id: vinaigre-balsamique
+    quantite_base: 20
+    unite: ml
+  - ingredient_id: moutarde-dijon
+    quantite_base: 20
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: oignon
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: paprika
+    quantite_base: 5
+    unite: g
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+  - ingredient_id: poivre-noir
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Préparer la sauce BBQ maison : faire suer l'oignon et l'ail émincés, ajouter coulis de tomate, miel, vinaigre balsamique, moutarde, paprika, sel et poivre. Mijoter 10 min à feu doux."
+  - "Laisser refroidir la sauce, en enrober généreusement les travers de porc."
+  - "Mariner au moins 2h au frais, idéalement toute une nuit."
+  - "Précuire les travers 30 min à feu doux/indirect sur le barbecue couvercle fermé."
+  - "Terminer 10-15 min à feu plus vif en badigeonnant régulièrement de sauce, jusqu'à belle caramélisation."
+tags_libres:
+  - ete
+  - convivial

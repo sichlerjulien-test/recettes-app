@@ -1,0 +1,35 @@
+id: chipolatas-grillees
+nom: Chipolatas grillées au barbecue
+description: "Chipolatas grillées au barbecue jusqu'à ce que la peau soit bien dorée et craquante. Le repas grillades simple et efficace du dimanche."
+portions_base: 4
+duree_minutes: 20
+duree_active: 10
+difficulte: facile
+equipement:
+  - barbecue
+type_repas:
+  - midi
+  - soir
+type_cuisine: francaise
+saison:
+  - ete
+ingredient_principal: porc
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: chipolata
+    quantite_base: 12
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 15
+    unite: ml
+  - ingredient_id: poivre-noir
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Piquer légèrement les chipolatas pour éviter qu'elles n'éclatent à la cuisson."
+  - "Badigeonner d'un filet d'huile d'olive."
+  - "Griller au barbecue 10-12 min à feu moyen en les tournant régulièrement, jusqu'à cuisson complète et belle coloration."
+  - "Poivrer et servir bien chaud."
+tags_libres:
+  - ete
+  - convivial

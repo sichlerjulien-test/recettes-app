@@ -1,0 +1,50 @@
+id: gambas-ail-persil
+nom: Gambas grillées à l'ail et au persil
+description: "Gambas marinées à l'ail, au persil et au citron, grillées quelques minutes au barbecue. Rapide, léger et plein de saveurs iodées."
+portions_base: 4
+duree_minutes: 25
+duree_active: 15
+difficulte: facile
+equipement:
+  - barbecue
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: fruits-de-mer
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: gambas
+    quantite_base: 600
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: persil-plat
+    quantite_base: 15
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: piment-espelette
+    quantite_base: 2
+    unite: g
+    optionnel: true
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+etapes:
+  - "Mélanger ail écrasé, persil ciselé, jus de citron, huile d'olive, piment d'Espelette et sel."
+  - "Enrober les gambas de cette marinade, laisser reposer 20 min au frais."
+  - "Enfiler les gambas sur des piques à brochette pour faciliter la cuisson."
+  - "Griller au barbecue 2-3 min par face jusqu'à ce qu'elles deviennent roses et opaques."
+  - "Servir immédiatement avec le reste de persil et un filet de citron."
+tags_libres:
+  - sans-gluten
+  - ete
+  - rapide

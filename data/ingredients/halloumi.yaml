@@ -1,0 +1,12 @@
+id: halloumi
+nom_singulier: Halloumi
+nom_pluriel: Halloumis
+categorie: cremerie-oeufs
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - lait
+contient_trace: []
+substituts: []
+notes: Fromage à pâte pressée à base de présure, tient bien à la grillade.

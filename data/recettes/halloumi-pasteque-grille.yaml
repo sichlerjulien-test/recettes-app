@@ -1,0 +1,47 @@
+id: halloumi-pasteque-grille
+nom: Halloumi grillé et pastèque
+description: "Tranches d'halloumi grillées au barbecue servies avec des cubes de pastèque fraîche, menthe et citron. Le contraste chaud-froid, salé-sucré emblématique de l'été."
+portions_base: 4
+duree_minutes: 20
+duree_active: 15
+difficulte: facile
+equipement:
+  - barbecue
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: fromage
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: halloumi
+    quantite_base: 400
+    unite: g
+  - ingredient_id: pasteque
+    quantite_base: 600
+    unite: g
+  - ingredient_id: menthe-fraiche
+    quantite_base: 10
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 20
+    unite: ml
+  - ingredient_id: miel
+    quantite_base: 20
+    unite: g
+    optionnel: true
+etapes:
+  - "Couper l'halloumi en tranches d'1cm et la pastèque en cubes."
+  - "Griller les tranches d'halloumi au barbecue 2-3 min par face, jusqu'à belles marques dorées."
+  - "Disposer les cubes de pastèque et l'halloumi grillé sur un plat."
+  - "Arroser d'huile d'olive, jus de citron et, pour plus de gourmandise, d'un filet de miel."
+  - "Parsemer de menthe fraîche ciselée et servir aussitôt, l'halloumi se déguste chaud."
+tags_libres:
+  - vegetarien
+  - sans-gluten
+  - ete

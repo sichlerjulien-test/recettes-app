@@ -11,44 +11,52 @@
       "description": "Aucune contrainte",
       "counts": {
         "petit-dejeuner": 17,
-        "midi": 30,
-        "soir": 30
+        "midi": 39,
+        "soir": 44
       },
       "verdict": "tient",
       "mains": {
         "midi": {
-          "mains_distincts": 7,
+          "mains_distincts": 9,
           "mains_list": [
             "boeuf",
             "fromage",
+            "fruits-de-mer",
             "legumes",
             "legumineuses",
             "oeufs",
             "poisson",
+            "porc",
             "poulet"
           ]
         },
         "soir": {
-          "mains_distincts": 7,
+          "mains_distincts": 10,
           "mains_list": [
+            "agneau",
             "boeuf",
             "fromage",
+            "fruits-de-mer",
             "legumes",
             "legumineuses",
             "oeufs",
             "poisson",
+            "porc",
             "poulet"
           ]
         },
         "midi_soir_union": {
-          "mains_distincts": 7,
+          "mains_distincts": 10,
           "mains_list": [
+            "agneau",
             "boeuf",
             "fromage",
+            "fruits-de-mer",
             "legumes",
             "legumineuses",
             "oeufs",
             "poisson",
+            "porc",
             "poulet"
           ]
         }
@@ -60,8 +68,8 @@
       "description": "Cœliaque + végétarien, 6 couverts, 7 jours",
       "counts": {
         "petit-dejeuner": 2,
-        "midi": 13,
-        "soir": 14
+        "midi": 18,
+        "soir": 19
       },
       "verdict": "tient",
       "mains": {

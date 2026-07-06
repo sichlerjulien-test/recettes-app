@@ -1,0 +1,52 @@
+id: brochettes-halloumi-legumes
+nom: Brochettes d'halloumi et légumes
+description: "Cubes d'halloumi grillé en brochettes avec courgette, poivron et oignon rouge, marinés à l'huile d'olive et au citron. L'option végé qui tient la grillade."
+portions_base: 4
+duree_minutes: 30
+duree_active: 20
+difficulte: facile
+equipement:
+  - barbecue
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: fromage
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: halloumi
+    quantite_base: 400
+    unite: g
+  - ingredient_id: courgette
+    quantite_base: 250
+    unite: g
+  - ingredient_id: poivron-rouge
+    quantite_base: 200
+    unite: g
+  - ingredient_id: oignon-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: thym-frais
+    quantite_base: 5
+    unite: g
+  - ingredient_id: poivre-noir
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Couper l'halloumi et les légumes en cubes de taille similaire."
+  - "Mélanger huile d'olive, jus de citron, thym effeuillé et poivre. Enrober l'halloumi et les légumes."
+  - "Monter les brochettes en alternant halloumi, courgette, poivron et oignon rouge."
+  - "Griller au barbecue 8-10 min en tournant, jusqu'à ce que l'halloumi soit doré et les légumes tendres."
+  - "Servir aussitôt, l'halloumi durcit en refroidissant."
+tags_libres:
+  - vegetarien
+  - sans-gluten
+  - ete

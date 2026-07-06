@@ -1,0 +1,13 @@
+id: travers-porc
+nom_singulier: Travers de porc
+nom_pluriel: Travers de porc
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []
+exclusion_tags:
+  - sans-porc
+notes: Compter environ 400g par personne avec os.

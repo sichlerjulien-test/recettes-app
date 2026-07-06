@@ -1,0 +1,55 @@
+id: brochettes-poulet-citron
+nom: Brochettes de poulet au citron
+description: "Cubes de poulet marinés au citron, ail et thym, grillés au barbecue avec courgette et poivron. Le classique convivial des soirs d'été."
+portions_base: 4
+duree_minutes: 40
+duree_active: 20
+difficulte: facile
+equipement:
+  - barbecue
+type_repas:
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: poulet
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: poulet-blanc
+    quantite_base: 600
+    unite: g
+  - ingredient_id: courgette
+    quantite_base: 300
+    unite: g
+  - ingredient_id: poivron-rouge
+    quantite_base: 200
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: thym-frais
+    quantite_base: 5
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+  - ingredient_id: poivre-noir
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Couper le poulet en cubes de 3cm. Mélanger jus d'un citron, huile d'olive, ail écrasé, thym effeuillé, sel et poivre."
+  - "Mariner le poulet dans ce mélange au moins 1h au frais (idéalement 3h)."
+  - "Couper courgette et poivron en morceaux de taille similaire aux cubes de poulet."
+  - "Monter les brochettes en alternant poulet, courgette et poivron."
+  - "Griller au barbecue 12-15 min en tournant régulièrement, jusqu'à ce que le poulet soit doré et cuit à cœur."
+  - "Servir avec le second citron coupé en quartiers pour arroser au moment de manger."
+tags_libres:
+  - sans-gluten
+  - ete
+  - convivial

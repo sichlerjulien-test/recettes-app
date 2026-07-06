@@ -1,0 +1,51 @@
+id: merguez-legumes-grilles
+nom: Merguez et légumes grillés
+description: "Merguez grillées au barbecue accompagnées de courgette, poivron et oignon rouge grillés à l'huile d'olive et au cumin. Simple, généreux, parfait à partager."
+portions_base: 4
+duree_minutes: 30
+duree_active: 20
+difficulte: facile
+equipement:
+  - barbecue
+type_repas:
+  - soir
+type_cuisine: orientale
+saison:
+  - ete
+ingredient_principal: boeuf
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: merguez
+    quantite_base: 12
+    unite: piece
+  - ingredient_id: courgette
+    quantite_base: 300
+    unite: g
+  - ingredient_id: poivron-rouge
+    quantite_base: 200
+    unite: g
+  - ingredient_id: oignon-rouge
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: cumin-moulu
+    quantite_base: 5
+    unite: g
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+  - ingredient_id: poivre-noir
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Couper courgette, poivron et oignons rouges en tranches épaisses."
+  - "Enrober les légumes d'huile d'olive, cumin, sel et poivre."
+  - "Griller les légumes au barbecue 8-10 min en les retournant, jusqu'à belles marques de grill."
+  - "Piquer légèrement les merguez et les griller en parallèle 10-12 min en les tournant régulièrement."
+  - "Servir merguez et légumes grillés ensemble, encore chauds."
+tags_libres:
+  - sans-gluten
+  - ete
+  - convivial
