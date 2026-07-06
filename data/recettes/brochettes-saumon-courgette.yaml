@@ -1,0 +1,49 @@
+id: brochettes-saumon-courgette
+nom: Brochettes de saumon et courgette
+description: "Cubes de saumon frais et courgette marinés au citron et à l'huile d'olive, grillés au barbecue. Léger, coloré et facile à réussir."
+portions_base: 4
+duree_minutes: 30
+duree_active: 15
+difficulte: facile
+equipement:
+  - barbecue
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: poisson
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: saumon-frais
+    quantite_base: 600
+    unite: g
+  - ingredient_id: courgette
+    quantite_base: 300
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: ail
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+  - ingredient_id: poivre-noir
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Couper le saumon et la courgette en cubes de taille similaire."
+  - "Mélanger jus d'un citron, huile d'olive, ail écrasé, sel et poivre."
+  - "Enrober saumon et courgette de cette marinade, laisser reposer 20 min au frais."
+  - "Monter les brochettes en alternant saumon et courgette."
+  - "Griller au barbecue 8-10 min en tournant délicatement, jusqu'à ce que le saumon soit cuit à cœur."
+  - "Servir avec le second citron coupé en quartiers."
+tags_libres:
+  - sans-gluten
+  - ete

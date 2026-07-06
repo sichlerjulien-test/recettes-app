@@ -1,0 +1,52 @@
+id: cotelettes-porc-bbq
+nom: Côtelettes de porc BBQ
+description: "Côtelettes de porc marinées au miel, moutarde et paprika, grillées au barbecue. Caramélisées à l'extérieur, juteuses à l'intérieur."
+portions_base: 4
+duree_minutes: 35
+duree_active: 15
+difficulte: facile
+equipement:
+  - barbecue
+type_repas:
+  - soir
+type_cuisine: francaise
+saison:
+  - ete
+ingredient_principal: porc
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: cotelette-porc
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: miel
+    quantite_base: 40
+    unite: g
+  - ingredient_id: moutarde-dijon
+    quantite_base: 30
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: paprika
+    quantite_base: 5
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 20
+    unite: ml
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+  - ingredient_id: poivre-noir
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Mélanger miel, moutarde, ail écrasé, paprika, huile d'olive, jus de citron, sel et poivre."
+  - "Badigeonner les côtelettes de cette marinade des deux côtés, laisser reposer 30 min à température ambiante."
+  - "Griller au barbecue 6-7 min par face en badigeonnant régulièrement du reste de marinade, jusqu'à belle caramélisation."
+  - "Vérifier la cuisson à cœur (jus clair) avant de servir."
+tags_libres:
+  - ete
+  - convivial

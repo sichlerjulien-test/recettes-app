@@ -1,0 +1,13 @@
+id: epaule-agneau
+nom_singulier: Épaule d'agneau désossée (en cubes)
+nom_pluriel: Épaules d'agneau désossées
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []
+exclusion_tags:
+  - sans-viande-rouge
+notes: Demander à couper en cubes pour brochettes.

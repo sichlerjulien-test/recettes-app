@@ -1,0 +1,44 @@
+id: epis-mais-grilles
+nom: Épis de maïs grillés au beurre
+description: "Épis de maïs grillés au barbecue, badigeonnés de beurre fondu, sel et poivre. L'accompagnement incontournable des grillades d'été."
+portions_base: 4
+duree_minutes: 25
+duree_active: 10
+difficulte: facile
+equipement:
+  - barbecue
+type_repas:
+  - midi
+  - soir
+type_cuisine: americaine
+saison:
+  - ete
+ingredient_principal: legumes
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: mais
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: beurre
+    quantite_base: 40
+    unite: g
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+  - ingredient_id: poivre-noir
+    quantite_base: 2
+    unite: g
+  - ingredient_id: persil-plat
+    quantite_base: 5
+    unite: g
+    optionnel: true
+etapes:
+  - "Éplucher les épis de maïs, retirer les fils."
+  - "Faire fondre le beurre."
+  - "Griller les épis au barbecue 15-18 min en les tournant régulièrement, jusqu'à belles marques dorées."
+  - "Badigeonner de beurre fondu, saler, poivrer."
+  - "Parsemer de persil ciselé avant de servir bien chaud."
+tags_libres:
+  - vegetarien
+  - sans-gluten
+  - ete

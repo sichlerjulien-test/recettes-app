@@ -1,0 +1,13 @@
+id: gambas
+nom_singulier: Gambas crue décortiquée
+nom_pluriel: Gambas crues décortiquées
+categorie: viandes-poissons
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - crustaces
+contient_trace: []
+substituts: []
+exclusion_tags:
+  - sans-fruits-de-mer

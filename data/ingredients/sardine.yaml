@@ -1,0 +1,14 @@
+id: sardine
+nom_singulier: Sardine fraîche entière (vidée)
+nom_pluriel: Sardines fraîches entières
+categorie: viandes-poissons
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes:
+  - poissons
+contient_trace: []
+substituts: []
+exclusion_tags:
+  - sans-poisson
+notes: 1 sardine ≈ 80g. Demander au poissonnier de vider et écailler.

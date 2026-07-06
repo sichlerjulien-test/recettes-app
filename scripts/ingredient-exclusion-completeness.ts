@@ -40,6 +40,9 @@ export const TRIAGE_PORC = new Set([
   'guanciale-ou-lardon',
   'jambon-blanc',
   'lardon-fume',
+  'chipolata',
+  'cotelette-porc',
+  'travers-porc',
 ]);
 
 export const TRIAGE_VIANDE_ROUGE = new Set([
@@ -48,6 +51,8 @@ export const TRIAGE_VIANDE_ROUGE = new Set([
   'boeuf-tartare',
   'bouillon-boeuf',
   'steak-hache-boeuf',
+  'epaule-agneau',
+  'merguez',
 ]);
 
 export const TRIAGE_ALCOOL = new Set([
@@ -95,6 +100,8 @@ export const TRIAGE_COVERED = new Set([
   'saumon-fume',
   'sauce-worcestershire',
   'thon-boite',
+  'gambas',
+  'sardine',
 ]);
 
 export function validateIngredientExclusionCompleteness(

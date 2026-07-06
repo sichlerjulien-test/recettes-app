@@ -1,0 +1,12 @@
+id: cotelette-porc
+nom_singulier: Côtelette de porc
+nom_pluriel: Côtelettes de porc
+categorie: viandes-poissons
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []
+exclusion_tags:
+  - sans-porc

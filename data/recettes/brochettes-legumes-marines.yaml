@@ -1,0 +1,58 @@
+id: brochettes-legumes-marines
+nom: Brochettes de légumes marinés
+description: "Courgette, poivron, oignon rouge et champignons marinés à l'huile d'olive, ail et romarin, grillés au barbecue. L'option vegan qui ne sacrifie rien au goût."
+portions_base: 4
+duree_minutes: 30
+duree_active: 20
+difficulte: facile
+equipement:
+  - barbecue
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: legumes
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: courgette
+    quantite_base: 300
+    unite: g
+  - ingredient_id: poivron-rouge
+    quantite_base: 200
+    unite: g
+  - ingredient_id: oignon-rouge
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: champignon-de-paris
+    quantite_base: 250
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: romarin-frais
+    quantite_base: 5
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+  - ingredient_id: poivre-noir
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Couper courgette, poivron et oignons rouges en morceaux, laisser les champignons entiers si petits."
+  - "Mélanger huile d'olive, ail écrasé, romarin effeuillé, jus de citron, sel et poivre."
+  - "Enrober tous les légumes de cette marinade, laisser reposer 20 min."
+  - "Monter les brochettes en alternant les légumes."
+  - "Griller au barbecue 10-12 min en tournant régulièrement, jusqu'à ce que les légumes soient tendres et marqués."
+tags_libres:
+  - vegan
+  - sans-gluten
+  - ete

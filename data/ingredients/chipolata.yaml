@@ -1,0 +1,13 @@
+id: chipolata
+nom_singulier: Chipolata
+nom_pluriel: Chipolatas
+categorie: viandes-poissons
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []
+exclusion_tags:
+  - sans-porc
+notes: Chipolata artisanale porc chez le boucher, sans additifs ni panure.

@@ -1,0 +1,49 @@
+id: sardines-grillees
+nom: Sardines grillées
+description: "Sardines fraîches grillées entières au barbecue, arrosées d'huile d'olive, ail et citron. Le poisson grillé le plus simple et le plus généreux de l'été."
+portions_base: 4
+duree_minutes: 20
+duree_active: 10
+difficulte: facile
+equipement:
+  - barbecue
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: poisson
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: sardine
+    quantite_base: 16
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: persil-plat
+    quantite_base: 10
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+  - ingredient_id: poivre-noir
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Rincer et sécher les sardines vidées, les inciser légèrement sur les flancs."
+  - "Assaisonner de sel, poivre et d'un filet d'huile d'olive."
+  - "Griller au barbecue 2-3 min par face à feu vif, la peau doit être bien marquée et croustillante."
+  - "Mélanger ail écrasé, persil ciselé, huile d'olive et jus de citron pour l'assaisonnement final."
+  - "Napper les sardines grillées de ce mélange et servir avec les quartiers de citron restants."
+tags_libres:
+  - sans-gluten
+  - ete
+  - rapide

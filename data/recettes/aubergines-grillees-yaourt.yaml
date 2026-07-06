@@ -1,0 +1,55 @@
+id: aubergines-grillees-yaourt
+nom: Aubergines grillées, sauce yaourt à la menthe
+description: "Tranches d'aubergine grillées au barbecue, servies avec une sauce yaourt, ail, menthe et citron. Fondant et frais à la fois."
+portions_base: 4
+duree_minutes: 30
+duree_active: 15
+difficulte: facile
+equipement:
+  - barbecue
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: legumes
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: aubergine
+    quantite_base: 600
+    unite: g
+  - ingredient_id: yaourt-grec
+    quantite_base: 200
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: menthe-fraiche
+    quantite_base: 10
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: cumin-moulu
+    quantite_base: 3
+    unite: g
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+  - ingredient_id: poivre-noir
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Couper les aubergines en tranches d'1cm, saler et laisser dégorger 15 min, puis éponger."
+  - "Badigeonner les tranches d'huile d'olive des deux côtés."
+  - "Griller au barbecue 4-5 min par face jusqu'à ce qu'elles soient tendres et marquées."
+  - "Mélanger yaourt grec, ail écrasé, menthe ciselée, jus de citron, cumin, sel et poivre."
+  - "Napper les tranches d'aubergine grillées de la sauce yaourt et servir tiède."
+tags_libres:
+  - vegetarien
+  - sans-gluten
+  - ete
