@@ -1,0 +1,45 @@
+id: salade-concombre-yaourt
+nom: Salade de concombre au yaourt et menthe
+description: "Concombre croquant, yaourt grec onctueux, menthe fraîche et un trait d'ail. Fraîche, légère, à servir bien froide."
+portions_base: 4
+duree_minutes: 15
+duree_active: 15
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: legumes
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: concombre
+    quantite_base: 400
+    unite: g
+  - ingredient_id: yaourt-grec
+    quantite_base: 250
+    unite: g
+  - ingredient_id: menthe-fraiche
+    quantite_base: 15
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 20
+    unite: ml
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+etapes:
+  - "Couper le concombre en petits dés, saler légèrement et laisser dégorger 10 min, puis égoutter."
+  - "Écraser l'ail finement, ciseler la menthe."
+  - "Mélanger le yaourt grec avec l'ail, la menthe et l'huile d'olive."
+  - "Ajouter le concombre égoutté, mélanger et réserver au frais avant de servir."
+tags_libres:
+  - vegetarien
+  - sans-gluten
+  - ete
+  - frais

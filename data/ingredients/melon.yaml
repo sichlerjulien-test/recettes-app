@@ -1,0 +1,11 @@
+id: melon
+nom_singulier: Melon
+nom_pluriel: Melons
+categorie: fruits-legumes
+unite_base: g
+unite_achat: piece
+conversion: 1200
+allergenes: []
+contient_trace: []
+substituts: []
+notes: 1 melon ≈ 1.2kg.

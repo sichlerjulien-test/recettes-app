@@ -43,6 +43,7 @@ export const TRIAGE_PORC = new Set([
   'chipolata',
   'cotelette-porc',
   'travers-porc',
+  'jambon-cru',
 ]);
 
 export const TRIAGE_VIANDE_ROUGE = new Set([
@@ -102,6 +103,7 @@ export const TRIAGE_COVERED = new Set([
   'thon-boite',
   'gambas',
   'sardine',
+  'jambon-cru',
 ]);
 
 export function validateIngredientExclusionCompleteness(

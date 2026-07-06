@@ -1,0 +1,60 @@
+id: salade-cesar-poulet
+nom: Salade César au poulet
+description: "Poulet grillé, salade verte croquante, croûtons de pain de campagne maison et une vraie sauce César à l'anchois, jaune d'œuf et parmesan. Copieuse et généreuse."
+portions_base: 4
+duree_minutes: 35
+duree_active: 25
+difficulte: normale
+equipement:
+  - plaque
+type_repas:
+  - midi
+  - soir
+type_cuisine: americaine
+saison:
+  - toutes
+ingredient_principal: poulet
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: poulet-blanc
+    quantite_base: 500
+    unite: g
+  - ingredient_id: salade-verte
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: pain-campagne
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: anchois-boite
+    quantite_base: 20
+    unite: g
+  - ingredient_id: oeuf
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: parmesan
+    quantite_base: 60
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: moutarde-dijon
+    quantite_base: 10
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 80
+    unite: ml
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+etapes:
+  - "Couper le pain de campagne en cubes, les faire dorer à la poêle dans un filet d'huile d'olive jusqu'à ce qu'ils soient croustillants : ce sont les croûtons."
+  - "Assaisonner et griller le poulet à la poêle, puis le couper en lanières."
+  - "Préparer la sauce César : écraser l'anchois et l'ail, ajouter le jaune d'œuf, la moutarde, le jus de citron et le parmesan râpé. Monter en filet avec l'huile d'olive en fouettant jusqu'à obtenir une sauce onctueuse."
+  - "Déchirer la salade verte, mélanger avec la sauce César, ajouter le poulet et les croûtons."
+  - "Finir avec un peu de parmesan râpé sur le dessus."
+tags_libres:
+  - proteines
+  - convivial

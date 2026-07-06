@@ -1,0 +1,10 @@
+id: mais-boite
+nom_singulier: Maïs en boîte (égoutté)
+nom_pluriel: Maïs en boîte
+categorie: epicerie-salee
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts: []
