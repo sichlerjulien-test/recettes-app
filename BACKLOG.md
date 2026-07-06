@@ -325,6 +325,24 @@ Respecter ADR-008/013 : migration committée, appliquée aux DEUX instances, jam
 - **TK-61** — Remplacer l'icône fourchette placeholder par un vrai logo de marque. Cosmétique, réversible, différable.
 - **TK-62** — Hex de marque dupliqué en 3 endroits (globals.css --primary / manifest.json / layout.tsx) sans gate de synchro. Même famille que le Trou A. Dériver de --primary au build ou poser une sentinelle. Inerte tant que la couleur ne bouge pas.
 
+### TK-63 — Même flash overlay/formulaire sur le flow de régénération · XS
+
+**Origine :** cadrage TK-51 (2026-07-06) — même pattern repéré en lisant le code.
+
+`EditSejourClient.tsx::generatePlanning()` reproduit exactement le bug de TK-51 :
+`router.push(...)` appelé en corps de `try`, puis `finally { setIsGenerating(false) }`
+qui lève l'overlay avant que la navigation aboutisse. Même cause, autre fichier.
+
+Différable : ce n'est pas le moment-clé décrit par TK-51 (payoff de création), c'est
+le flow de régénération depuis l'édition — moins de visibilité, moins de fréquence
+d'usage. Zéro impact sûreté, comme TK-51.
+
+**Critères :** mêmes que TK-51 côté overlay ↔ navigation, transposés à ce fichier.
+
+> Si le fix de TK-51 se généralise proprement (ex. un hook partagé `useNavigateAfterAction`
+> qui ne lève jamais l'overlay avant démontage), TK-63 peut se fermer par simple
+> réutilisation — à évaluer au cadrage de TK-63, pas maintenant.
+
 ---
 
 ## V3
@@ -460,6 +478,9 @@ une branche morte = fausse confiance, à corriger opportunistement, pas urgent.
 | TK-58 | Corriger commentaire mensonger SejourSchema (HMAC vs UUID) | VS | XS | À faire |
 | TK-59 | dbErrorToResponse : fuite messages Supabase bruts en 500 | VS | S | À faire |
 | TK-60 | Headers de sécurité de base (CSP minimale) | VS | S | À faire |
+| TK-61 | Remplacer l'icône fourchette placeholder par un vrai logo | VS | — | À faire |
+| TK-62 | Hex de marque dupliqué (globals.css / manifest.json / layout.tsx) | VS | — | À faire |
+| TK-63 | Même flash overlay/formulaire sur régénération (EditSejourClient) | P2 | XS | À faire |
 
 **Ordre conseillé :** **TK-54 en tête absolue** (VS-bloquant, S, sans dépendance — ferme le trou RLS avant tout élargissement d'audience). Puis V2 restant — TK-43 (TK-38, TK-39, TK-40a, TK-41, TK-42, TK-44 faits). TK-55 à TK-60 à rédiger et séquencer après TK-54 (budget cap console Anthropic à poser dès TK-55). Filler si trous : TK-17, TK-52/53. TK-40b, TK-20, TK-28 DORMANT (seuils de réveil non atteints). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
