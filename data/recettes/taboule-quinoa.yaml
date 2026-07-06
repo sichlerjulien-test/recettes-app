@@ -1,0 +1,53 @@
+id: taboule-quinoa
+nom: Taboulé de quinoa au citron
+description: "Quinoa froid, tomate, concombre, persil et menthe en quantité, citron et huile d'olive. Le taboulé version sans-gluten qui passe partout en vacances."
+portions_base: 4
+duree_minutes: 30
+duree_active: 25
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - printemps
+  - ete
+ingredient_principal: legumes
+feculent_dominant: quinoa
+ingredients:
+  - ingredient_id: quinoa
+    quantite_base: 200
+    unite: g
+  - ingredient_id: tomate
+    quantite_base: 360
+    unite: g
+  - ingredient_id: concombre
+    quantite_base: 300
+    unite: g
+  - ingredient_id: persil-plat
+    quantite_base: 30
+    unite: g
+  - ingredient_id: menthe-fraiche
+    quantite_base: 15
+    unite: g
+  - ingredient_id: oignon-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: citron
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 50
+    unite: ml
+etapes:
+  - "Cuire le quinoa dans l'eau bouillante salée, égoutter et laisser refroidir complètement."
+  - "Tailler tomate et concombre en petits dés, émincer finement l'oignon rouge."
+  - "Ciseler généreusement persil et menthe."
+  - "Mélanger le quinoa froid avec les légumes et les herbes, arroser de jus de citron et d'huile d'olive."
+  - "Rectifier l'assaisonnement, réserver au frais au moins 1h avant de servir."
+tags_libres:
+  - vegan
+  - sans-gluten
+  - frais
+  - ete

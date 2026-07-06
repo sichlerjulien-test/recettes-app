@@ -1,0 +1,51 @@
+id: aubergines-parmigiana
+nom: Aubergines à la parmigiana
+description: "Tranches d'aubergines rôties, superposées avec sauce tomate, mozzarella et parmesan, gratinées au four. Un plat généreux qui fond en bouche, parfait pour une grande tablée."
+portions_base: 4
+duree_minutes: 70
+duree_active: 30
+difficulte: normale
+equipement:
+  - four
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+  - automne
+ingredient_principal: legumes
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: aubergine
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: sauce-tomate
+    quantite_base: 400
+    unite: g
+  - ingredient_id: mozzarella-boule
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: parmesan
+    quantite_base: 80
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: basilic-frais
+    quantite_base: 10
+    unite: g
+etapes:
+  - "Couper les aubergines en tranches d'1 cm, les badigeonner d'huile d'olive et les rôtir 20 min à 200°C jusqu'à ce qu'elles soient tendres."
+  - "Faire chauffer la sauce tomate avec l'ail écrasé quelques minutes."
+  - "Dans un plat à gratin, alterner couches d'aubergines, sauce tomate, mozzarella en tranches et parmesan râpé."
+  - "Terminer par une couche généreuse de parmesan, enfourner 25 min à 190°C jusqu'à ce que le dessus soit doré."
+  - "Parsemer de basilic frais ciselé avant de servir."
+tags_libres:
+  - vegetarien
+  - four
+  - gratine
+  - partage

@@ -1,0 +1,46 @@
+id: salade-grecque
+nom: Salade grecque à la feta
+description: "Tomate, concombre, oignon rouge et olives noires, gros morceaux de feta et huile d'olive. La salade qu'on mange en terrasse avec du pain, sans jamais s'en lasser."
+portions_base: 4
+duree_minutes: 15
+duree_active: 15
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - printemps
+  - ete
+ingredient_principal: legumes
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: tomate
+    quantite_base: 480
+    unite: g
+  - ingredient_id: concombre
+    quantite_base: 300
+    unite: g
+  - ingredient_id: oignon-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: olives-noires
+    quantite_base: 100
+    unite: g
+  - ingredient_id: feta
+    quantite_base: 200
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+etapes:
+  - "Couper tomates et concombre en gros quartiers, émincer finement l'oignon rouge."
+  - "Disposer les légumes dans un saladier avec les olives noires."
+  - "Poser la feta en un seul bloc ou en gros pavés sur le dessus, ne pas l'émietter."
+  - "Arroser généreusement d'huile d'olive juste avant de servir."
+tags_libres:
+  - vegetarien
+  - sans-gluten
+  - frais
+  - ete

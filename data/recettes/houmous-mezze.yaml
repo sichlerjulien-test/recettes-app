@@ -1,0 +1,55 @@
+id: houmous-mezze
+nom: Houmous mezze au tahini
+description: "Houmous crémeux au tahini et citron, huile d'olive et cumin, à tartiner ou piocher à plusieurs. L'apéro qui fait tenir la tablée jusqu'au coucher de soleil."
+portions_base: 4
+duree_minutes: 15
+duree_active: 15
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - printemps
+  - ete
+ingredient_principal: legumineuses
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: pois-chiches-conserve
+    quantite_base: 480
+    unite: g
+  - ingredient_id: tahini
+    quantite_base: 80
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: ail
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: cumin-moulu
+    quantite_base: 3
+    unite: g
+  - ingredient_id: concombre
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: poivron-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: carotte
+    quantite_base: 2
+    unite: piece
+etapes:
+  - "Égoutter les pois chiches en gardant un peu de leur jus."
+  - "Mixer pois chiches, tahini, jus de citron, ail écrasé et cumin jusqu'à obtenir une pâte lisse, en ajoutant le jus de pois chiches pour ajuster la texture."
+  - "Verser dans un plat creux, creuser un puits au centre et y verser l'huile d'olive."
+  - "Servir frais avec des bâtonnets de concombre, poivron et carotte."
+tags_libres:
+  - vegan
+  - sans-gluten
+  - apero
+  - partage

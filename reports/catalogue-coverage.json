@@ -11,8 +11,8 @@
       "description": "Aucune contrainte",
       "counts": {
         "petit-dejeuner": 17,
-        "midi": 20,
-        "soir": 20
+        "midi": 30,
+        "soir": 30
       },
       "verdict": "tient",
       "mains": {
@@ -29,11 +29,12 @@
           ]
         },
         "soir": {
-          "mains_distincts": 6,
+          "mains_distincts": 7,
           "mains_list": [
             "boeuf",
             "fromage",
             "legumes",
+            "legumineuses",
             "oeufs",
             "poisson",
             "poulet"
@@ -59,24 +60,26 @@
       "description": "Cœliaque + végétarien, 6 couverts, 7 jours",
       "counts": {
         "petit-dejeuner": 2,
-        "midi": 4,
-        "soir": 5
+        "midi": 13,
+        "soir": 14
       },
       "verdict": "tient",
       "mains": {
         "midi": {
-          "mains_distincts": 3,
+          "mains_distincts": 4,
           "mains_list": [
             "fromage",
+            "legumes",
             "legumineuses",
             "oeufs"
           ]
         },
         "soir": {
-          "mains_distincts": 3,
+          "mains_distincts": 4,
           "mains_list": [
             "fromage",
             "legumes",
+            "legumineuses",
             "oeufs"
           ]
         },
@@ -97,25 +100,31 @@
       "description": "EU14 complet + équipement vide",
       "counts": {
         "petit-dejeuner": 0,
-        "midi": 0,
-        "soir": 0
+        "midi": 1,
+        "soir": 1
       },
-      "verdict": "profondeur insuffisante: petit-dejeuner, 0 distinctes; midi, 0 distinctes; soir, 0 distinctes",
+      "verdict": "profondeur insuffisante: petit-dejeuner, 0 distinctes; midi, 1 distinctes; soir, 1 distinctes",
       "mains": {
         "midi": {
-          "mains_distincts": 0,
-          "mains_list": []
+          "mains_distincts": 1,
+          "mains_list": [
+            "legumes"
+          ]
         },
         "soir": {
-          "mains_distincts": 0,
-          "mains_list": []
+          "mains_distincts": 1,
+          "mains_list": [
+            "legumes"
+          ]
         },
         "midi_soir_union": {
-          "mains_distincts": 0,
-          "mains_list": []
+          "mains_distincts": 1,
+          "mains_list": [
+            "legumes"
+          ]
         }
       },
-      "unicite_jour": "impossible"
+      "unicite_jour": "a_risque"
     }
   ]
 }

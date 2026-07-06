@@ -314,11 +314,11 @@ describe('TK-40a — couverture catalogue par profil', () => {
     expect(vide.unicite_jour).toBe('satisfiable');
   });
 
-  it('profil saturant → mains_distincts = 0 (pool vide → impossible)', () => {
+  it('profil saturant → mains_distincts = 1 (taboule-quinoa, seule recette sans allergène EU14 et sans équipement)', () => {
     const saturant = results.get('saturant')!;
-    expect(saturant.mains.midi.mains_distincts).toBe(0);
-    expect(saturant.mains.soir.mains_distincts).toBe(0);
-    expect(saturant.mains.midi_soir_union.mains_distincts).toBe(0);
-    expect(saturant.unicite_jour).toBe('impossible');
+    expect(saturant.mains.midi.mains_distincts).toBe(1);
+    expect(saturant.mains.soir.mains_distincts).toBe(1);
+    expect(saturant.mains.midi_soir_union.mains_distincts).toBe(1);
+    expect(saturant.unicite_jour).toBe('a_risque');
   });
 });

@@ -1,0 +1,46 @@
+id: tzatziki-pita
+nom: Tzatziki et pain pita
+description: "Yaourt grec, concombre râpé, ail et menthe, servi avec du pain pita chaud à tremper. Simple, frais, et redoutablement efficace en apéro dînatoire."
+portions_base: 4
+duree_minutes: 20
+duree_active: 15
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - printemps
+  - ete
+ingredient_principal: fromage
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: yaourt-grec
+    quantite_base: 400
+    unite: g
+  - ingredient_id: concombre
+    quantite_base: 300
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: menthe-fraiche
+    quantite_base: 10
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 20
+    unite: ml
+  - ingredient_id: pain-pita
+    quantite_base: 4
+    unite: piece
+etapes:
+  - "Râper le concombre, saler et laisser dégorger 10 min, puis presser pour évacuer l'eau."
+  - "Mélanger le yaourt grec avec le concombre égoutté, l'ail écrasé et la menthe ciselée."
+  - "Ajouter un filet d'huile d'olive, rectifier le sel."
+  - "Réchauffer les pains pitas et les découper en pointes pour tremper dans le tzatziki."
+tags_libres:
+  - vegetarien
+  - frais
+  - apero
+  - partage

@@ -1,0 +1,72 @@
+{
+  "genere_le": "2026-07-06",
+  "objectif": "Session 0 du programme +50 recettes été/barbecue/méditerranéen — carte des cellules vides/maigres AVANT curation",
+  "total_recettes": 51,
+  "par_type_cuisine": {
+    "francaise": 20,
+    "neutre": 11,
+    "italienne": 7,
+    "asiatique": 5,
+    "americaine": 4,
+    "orientale": 3,
+    "anglaise": 1,
+    "mediterraneenne": 0,
+    "mexicaine": 0,
+    "barbecue": 0,
+    "ete": 0
+  },
+  "par_ingredient_principal": {
+    "oeufs": 10,
+    "legumes": 7,
+    "fromage": 7,
+    "poisson": 7,
+    "fruits": 6,
+    "boeuf": 5,
+    "poulet": 5,
+    "legumineuses": 2,
+    "pain": 2
+  },
+  "par_type_cuisine_x_creneau_midi_soir": {
+    "francaise × soir": 9,
+    "francaise × midi": 7,
+    "italienne × soir": 5,
+    "italienne × midi": 4,
+    "asiatique × midi": 3,
+    "neutre × midi": 3,
+    "asiatique × soir": 3,
+    "orientale × midi": 2,
+    "americaine × midi": 1,
+    "americaine × soir": 1,
+    "anglaise × soir": 1,
+    "orientale × soir": 1,
+    "mediterraneenne × midi": 0,
+    "mediterraneenne × soir": 0,
+    "mexicaine × midi": 0,
+    "mexicaine × soir": 0
+  },
+  "par_creneau": {
+    "soir": 20,
+    "midi": 20,
+    "petit-dejeuner": 17
+  },
+  "barbecue_equipement_count": 0,
+  "saison_ete_count": 9,
+  "carte_cellules_vides_ou_maigres": {
+    "cuisines_a_zero_midi_et_soir": ["mediterraneenne", "mexicaine"],
+    "note_type_cuisine_barbecue_ete": "Les valeurs 'barbecue' et 'ete' apparaissent dans l'enum type_cuisine (0 recette) — distinctes du champ equipement (barbecue) et saison (ete) comptés séparément ci-dessus.",
+    "equipement_barbecue": "0/51 — trou total, cohérent avec la cible ≥15 du programme",
+    "saison_ete": "9/51 — loin de la cible ≥20 du programme",
+    "cuisine_francaise_dominante": "20/51 (39%) — surreprésentée, ne pas nourrir davantage",
+    "cellules_maigres_cuisine_x_creneau": [
+      "anglaise × midi (0)",
+      "americaine × midi et soir (1 chacun)",
+      "orientale × soir (1)"
+    ]
+  },
+  "verdict": "Prémisse CONFIRMÉE — mediterraneenne et mexicaine sont à 0 sur midi∪soir, barbecue (équipement) à 0, saison ete loin de la cible. Le skew été/barbecue/méditerranéen du programme comble des trous réels, pas des cases déjà pleines. Poursuite vers curation (Project) recommandée.",
+  "implication_batchs": {
+    "Batch_A_mediterraneen_mezze": "Priorité maximale — cuisine à 0, aucune recette existante à déplacer/adapter",
+    "Batch_B_barbecue_plancha": "Priorité maximale — équipement barbecue à 0/51",
+    "Batch_D_mexicaine": "Cuisine mexicaine absente du catalogue malgré présence dans l'enum — à vérifier avec le Project si un batch dédié doit être ajouté ou si mexicaine reste dans Batch D 'plats du monde'"
+  }
+}

@@ -1,0 +1,11 @@
+id: tahini
+nom_singulier: Tahini
+nom_pluriel: Tahinis
+categorie: epicerie-salee
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - sesame
+contient_trace: []
+substituts: []

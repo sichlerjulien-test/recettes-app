@@ -21,6 +21,7 @@ import { computeRecipeMetadata } from '../src/lib/allergens/compute';
 import { computeDietaryMetadata } from '../src/lib/dietary/compute';
 import { resolveEnvFile, isProdEnvFile } from './resolve-env-file';
 import { validateIngredientExclusionCompleteness } from './ingredient-exclusion-completeness';
+import { validateAllergenTagConsistency } from './allergen-tag-consistency';
 
 // ---------------------------------------------------------------------------
 // ENV
@@ -314,6 +315,16 @@ async function main(): Promise<void> {
       dietaryMeta = computeDietaryMetadata(recette, ingredientsMap);
     } catch (err) {
       buildErrors.push(`[${recette.id}] Calcul métadonnées : ${(err as Error).message}`);
+      continue;
+    }
+
+    const tagConsistencyErrors = validateAllergenTagConsistency(
+      recette.id,
+      recette.tags_libres,
+      allergenMeta.allergenes_calcules,
+    );
+    if (tagConsistencyErrors.length > 0) {
+      buildErrors.push(...tagConsistencyErrors);
       continue;
     }
 
