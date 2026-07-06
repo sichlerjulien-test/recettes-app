@@ -392,8 +392,14 @@ Plafond de fréquence sur exclusions (ex : viande rouge max 1×/sem). Objet dist
 ### TK-50 — Présence partielle par repas
 Convives variables par créneau.
 
-### TK-51 — Flash retour au formulaire entre génération et affichage du planning
+### TK-51 — Flash retour au formulaire entre génération et affichage du planning · XS  ✅ Livré
 L'overlay d'attente se lève avant que la nav vers /sejour/:id aboutisse : le formulaire de création réapparaît ~qq s avant le planning, perçu comme un bug alors que le résultat est correct. Perceived-quality, tombe pile sur le moment-clé (le payoff de la génération). Zéro impact sûreté. Hypothèse à confirmer au cadrage : séquencement overlay ↔ router.push côté nouveau-sejour ; latence destination amplifiée par le chargement catalogue complet (cf TK-28).
+
+**Livré (2026-07-06) :** suppression du `setIsGenerating(false)` dans le `finally` de
+`handleSubmit` (`src/app/nouveau-sejour/page.tsx`) — le composant est démonté par la
+navigation, rien n'oblige à relever l'overlay avant. Test E2E
+`e2e/flash-overlay.spec.ts` : vérifié rouge sur l'ancien code (flash détecté), vert
+sur le fix. `EditSejourClient.tsx` (même bug) reste hors scope, ticketé en TK-63.
 
 > Résidu perf lié : le swap (TK-41) déclenche router.refresh() qui recharge le
 > catalogue complet (cf TK-28 dormant) — même famille de latence perçue que le
@@ -468,7 +474,7 @@ une branche morte = fausse confiance, à corriger opportunistement, pas urgent.
 | TK-48 | Pondération des portions pour enfants | V3 | — | À faire |
 | TK-49 | Plafond de fréquence sur exclusions | V4 | — | À faire |
 | TK-50 | Présence partielle par repas | V4 | — | À faire |
-| TK-51 | Flash retour au formulaire entre génération et affichage du planning | V2 | — | À faire |
+| TK-51 | Flash retour au formulaire entre génération et affichage du planning | V2 | XS | ✅ Livré |
 | TK-52 | Test RTL empty-state picker (chemin mort) | P2 | S | À faire |
 | TK-53 | Micro-cleanup assertion cross-device restoSlots (index nu) | P2 | XS | À faire |
 | TK-54 | Drop policies RLS allow_all_mvp | VS | S | À faire |
