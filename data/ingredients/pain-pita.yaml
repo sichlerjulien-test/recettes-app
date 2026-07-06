@@ -1,0 +1,11 @@
+id: pain-pita
+nom_singulier: Pain pita
+nom_pluriel: Pains pitas
+categorie: boulangerie
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes:
+  - gluten
+contient_trace: []
+substituts: []

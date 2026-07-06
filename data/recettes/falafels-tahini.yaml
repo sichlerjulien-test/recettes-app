@@ -1,0 +1,54 @@
+id: falafels-tahini
+nom: Falafels et sauce tahini
+description: "Boulettes de pois chiches, ail, coriandre et cumin, dorées à la poêle, accompagnées d'une sauce tahini-citron. Le genre de plat qu'on refait sans compter."
+portions_base: 4
+duree_minutes: 35
+duree_active: 30
+difficulte: normale
+equipement:
+  - plaque
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - printemps
+  - ete
+ingredient_principal: legumineuses
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: pois-chiches-conserve
+    quantite_base: 480
+    unite: g
+  - ingredient_id: oignon-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: coriandre-frais
+    quantite_base: 20
+    unite: g
+  - ingredient_id: cumin-moulu
+    quantite_base: 4
+    unite: g
+  - ingredient_id: tahini
+    quantite_base: 40
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+etapes:
+  - "Égoutter et bien sécher les pois chiches, les mixer grossièrement avec oignon, ail, coriandre et cumin jusqu'à obtenir une texture qui se tient."
+  - "Former des boulettes aplaties avec les mains, réserver 10 min au frais."
+  - "Faire dorer les falafels à la poêle dans l'huile d'olive, 4 à 5 min de chaque côté."
+  - "Préparer la sauce en délayant le tahini avec le jus de citron et un peu d'eau jusqu'à consistance onctueuse."
+  - "Servir les falafels chauds nappés de sauce tahini."
+tags_libres:
+  - vegan
+  - sans-gluten
+  - friture-legere
+  - reconfortant

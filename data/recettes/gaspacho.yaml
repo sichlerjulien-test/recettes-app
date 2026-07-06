@@ -1,0 +1,46 @@
+id: gaspacho
+nom: Gaspacho andalou
+description: "Tomate, concombre, poivron et ail mixés glacés avec un filet d'huile d'olive. La soupe froide qui sauve les soirées trop chaudes pour cuisiner."
+portions_base: 4
+duree_minutes: 15
+duree_active: 15
+difficulte: facile
+equipement:
+  - blender
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: legumes
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: tomate
+    quantite_base: 800
+    unite: g
+  - ingredient_id: concombre
+    quantite_base: 300
+    unite: g
+  - ingredient_id: poivron-rouge
+    quantite_base: 200
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: vinaigre-balsamique
+    quantite_base: 15
+    unite: ml
+etapes:
+  - "Couper grossièrement tomates, concombre et poivron, éplucher l'ail."
+  - "Mixer le tout au blender jusqu'à obtenir une texture bien lisse."
+  - "Ajouter huile d'olive et vinaigre balsamique, mixer à nouveau, saler."
+  - "Filtrer si besoin pour une texture plus fine, réserver au réfrigérateur au moins 2h avant de servir bien frais."
+tags_libres:
+  - vegan
+  - sans-gluten
+  - ete
+  - froid

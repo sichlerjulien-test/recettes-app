@@ -1,0 +1,54 @@
+id: poivrons-farcis-riz
+nom: Poivrons farcis au riz et aux herbes
+description: "Poivrons rouges évidés, farcis d'un riz parfumé à la tomate, à l'oignon et aux herbes fraîches, puis rôtis au four jusqu'à fondant. Un classique méditerranéen qui régale sans viande."
+portions_base: 4
+duree_minutes: 60
+duree_active: 25
+difficulte: normale
+equipement:
+  - four
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+  - automne
+ingredient_principal: legumes
+feculent_dominant: riz
+ingredients:
+  - ingredient_id: poivron-rouge
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: riz-basmati
+    quantite_base: 200
+    unite: g
+  - ingredient_id: tomate
+    quantite_base: 240
+    unite: g
+  - ingredient_id: oignon-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: persil-plat
+    quantite_base: 15
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: cumin-moulu
+    quantite_base: 3
+    unite: g
+etapes:
+  - "Couper le chapeau des poivrons, les évider en gardant les chapeaux de côté."
+  - "Cuire le riz à mi-cuisson dans l'eau bouillante salée, égoutter."
+  - "Faire revenir oignon et ail émincés dans l'huile d'olive, ajouter la tomate concassée et le cumin, mijoter 5 min."
+  - "Mélanger cette base avec le riz et le persil ciselé, garnir les poivrons et remettre leur chapeau."
+  - "Enfourner à 190°C pendant 35 min, jusqu'à ce que les poivrons soient fondants."
+tags_libres:
+  - vegan
+  - sans-gluten
+  - four
+  - reconfortant

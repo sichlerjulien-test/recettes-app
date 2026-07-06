@@ -1,0 +1,48 @@
+id: baba-ganoush
+nom: Baba ganoush à l'aubergine fumée
+description: "Aubergines rôties au four jusqu'à la peau craquelée, écrasées au tahini, citron et ail. Le goût fumé qui change du houmous sans perdre le côté mezze."
+portions_base: 4
+duree_minutes: 55
+duree_active: 15
+difficulte: facile
+equipement:
+  - four
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - printemps
+  - ete
+  - automne
+ingredient_principal: legumes
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: aubergine
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: tahini
+    quantite_base: 60
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: ail
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 30
+    unite: ml
+  - ingredient_id: cumin-moulu
+    quantite_base: 2
+    unite: g
+etapes:
+  - "Piquer les aubergines entières et les enfourner à 220°C pendant 40 min, jusqu'à ce que la peau soit noire et craquelée et la chair effondrée."
+  - "Laisser tiédir, couper en deux et récupérer la chair à la cuillère en jetant la peau."
+  - "Égoutter la chair quelques minutes pour évacuer l'excès d'eau, puis écraser à la fourchette avec tahini, jus de citron, ail écrasé et cumin."
+  - "Ajouter l'huile d'olive, mélanger, rectifier le sel. Servir tiède ou froid."
+tags_libres:
+  - vegan
+  - sans-gluten
+  - fume
+  - apero

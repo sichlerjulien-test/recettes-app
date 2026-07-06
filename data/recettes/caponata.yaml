@@ -1,0 +1,53 @@
+id: caponata
+nom: Caponata sicilienne
+description: "Aubergines, courgettes et poivrons mijotés à la poêle avec tomate, olives et un fond aigre-doux au vinaigre balsamique. Meilleure encore tiède ou froide le lendemain."
+portions_base: 4
+duree_minutes: 40
+duree_active: 30
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: legumes
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: aubergine
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: courgette
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: poivron-rouge
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: tomate
+    quantite_base: 360
+    unite: g
+  - ingredient_id: oignon-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: olives-noires
+    quantite_base: 80
+    unite: g
+  - ingredient_id: vinaigre-balsamique
+    quantite_base: 30
+    unite: ml
+  - ingredient_id: huile-olive
+    quantite_base: 50
+    unite: ml
+etapes:
+  - "Couper tous les légumes en dés réguliers d'environ 2 cm."
+  - "Faire revenir l'oignon dans l'huile d'olive, puis ajouter aubergine, courgette et poivron, faire dorer à feu vif en remuant régulièrement."
+  - "Ajouter la tomate et les olives, saler, laisser mijoter 15 min à couvert jusqu'à ce que les légumes soient fondants."
+  - "Déglacer au vinaigre balsamique en fin de cuisson, laisser réduire 2 min."
+  - "Servir tiède ou laisser refroidir : la caponata est encore meilleure le lendemain."
+tags_libres:
+  - vegan
+  - sans-gluten
+  - ete
+  - meilleur-le-lendemain
