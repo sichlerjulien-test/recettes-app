@@ -34,11 +34,20 @@ ingredients:
   - ingredient_id: cumin-moulu
     quantite_base: 3
     unite: g
+  - ingredient_id: concombre
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: poivron-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: carotte
+    quantite_base: 2
+    unite: piece
 etapes:
   - "Égoutter les pois chiches en gardant un peu de leur jus."
   - "Mixer pois chiches, tahini, jus de citron, ail écrasé et cumin jusqu'à obtenir une pâte lisse, en ajoutant le jus de pois chiches pour ajuster la texture."
   - "Verser dans un plat creux, creuser un puits au centre et y verser l'huile d'olive."
-  - "Servir frais avec du pain pita chaud à déchirer."
+  - "Servir frais avec des bâtonnets de concombre, poivron et carotte."
 tags_libres:
   - vegan
   - sans-gluten
