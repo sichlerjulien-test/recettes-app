@@ -289,8 +289,12 @@ Pouce bas sur un repas loggé en Supabase pour instrumenter le test d'août.
 
 **Livré (2026-07-04) : PR #83 + #84 — table `feedback` (migration 013, RLS deny-by-default), signal négatif append-only.**
 
-### TK-44 — Polish install PWA
-Polish manifest / icônes / add-to-home-screen.
+### TK-44 — Polish install PWA ✅
+Manifest lié au `<head>` (metadata Next), name/description/theme_color corrigés (theme_color = #BB4D00 = --primary ambre), icônes générées par script déterministe (scripts/generate-icons.mjs → 192/512 any maskable + apple-touch 180), 5 assertions E2E. Rend l'install correcte, pas utile : start_url reste `/`, l'icône ouvre le formulaire vide, pas le séjour — c'est TK-46, hors-scope assumé.
+
+Vérif : installabilité validée desktop (DevTools) + icône de marque validée sur device iOS. Rendu icône sur launcher Android physique non vérifié (pas d'appareil) → reporté en 1er step de TK-47.
+
+**Livré : PR #86**
 
 ---
 
@@ -318,6 +322,8 @@ Respecter ADR-008/013 : migration committée, appliquée aux DEUX instances, jam
 - **TK-58** — Corriger le commentaire mensonger de SejourSchema (« signé HMAC » alors que crypto.randomUUID). XS. Viole « règle affichée = règle appliquée ».
 - **TK-59** — Vérifier que dbErrorToResponse / error-mapping.ts ne renvoie pas les messages Supabase bruts dans les réponses 500 (fuite d'internals). S.
 - **TK-60** — Headers de sécurité de base (CSP minimale) dans next.config. Motif : token en URL ⇒ un XSS vaut vol de token. S.
+- **TK-61** — Remplacer l'icône fourchette placeholder par un vrai logo de marque. Cosmétique, réversible, différable.
+- **TK-62** — Hex de marque dupliqué en 3 endroits (globals.css --primary / manifest.json / layout.tsx) sans gate de synchro. Même famille que le Trou A. Dériver de --primary au build ou poser une sentinelle. Inerte tant que la couleur ne bouge pas.
 
 ---
 
@@ -349,6 +355,8 @@ Auth / comptes. [ADR] Lié au store/monétisation ; renverse la décision no-aut
 Historique des séjours (server-side). Dépend de TK-45.
 
 ### TK-47 — Packaging store iOS/Android (TWA / wrapper)
+Premier step obligatoire : vérif install Android sur appareil réel (rendu de l'icône sur launcher adaptatif). Hérité non vérifié de TK-44 (validé desktop uniquement, faute d'appareil).
+
 Packaging store iOS/Android (TWA / wrapper).
 
 ### TK-48 — Pondération des portions pour enfants
@@ -435,7 +443,7 @@ une branche morte = fausse confiance, à corriger opportunistement, pas urgent.
 | TK-41 | Régénération partielle d'un repas | V2 | L | Fait |
 | TK-42 | Créneau « resto / non cuisiné » | V2 | — | Fait |
 | TK-43 | (optionnel) Feedback in-app loggé Supabase | V2 | — | Fait |
-| TK-44 | Polish install PWA | V2 | — | À faire |
+| TK-44 | Polish install PWA | V2 | — | Fait |
 | TK-45 | Auth / comptes [ADR] | V3 | — | À faire |
 | TK-46 | Historique des séjours (server-side) | V3 | — | À faire |
 | TK-47 | Packaging store iOS/Android (TWA / wrapper) | V3 | — | À faire |
@@ -453,6 +461,6 @@ une branche morte = fausse confiance, à corriger opportunistement, pas urgent.
 | TK-59 | dbErrorToResponse : fuite messages Supabase bruts en 500 | VS | S | À faire |
 | TK-60 | Headers de sécurité de base (CSP minimale) | VS | S | À faire |
 
-**Ordre conseillé :** **TK-54 en tête absolue** (VS-bloquant, S, sans dépendance — ferme le trou RLS avant tout élargissement d'audience). Puis V2 restant — TK-43/44 (TK-38, TK-39, TK-40a, TK-41, TK-42 faits). TK-55 à TK-60 à rédiger et séquencer après TK-54 (budget cap console Anthropic à poser dès TK-55). Filler si trous : TK-17, TK-52/53. TK-40b, TK-20, TK-28 DORMANT (seuils de réveil non atteints). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
+**Ordre conseillé :** **TK-54 en tête absolue** (VS-bloquant, S, sans dépendance — ferme le trou RLS avant tout élargissement d'audience). Puis V2 restant — TK-43 (TK-38, TK-39, TK-40a, TK-41, TK-42, TK-44 faits). TK-55 à TK-60 à rédiger et séquencer après TK-54 (budget cap console Anthropic à poser dès TK-55). Filler si trous : TK-17, TK-52/53. TK-40b, TK-20, TK-28 DORMANT (seuils de réveil non atteints). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
 > **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.

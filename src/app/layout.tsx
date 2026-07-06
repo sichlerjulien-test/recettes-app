@@ -20,10 +20,20 @@ export const metadata: Metadata = {
   title: "Meal Planner — Planifie tes repas en groupe",
   description:
     "Organise les repas d'un séjour entre amis en quelques minutes, avec toutes les contraintes alimentaires respectées et une liste de courses prête.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    title: "Meal Planner",
+    statusBarStyle: "default",
+  },
+  icons: {
+    apple: "/icons/apple-touch-icon-180.png",
+  },
 };
 
 export const viewport: Viewport = {
   colorScheme: "light",
+  themeColor: "#BB4D00",
 };
 
 export default function RootLayout({
