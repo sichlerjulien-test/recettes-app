@@ -78,7 +78,9 @@ export default function NouveauSejourPage() {
         }
       }
     } finally {
-      setIsGenerating(false)
+      // Ne pas repasser isGenerating à false ici : router.push ne complète pas dans
+      // ce tick, et le repasser avant le swap de page fait réapparaître le
+      // formulaire (flash, TK-51). Le composant est démonté par la navigation.
       router.push(destination)
     }
   }
