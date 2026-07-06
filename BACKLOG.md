@@ -212,6 +212,35 @@ amendement ADR-013), pas un choix d'exécutant. Penchant courant : conteneur > n
 Réouverture (un seul suffit) : 2e contributeur sur OS différent · changement de ta machine
 ou de version pg_dump locale · prochaine divergence replay non liée au schéma réel.
 
+### TK-53 — Micro-cleanup assertion cross-device restoSlots · XS
+`generatePlanning.mock.calls[0]![6]` dans `route.test.ts` : remplacer l'index nu par une assertion nommée ou une destructuration — le commentaire `// index 6 = restoSlots` est en place, l'index reste fragile à une évolution de signature.
+
+### TK-52 — Test RTL empty-state du picker frappe un chemin mort · S
+Le test empty-state de PlanningSection mocke { ok:true, status:200, candidates:[] } —
+réponse que le serveur ne produit jamais (422 dès candidates.length===0). Il ne passe
+que via un guard défensif `if (list.length===0)` ; le vrai chemin `res.status===422 →
+no_alternative` n'a aucune assertion RTL. Corriger le mock en 422 quand le picker est
+retouché ; au passage, trancher si le guard mort reste ou saute. Test qui verrouille
+une branche morte = fausse confiance, à corriger opportunistement, pas urgent.
+
+### TK-63 — Même flash overlay/formulaire sur le flow de régénération · XS
+
+**Origine :** cadrage TK-51 (2026-07-06) — même pattern repéré en lisant le code.
+
+`EditSejourClient.tsx::generatePlanning()` reproduit exactement le bug de TK-51 :
+`router.push(...)` appelé en corps de `try`, puis `finally { setIsGenerating(false) }`
+qui lève l'overlay avant que la navigation aboutisse. Même cause, autre fichier.
+
+Différable : ce n'est pas le moment-clé décrit par TK-51 (payoff de création), c'est
+le flow de régénération depuis l'édition — moins de visibilité, moins de fréquence
+d'usage. Zéro impact sûreté, comme TK-51.
+
+**Critères :** mêmes que TK-51 côté overlay ↔ navigation, transposés à ce fichier.
+
+> Si le fix de TK-51 se généralise proprement (ex. un hook partagé `useNavigateAfterAction`
+> qui ne lève jamais l'overlay avant démontage), TK-63 peut se fermer par simple
+> réutilisation — à évaluer au cadrage de TK-63, pas maintenant.
+
 ---
 
 ## V2 — Hors MVP
@@ -296,6 +325,20 @@ Vérif : installabilité validée desktop (DevTools) + icône de marque validée
 
 **Livré : PR #86**
 
+### TK-51 — Flash retour au formulaire entre génération et affichage du planning · XS  ✅ Livré
+L'overlay d'attente se lève avant que la nav vers /sejour/:id aboutisse : le formulaire de création réapparaît ~qq s avant le planning, perçu comme un bug alors que le résultat est correct. Perceived-quality, tombe pile sur le moment-clé (le payoff de la génération). Zéro impact sûreté. Hypothèse à confirmer au cadrage : séquencement overlay ↔ router.push côté nouveau-sejour ; latence destination amplifiée par le chargement catalogue complet (cf TK-28).
+
+**Livré (2026-07-06) :** suppression du `setIsGenerating(false)` dans le `finally` de
+`handleSubmit` (`src/app/nouveau-sejour/page.tsx`) — le composant est démonté par la
+navigation, rien n'oblige à relever l'overlay avant. Test E2E
+`e2e/flash-overlay.spec.ts` : vérifié rouge sur l'ancien code (flash détecté), vert
+sur le fix. `EditSejourClient.tsx` (même bug) reste hors scope, ticketé en TK-63.
+
+> Résidu perf lié : le swap (TK-41) déclenche router.refresh() qui recharge le
+> catalogue complet (cf TK-28 dormant) — même famille de latence perçue que le
+> flash ci-dessus. Différable ; à traiter avec TK-51/TK-28 si ressenti à l'usage,
+> pas de ticket séparé.
+
 ---
 
 ## VS — Sécurité
@@ -324,24 +367,6 @@ Respecter ADR-008/013 : migration committée, appliquée aux DEUX instances, jam
 - **TK-60** — Headers de sécurité de base (CSP minimale) dans next.config. Motif : token en URL ⇒ un XSS vaut vol de token. S.
 - **TK-61** — Remplacer l'icône fourchette placeholder par un vrai logo de marque. Cosmétique, réversible, différable.
 - **TK-62** — Hex de marque dupliqué en 3 endroits (globals.css --primary / manifest.json / layout.tsx) sans gate de synchro. Même famille que le Trou A. Dériver de --primary au build ou poser une sentinelle. Inerte tant que la couleur ne bouge pas.
-
-### TK-63 — Même flash overlay/formulaire sur le flow de régénération · XS
-
-**Origine :** cadrage TK-51 (2026-07-06) — même pattern repéré en lisant le code.
-
-`EditSejourClient.tsx::generatePlanning()` reproduit exactement le bug de TK-51 :
-`router.push(...)` appelé en corps de `try`, puis `finally { setIsGenerating(false) }`
-qui lève l'overlay avant que la navigation aboutisse. Même cause, autre fichier.
-
-Différable : ce n'est pas le moment-clé décrit par TK-51 (payoff de création), c'est
-le flow de régénération depuis l'édition — moins de visibilité, moins de fréquence
-d'usage. Zéro impact sûreté, comme TK-51.
-
-**Critères :** mêmes que TK-51 côté overlay ↔ navigation, transposés à ce fichier.
-
-> Si le fix de TK-51 se généralise proprement (ex. un hook partagé `useNavigateAfterAction`
-> qui ne lève jamais l'overlay avant démontage), TK-63 peut se fermer par simple
-> réutilisation — à évaluer au cadrage de TK-63, pas maintenant.
 
 ---
 
@@ -391,31 +416,6 @@ Plafond de fréquence sur exclusions (ex : viande rouge max 1×/sem). Objet dist
 
 ### TK-50 — Présence partielle par repas
 Convives variables par créneau.
-
-### TK-51 — Flash retour au formulaire entre génération et affichage du planning · XS  ✅ Livré
-L'overlay d'attente se lève avant que la nav vers /sejour/:id aboutisse : le formulaire de création réapparaît ~qq s avant le planning, perçu comme un bug alors que le résultat est correct. Perceived-quality, tombe pile sur le moment-clé (le payoff de la génération). Zéro impact sûreté. Hypothèse à confirmer au cadrage : séquencement overlay ↔ router.push côté nouveau-sejour ; latence destination amplifiée par le chargement catalogue complet (cf TK-28).
-
-**Livré (2026-07-06) :** suppression du `setIsGenerating(false)` dans le `finally` de
-`handleSubmit` (`src/app/nouveau-sejour/page.tsx`) — le composant est démonté par la
-navigation, rien n'oblige à relever l'overlay avant. Test E2E
-`e2e/flash-overlay.spec.ts` : vérifié rouge sur l'ancien code (flash détecté), vert
-sur le fix. `EditSejourClient.tsx` (même bug) reste hors scope, ticketé en TK-63.
-
-> Résidu perf lié : le swap (TK-41) déclenche router.refresh() qui recharge le
-> catalogue complet (cf TK-28 dormant) — même famille de latence perçue que le
-> flash ci-dessus. Différable ; à traiter avec TK-51/TK-28 si ressenti à l'usage,
-> pas de ticket séparé.
-
-### TK-53 — Micro-cleanup assertion cross-device restoSlots · XS
-`generatePlanning.mock.calls[0]![6]` dans `route.test.ts` : remplacer l'index nu par une assertion nommée ou une destructuration — le commentaire `// index 6 = restoSlots` est en place, l'index reste fragile à une évolution de signature.
-
-### TK-52 — Test RTL empty-state du picker frappe un chemin mort · S
-Le test empty-state de PlanningSection mocke { ok:true, status:200, candidates:[] } —
-réponse que le serveur ne produit jamais (422 dès candidates.length===0). Il ne passe
-que via un guard défensif `if (list.length===0)` ; le vrai chemin `res.status===422 →
-no_alternative` n'a aucune assertion RTL. Corriger le mock en 422 quand le picker est
-retouché ; au passage, trancher si le guard mort reste ou saute. Test qui verrouille
-une branche morte = fausse confiance, à corriger opportunistement, pas urgent.
 
 **Non ticketés :**
 - Stratégie pricing + publication store (session dédiée).
@@ -488,6 +488,6 @@ une branche morte = fausse confiance, à corriger opportunistement, pas urgent.
 | TK-62 | Hex de marque dupliqué (globals.css / manifest.json / layout.tsx) | VS | — | À faire |
 | TK-63 | Même flash overlay/formulaire sur régénération (EditSejourClient) | P2 | XS | À faire |
 
-**Ordre conseillé :** **TK-54 en tête absolue** (VS-bloquant, S, sans dépendance — ferme le trou RLS avant tout élargissement d'audience). Puis V2 restant — TK-43 (TK-38, TK-39, TK-40a, TK-41, TK-42, TK-44 faits). TK-55 à TK-60 à rédiger et séquencer après TK-54 (budget cap console Anthropic à poser dès TK-55). Filler si trous : TK-17, TK-52/53. TK-40b, TK-20, TK-28 DORMANT (seuils de réveil non atteints). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
+**Ordre conseillé :** **TK-54 en tête absolue** (VS-bloquant, S, sans dépendance — ferme le trou RLS avant tout élargissement d'audience). V2 est clos (tous les tickets Fait ou Dormant — TK-38, TK-39, TK-40a, TK-41, TK-42, TK-43, TK-44, TK-51 faits ; TK-28, TK-40b dormants). TK-55 à TK-62 à rédiger et séquencer après TK-54 (budget cap console Anthropic à poser dès TK-55 ; TK-61/TK-62 cosmétiques, différables sans urgence). Filler si trous : TK-17, TK-52, TK-53, TK-63. TK-40b, TK-20, TK-28 DORMANT (seuils de réveil non atteints). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
 > **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.
