@@ -1,0 +1,48 @@
+id: focaccia-romarin
+nom: Focaccia au romarin et tomates cerises
+description: "Pain plat moelleux à l'huile d'olive, piqué de romarin frais, tomates cerises et olives noires. À déchirer et partager à l'apéro dînatoire."
+portions_base: 4
+duree_minutes: 90
+duree_active: 20
+difficulte: normale
+equipement:
+  - four
+type_repas:
+  - soir
+type_cuisine: italienne
+saison:
+  - toutes
+ingredient_principal: pain
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: farine-blanche
+    quantite_base: 400
+    unite: g
+  - ingredient_id: levure-boulangere
+    quantite_base: 7
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 70
+    unite: ml
+  - ingredient_id: sel
+    quantite_base: 8
+    unite: g
+  - ingredient_id: romarin-frais
+    quantite_base: 10
+    unite: g
+  - ingredient_id: tomate-cerise
+    quantite_base: 200
+    unite: g
+  - ingredient_id: olives-noires
+    quantite_base: 80
+    unite: g
+etapes:
+  - "Mélanger farine, levure, sel et eau tiède. Ajouter un tiers de l'huile d'olive et pétrir 10 min. Laisser lever 1h."
+  - "Étaler la pâte dans un plat huilé, laisser pousser 20 min de plus."
+  - "Enfoncer les tomates cerises coupées en deux et les olives noires dans la pâte du bout des doigts."
+  - "Parsemer de romarin, arroser du reste d'huile d'olive et de sel."
+  - "Cuire au four à 220°C pendant 20-25 min jusqu'à ce que la focaccia soit dorée. Servir tiède, à déchirer."
+tags_libres:
+  - vegan
+  - apero
+  - partage

@@ -1,0 +1,57 @@
+id: pizza-maison-partager
+nom: Pizza maison à partager
+description: "Pâte maison, sauce tomate maison relevée à l'ail et au basilic, mozzarella fondante et olives noires. Une grande pizza à couper en parts pour un apéro dînatoire entre potes."
+portions_base: 4
+duree_minutes: 75
+duree_active: 35
+difficulte: normale
+equipement:
+  - four
+type_repas:
+  - soir
+type_cuisine: italienne
+saison:
+  - toutes
+ingredient_principal: fromage
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: farine-blanche
+    quantite_base: 400
+    unite: g
+  - ingredient_id: levure-boulangere
+    quantite_base: 7
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 45
+    unite: ml
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+  - ingredient_id: tomate
+    quantite_base: 400
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: basilic-frais
+    quantite_base: 15
+    unite: g
+  - ingredient_id: origan
+    quantite_base: 5
+    unite: g
+  - ingredient_id: mozzarella-boule
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: olives-noires
+    quantite_base: 60
+    unite: g
+etapes:
+  - "Mélanger farine, levure, sel, un peu d'huile d'olive et eau tiède. Pétrir 10 min. Laisser lever 45 min."
+  - "Préparer la sauce tomate maison : écraser la tomate avec l'ail écrasé, un filet d'huile d'olive, le basilic ciselé et l'origan."
+  - "Préchauffer le four à 250°C. Étaler la pâte et napper de sauce tomate maison."
+  - "Déchirer la mozzarella et répartir sur la pizza avec les olives noires."
+  - "Cuire 12-15 min jusqu'à ce que la pâte soit dorée. Couper en parts et servir à partager."
+tags_libres:
+  - vegetarien
+  - apero
+  - partage

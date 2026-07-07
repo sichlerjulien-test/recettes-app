@@ -1,0 +1,11 @@
+id: origan
+nom_singulier: Origan séché
+nom_pluriel: Origan séché
+categorie: condiments-epices
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts:
+  - herbes-de-provence
