@@ -1,0 +1,32 @@
+id: melon-jambon-cru
+nom: Melon au jambon cru
+description: "Melon bien mûr et tranches de jambon cru. L'entrée d'été la plus simple, à condition d'avoir un bon melon."
+portions_base: 4
+duree_minutes: 10
+duree_active: 10
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+  - soir
+type_cuisine: francaise
+saison:
+  - ete
+ingredient_principal: fruits
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: melon
+    quantite_base: 1200
+    unite: g
+  - ingredient_id: jambon-cru
+    quantite_base: 8
+    unite: piece
+etapes:
+  - "Couper le melon en deux, retirer les graines, puis détailler en tranches ou en quartiers."
+  - "Retirer l'écorce si besoin."
+  - "Disposer les tranches de melon sur un plat, entourer ou draper chaque quartier d'une tranche de jambon cru."
+  - "Servir bien frais."
+tags_libres:
+  - sans-gluten
+  - ete
+  - rapide

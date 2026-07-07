@@ -1,0 +1,48 @@
+id: salade-quinoa-avocat
+nom: Salade de quinoa à l'avocat et citron vert
+description: "Quinoa froid, avocat, concombre, coriandre et une vinaigrette citron vert-huile d'olive. Fraîche et gourmande, parfaite les jours de grosse chaleur."
+portions_base: 4
+duree_minutes: 25
+duree_active: 20
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: legumes
+feculent_dominant: quinoa
+ingredients:
+  - ingredient_id: quinoa
+    quantite_base: 200
+    unite: g
+  - ingredient_id: avocat
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: concombre
+    quantite_base: 200
+    unite: g
+  - ingredient_id: coriandre-frais
+    quantite_base: 15
+    unite: g
+  - ingredient_id: citron-vert
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+etapes:
+  - "Cuire le quinoa dans l'eau bouillante salée, égoutter et laisser refroidir complètement."
+  - "Couper l'avocat et le concombre en dés, ciseler la coriandre."
+  - "Mélanger le quinoa froid avec l'avocat, le concombre et la coriandre."
+  - "Arroser du jus des citrons verts et de l'huile d'olive, saler, mélanger délicatement pour ne pas écraser l'avocat."
+tags_libres:
+  - vegan
+  - sans-gluten
+  - ete
+  - frais

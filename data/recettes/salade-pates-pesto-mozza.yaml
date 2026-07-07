@@ -1,0 +1,52 @@
+id: salade-pates-pesto-mozza
+nom: Salade de penne au pesto maison et mozzarella
+description: "Penne froides, pesto maison au basilic et pignons, billes de mozzarella et tomates cerises. Un pesto fait main, sans pot ni raccourci."
+portions_base: 4
+duree_minutes: 30
+duree_active: 20
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+  - soir
+type_cuisine: italienne
+saison:
+  - ete
+ingredient_principal: legumes
+feculent_dominant: pates
+ingredients:
+  - ingredient_id: penne
+    quantite_base: 350
+    unite: g
+  - ingredient_id: basilic-frais
+    quantite_base: 50
+    unite: g
+  - ingredient_id: pignons
+    quantite_base: 40
+    unite: g
+  - ingredient_id: parmesan
+    quantite_base: 60
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 90
+    unite: ml
+  - ingredient_id: mozzarella-boule
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: tomate-cerise
+    quantite_base: 200
+    unite: g
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+etapes:
+  - "Cuire les penne al dente à l'eau bouillante salée, égoutter et rafraîchir sous l'eau froide."
+  - "Préparer le pesto maison : mixer le basilic, les pignons, l'ail et le parmesan, ajouter l'huile d'olive en filet jusqu'à obtenir une texture onctueuse. Saler."
+  - "Couper la mozzarella en billes ou en dés, couper les tomates cerises en deux."
+  - "Mélanger les penne froides avec le pesto maison, ajouter la mozzarella et les tomates cerises."
+tags_libres:
+  - vegetarien
+  - ete

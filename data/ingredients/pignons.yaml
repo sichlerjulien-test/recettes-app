@@ -1,0 +1,11 @@
+id: pignons
+nom_singulier: Pignon de pin
+nom_pluriel: Pignons de pin
+categorie: epicerie-sucree
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - fruits-coque
+contient_trace: []
+substituts: []

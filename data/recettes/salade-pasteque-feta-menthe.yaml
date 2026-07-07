@@ -1,0 +1,39 @@
+id: salade-pasteque-feta-menthe
+nom: Salade pastèque, feta et menthe
+description: "Pastèque bien fraîche, feta salée, menthe fraîche et un filet d'huile d'olive. Le contraste sucré-salé qui rafraîchit les repas d'été."
+portions_base: 4
+duree_minutes: 15
+duree_active: 15
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: fruits
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: pasteque
+    quantite_base: 800
+    unite: g
+  - ingredient_id: feta
+    quantite_base: 200
+    unite: g
+  - ingredient_id: menthe-fraiche
+    quantite_base: 15
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 30
+    unite: ml
+etapes:
+  - "Couper la pastèque en gros cubes, égoutter l'excès de jus."
+  - "Émietter la feta en gros morceaux, ciseler la menthe."
+  - "Disposer la pastèque et la feta dans un plat, parsemer de menthe."
+  - "Arroser d'huile d'olive juste avant de servir."
+tags_libres:
+  - vegetarien
+  - sans-gluten
+  - ete
+  - frais

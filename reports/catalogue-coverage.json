@@ -11,16 +11,17 @@
       "description": "Aucune contrainte",
       "counts": {
         "petit-dejeuner": 17,
-        "midi": 39,
-        "soir": 44
+        "midi": 49,
+        "soir": 53
       },
       "verdict": "tient",
       "mains": {
         "midi": {
-          "mains_distincts": 9,
+          "mains_distincts": 10,
           "mains_list": [
             "boeuf",
             "fromage",
+            "fruits",
             "fruits-de-mer",
             "legumes",
             "legumineuses",
@@ -31,11 +32,12 @@
           ]
         },
         "soir": {
-          "mains_distincts": 10,
+          "mains_distincts": 11,
           "mains_list": [
             "agneau",
             "boeuf",
             "fromage",
+            "fruits",
             "fruits-de-mer",
             "legumes",
             "legumineuses",
@@ -46,11 +48,12 @@
           ]
         },
         "midi_soir_union": {
-          "mains_distincts": 10,
+          "mains_distincts": 11,
           "mains_list": [
             "agneau",
             "boeuf",
             "fromage",
+            "fruits",
             "fruits-de-mer",
             "legumes",
             "legumineuses",
@@ -68,33 +71,36 @@
       "description": "Cœliaque + végétarien, 6 couverts, 7 jours",
       "counts": {
         "petit-dejeuner": 2,
-        "midi": 18,
-        "soir": 19
+        "midi": 24,
+        "soir": 25
       },
       "verdict": "tient",
       "mains": {
         "midi": {
-          "mains_distincts": 4,
+          "mains_distincts": 5,
           "mains_list": [
             "fromage",
+            "fruits",
             "legumes",
             "legumineuses",
             "oeufs"
           ]
         },
         "soir": {
-          "mains_distincts": 4,
+          "mains_distincts": 5,
           "mains_list": [
             "fromage",
+            "fruits",
             "legumes",
             "legumineuses",
             "oeufs"
           ]
         },
         "midi_soir_union": {
-          "mains_distincts": 4,
+          "mains_distincts": 5,
           "mains_list": [
             "fromage",
+            "fruits",
             "legumes",
             "legumineuses",
             "oeufs"
@@ -108,31 +114,34 @@
       "description": "EU14 complet + équipement vide",
       "counts": {
         "petit-dejeuner": 0,
-        "midi": 1,
-        "soir": 1
+        "midi": 3,
+        "soir": 3
       },
-      "verdict": "profondeur insuffisante: petit-dejeuner, 0 distinctes; midi, 1 distinctes; soir, 1 distinctes",
+      "verdict": "profondeur insuffisante: petit-dejeuner, 0 distinctes",
       "mains": {
         "midi": {
-          "mains_distincts": 1,
+          "mains_distincts": 2,
           "mains_list": [
+            "fruits",
             "legumes"
           ]
         },
         "soir": {
-          "mains_distincts": 1,
+          "mains_distincts": 2,
           "mains_list": [
+            "fruits",
             "legumes"
           ]
         },
         "midi_soir_union": {
-          "mains_distincts": 1,
+          "mains_distincts": 2,
           "mains_list": [
+            "fruits",
             "legumes"
           ]
         }
       },
-      "unicite_jour": "a_risque"
+      "unicite_jour": "satisfiable"
     }
   ]
 }

@@ -1,0 +1,11 @@
+id: burrata
+nom_singulier: Burrata
+nom_pluriel: Burratas
+categorie: cremerie-oeufs
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes:
+  - lait
+contient_trace: []
+substituts: []

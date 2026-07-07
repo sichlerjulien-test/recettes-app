@@ -1,0 +1,50 @@
+id: salade-riz-thon-mais
+nom: Salade de riz au thon et maïs
+description: "Riz froid, thon, maïs, poivron et une vinaigrette citronnée. Le classique de la salade froide, simple et efficace, qui plaît à tout le monde."
+portions_base: 4
+duree_minutes: 25
+duree_active: 15
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: poisson
+feculent_dominant: riz
+ingredients:
+  - ingredient_id: riz-basmati
+    quantite_base: 250
+    unite: g
+  - ingredient_id: thon-boite
+    quantite_base: 320
+    unite: g
+  - ingredient_id: mais-boite
+    quantite_base: 200
+    unite: g
+  - ingredient_id: poivron-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: oignon-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+etapes:
+  - "Cuire le riz à l'eau bouillante salée, égoutter et laisser refroidir."
+  - "Couper le poivron et l'oignon rouge en petits dés."
+  - "Égoutter le thon et le maïs."
+  - "Mélanger le riz froid avec le thon, le maïs, le poivron et l'oignon."
+  - "Arroser du jus de citron et de l'huile d'olive, saler, mélanger."
+tags_libres:
+  - sans-gluten
+  - ete
+  - rapide

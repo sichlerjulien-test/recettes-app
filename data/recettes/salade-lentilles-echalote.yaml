@@ -1,0 +1,47 @@
+id: salade-lentilles-echalote
+nom: Salade de lentilles à l'échalote et vinaigrette moutarde
+description: "Lentilles vertes tièdes, échalote finement ciselée, persil et une vinaigrette moutarde bien relevée. Simple, nourrissant, parfait à préparer la veille."
+portions_base: 4
+duree_minutes: 30
+duree_active: 15
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+  - soir
+type_cuisine: francaise
+saison:
+  - toutes
+ingredient_principal: legumineuses
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: lentilles-vertes
+    quantite_base: 300
+    unite: g
+  - ingredient_id: echalote
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: persil-plat
+    quantite_base: 20
+    unite: g
+  - ingredient_id: moutarde-dijon
+    quantite_base: 15
+    unite: g
+  - ingredient_id: vinaigre-balsamique
+    quantite_base: 20
+    unite: ml
+  - ingredient_id: huile-olive
+    quantite_base: 45
+    unite: ml
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+etapes:
+  - "Cuire les lentilles 20 min à l'eau bouillante salée, égoutter."
+  - "Émincer finement l'échalote, ciseler le persil."
+  - "Fouetter la moutarde, le vinaigre balsamique et l'huile d'olive pour la vinaigrette."
+  - "Mélanger les lentilles tièdes avec l'échalote, le persil et la vinaigrette. Saler à convenance."
+tags_libres:
+  - vegan
+  - sans-gluten
+  - proteines

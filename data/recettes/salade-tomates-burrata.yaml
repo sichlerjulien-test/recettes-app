@@ -1,0 +1,42 @@
+id: salade-tomates-burrata
+nom: Salade de tomates anciennes à la burrata
+description: "Tomates anciennes multicolores, burrata crémeuse, basilic frais et huile d'olive. La caprese qui monte d'un cran."
+portions_base: 4
+duree_minutes: 15
+duree_active: 15
+difficulte: facile
+equipement: []
+type_repas:
+  - midi
+  - soir
+type_cuisine: italienne
+saison:
+  - ete
+ingredient_principal: fromage
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: tomate
+    quantite_base: 500
+    unite: g
+  - ingredient_id: burrata
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: basilic-frais
+    quantite_base: 15
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+etapes:
+  - "Couper les tomates anciennes en tranches ou en quartiers selon leur forme."
+  - "Disposer les tomates sur un plat, saler légèrement."
+  - "Déposer les burratas entières au centre, les ouvrir légèrement au moment de servir pour laisser couler le cœur crémeux."
+  - "Parsemer de basilic frais et arroser d'huile d'olive."
+tags_libres:
+  - vegetarien
+  - sans-gluten
+  - ete
+  - frais
