@@ -1,6 +1,6 @@
 id: curry-legumes-riz
 nom: Curry de légumes au riz
-description: Curry doux et réconfortant, vegan et sans gluten, qui fait l'unanimité.
+description: Curry doux et réconfortant, sans gluten, qui fait l'unanimité.
 
 portions_base: 4
 duree_minutes: 40
@@ -89,7 +89,6 @@ etapes:
   - Servir le curry sur le riz, parsemer de coriandre si utilisée.
 
 tags_libres:
-  - vegan
   - sans-gluten
   - reconfortant
   - groupe
