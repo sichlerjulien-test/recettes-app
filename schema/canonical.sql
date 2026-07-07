@@ -184,8 +184,8 @@ CREATE TABLE public.feedback (
     sejour_id uuid NOT NULL,
     planning_id text NOT NULL,
     jour integer NOT NULL,
-    repas text NOT NULL,
     recette_id text NOT NULL,
+    repas text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT feedback_jour_check CHECK ((jour > 0)),
     CONSTRAINT feedback_repas_check CHECK ((repas = ANY (ARRAY['midi'::text, 'soir'::text, 'petit-dejeuner'::text])))
