@@ -12,19 +12,19 @@ vi.mock('./schema-guard', () => ({
 
 import { getSupabaseClient } from './supabase';
 import { assertSchema } from './schema-guard';
-import { createPlanning, getPlanningBySejourId } from './plannings';
+import { countPlanningsBySejourId, createPlanning, getPlanningBySejourId } from './plannings';
 import type { CreatePlanningInput } from './plannings';
 
 // ─── Mock Supabase chainable builder ─────────────────────────────────────────
 
-type MockResult = { data: unknown; error: unknown };
+type MockResult = { data: unknown; error: unknown; count?: number | null };
 
 function makeChain(result: Promise<MockResult>) {
   return {
     then: result.then.bind(result),
     catch: result.catch.bind(result),
     finally: result.finally.bind(result),
-    select: (_cols?: string) => makeChain(result),
+    select: (_cols?: string, _opts?: unknown) => makeChain(result),
     eq: (_col: string, _val: unknown) => makeChain(result),
     insert: (_rows: unknown) => makeChain(result),
     order: (_col: string, _opts?: unknown) => makeChain(result),
@@ -123,6 +123,38 @@ describe('plannings DAL', () => {
           expect(result.error.entity).toBe('planning');
           expect(result.error.id).toBe('sejour-uuid');
         }
+      }
+    });
+  });
+
+  describe('countPlanningsBySejourId (TK-55)', () => {
+    it('retourne le count exact quand la requête réussit', async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        createMockSupabase({
+          plannings: [{ data: null, error: null, count: 3 }],
+        }),
+      );
+
+      const result = await countPlanningsBySejourId('sejour-uuid');
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.count).toBe(3);
+      }
+    });
+
+    it('retourne query_failed quand la requête échoue', async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        createMockSupabase({
+          plannings: [{ data: null, error: { message: 'count failed' } }],
+        }),
+      );
+
+      const result = await countPlanningsBySejourId('sejour-uuid');
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('query_failed');
       }
     });
   });

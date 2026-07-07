@@ -13,6 +13,7 @@ export type ApiErrorKind =
   | 'not_found'
   | 'business_error'
   | 'pool_empty'
+  | 'generation_cap_reached'
   | 'no_alternative_available'
   | 'invalid_candidate'
   | 'db_error'

@@ -359,9 +359,15 @@ Respecter ADR-008/013 : migration committée, appliquée aux DEUX instances, jam
 
 **Livré (2026-07-07) : PR #82 — migration 014 (dev + prod) ; canonical.sql et ledger MIGRATIONS.md à jour ; 4 gates CI verts. Preuve anon key sur prod : GET `/sejours`, `/participants`, `/plannings` → 200 `[]` (deny-by-default, zéro ligne exposée) ; POST `/sejours` → 401 `new row violates row-level security policy`.**
 
+### TK-55 — Plafond de générations par séjour · S · VS-bloquant ✅
+
+POST /api/sejours/:id/planning est ouvert et déclenche un appel LLM payant sans borne. Plafond par séjour = compteur DB natif (`COUNT(plannings)`), Upstash rejeté (dépendance/infra injustifiées à cette échelle). Le per-IP est différé (ligne dormante ci-dessous).
+
+**Livré (2026-07-07) :** ADR-023 (amende ADR-006 §5, nouveau kind API `generation_cap_reached` → 429). `countPlanningsBySejourId` (`src/lib/db/plannings.ts`) + garde dans `POST /api/sejours/:id/planning` (`GENERATION_CAP = 20`) : au plafond, 429 sans appel à `generatePlanning` ; sous le plafond, comportement inchangé. Zéro migration (append-only confirmé : génération initiale et swap/TK-41 font tous deux un `insert`, jamais d'upsert). TOCTOU non traité, assumé à cette échelle (cf ADR-023 §5). Budget cap console Anthropic posé manuellement — preuve à joindre à la PR.
+
 ### Tickets une-ligne (à rédiger quand tirés, pas maintenant)
 
-- **TK-55** — Rate limiting + plafond de générations par séjour [ADR — choix du mécanisme structurant : Upstash vs compteur DB vs autre]. POST /sejours et POST /planning sont ouverts et déclenchent un appel LLM payant sans borne. Action manuelle hors code à noter dans le ticket : budget cap console Anthropic.
+- **[DORMANT] TK-55b** — Rate limiting per-IP. Différé lors de TK-55 (ADR-023) : le plafond par séjour protège la disponibilité, pas le martèlement multi-séjours d'un même visiteur. Seuil de réveil : cap console Anthropic effectivement approché, OU martèlement visible en logs.
 - **TK-56** — Suppression de séjour (DELETE + token) et/ou purge des séjours expirés. Motif : allergies = donnée de santé RGPD, aucune rétention définie. Le ON DELETE CASCADE existant fait le travail côté DB.
 - **TK-57** — Amendement ADR-006 (une ligne) : expliciter que le token unique est un droit de LECTURE ET D'ÉCRITURE ; la séparation lecteur/organisateur se tranchera dans TK-45 (auth). Doc seulement.
 - **TK-58** — Corriger le commentaire mensonger de SejourSchema (« signé HMAC » alors que crypto.randomUUID). XS. Viole « règle affichée = règle appliquée ».
@@ -480,7 +486,8 @@ Convives variables par créneau.
 | TK-52 | Test RTL empty-state picker (chemin mort) | P2 | S | À faire |
 | TK-53 | Micro-cleanup assertion cross-device restoSlots (index nu) | P2 | XS | À faire |
 | TK-54 | Drop policies RLS allow_all_mvp | VS | S | Fait |
-| TK-55 | Rate limiting + plafond générations par séjour [ADR] | VS | — | À faire |
+| TK-55 | Plafond de générations par séjour [ADR-023] | VS | S | Fait |
+| TK-55b | [DORMANT] Rate limiting per-IP | VS | — | Dormant |
 | TK-56 | Suppression de séjour + purge séjours expirés (RGPD) | VS | — | À faire |
 | TK-57 | Amendement ADR-006 : token = lecture + écriture | VS | — | À faire |
 | TK-58 | Corriger commentaire mensonger SejourSchema (HMAC vs UUID) | VS | XS | À faire |
