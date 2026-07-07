@@ -11,6 +11,7 @@ vi.mock('@/lib/db/recettes', () => ({
 vi.mock('@/lib/db/plannings', () => ({
   createPlanning: vi.fn(),
   getPlanningBySejourId: vi.fn(),
+  countPlanningsBySejourId: vi.fn(),
 }));
 vi.mock('@/lib/llm/client', () => ({
   createAnthropicClient: vi.fn(),
@@ -24,7 +25,7 @@ vi.mock('@/lib/planning/build-constraints', () => ({
 
 import { getSejourById } from '@/lib/db/sejours';
 import { getAllRecettes, getAllRecettesAsMap } from '@/lib/db/recettes';
-import { createPlanning } from '@/lib/db/plannings';
+import { countPlanningsBySejourId, createPlanning } from '@/lib/db/plannings';
 import { generatePlanning } from '@/lib/llm/generate-planning';
 import { buildPlanningConstraints } from '@/lib/planning/build-constraints';
 import { NextRequest } from 'next/server';
@@ -73,6 +74,7 @@ describe('POST /api/sejours/[id]/planning', () => {
     vi.mocked(getSejourById).mockResolvedValue({ ok: true, sejour: SEJOUR_FIXTURE });
     vi.mocked(getAllRecettes).mockResolvedValue({ ok: true, recettes: [] });
     vi.mocked(getAllRecettesAsMap).mockResolvedValue({ ok: true, recettes: new Map() });
+    vi.mocked(countPlanningsBySejourId).mockResolvedValue({ ok: true, count: 0 });
     vi.mocked(createPlanning).mockResolvedValue({
       ok: true,
       planning: {
@@ -144,6 +146,35 @@ describe('POST /api/sejours/[id]/planning', () => {
     expect(response.status).toBe(503);
     const body = await response.json();
     expect(body.error.kind).toBe('llm_unavailable');
+  });
+
+  // TK-55 / ADR-023 : plafond de générations par séjour — protège la disponibilité.
+  describe('plafond de générations (TK-55)', () => {
+    it('au plafond (count >= GENERATION_CAP) : 429 generation_cap_reached, generatePlanning jamais appelé', async () => {
+      vi.mocked(countPlanningsBySejourId).mockResolvedValue({ ok: true, count: 20 });
+
+      const response = await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
+
+      expect(response.status).toBe(429);
+      const body = await response.json();
+      expect(body.error.kind).toBe('generation_cap_reached');
+      expect(vi.mocked(generatePlanning)).not.toHaveBeenCalled();
+    });
+
+    it('sous le plafond : génération normale inchangée (non-régression)', async () => {
+      vi.mocked(countPlanningsBySejourId).mockResolvedValue({ ok: true, count: 19 });
+      vi.mocked(buildPlanningConstraints).mockReturnValue({
+        allergenes_groupe: [],
+        exclusions_groupe: [],
+        equipement_disponible: [],
+      });
+      vi.mocked(generatePlanning).mockResolvedValue({ ok: true, entries: [] });
+
+      const response = await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
+
+      expect(response.status).toBe(201);
+      expect(vi.mocked(generatePlanning)).toHaveBeenCalledOnce();
+    });
   });
 
   describe('délégation des contraintes', () => {

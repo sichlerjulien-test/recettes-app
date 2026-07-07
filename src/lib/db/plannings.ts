@@ -19,6 +19,10 @@ export type GetPlanningResult =
   | { ok: true; planning: StoredPlanning }
   | { ok: false; error: DbError };
 
+export type CountPlanningsResult =
+  | { ok: true; count: number }
+  | { ok: false; error: DbError };
+
 /**
  * Récupère le dernier planning généré pour un séjour.
  * Retourne not_found si aucun planning n'existe pour ce séjour.
@@ -54,6 +58,24 @@ export async function getPlanningBySejourId(sejourId: string): Promise<GetPlanni
   }
 
   return { ok: true, planning: parsed.data };
+}
+
+/**
+ * Compte les plannings déjà générés pour un séjour (TK-55, plafond de générations).
+ */
+export async function countPlanningsBySejourId(sejourId: string): Promise<CountPlanningsResult> {
+  const supabase = getSupabaseClient();
+
+  const { count, error } = await supabase
+    .from('plannings')
+    .select('*', { count: 'exact', head: true })
+    .eq('sejour_id', sejourId);
+
+  if (error) {
+    return { ok: false, error: { kind: 'query_failed', cause: error.message } };
+  }
+
+  return { ok: true, count: count ?? 0 };
 }
 
 export async function createPlanning(input: CreatePlanningInput): Promise<PlanningResult> {

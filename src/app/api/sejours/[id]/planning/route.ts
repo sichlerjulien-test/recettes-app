@@ -1,12 +1,16 @@
 import type { NextRequest } from 'next/server';
 import { getSejourById } from '@/lib/db/sejours';
 import { getAllRecettes, getAllRecettesAsMap } from '@/lib/db/recettes';
-import { createPlanning, getPlanningBySejourId } from '@/lib/db/plannings';
+import { countPlanningsBySejourId, createPlanning, getPlanningBySejourId } from '@/lib/db/plannings';
 import { createAnthropicClient } from '@/lib/llm/client';
 import { generatePlanning } from '@/lib/llm/generate-planning';
 import { buildPlanningConstraints } from '@/lib/planning/build-constraints';
 import { jsonError, jsonSuccess } from '@/lib/api/responses';
 import { dbErrorToResponse } from '@/lib/api/error-mapping';
+
+// Plafond de générations par séjour (TK-55, ADR-023) — protège la disponibilité,
+// pas le portefeuille (le budget cap console Anthropic joue ce rôle).
+const GENERATION_CAP = 20;
 
 export async function GET(
   request: Request,
@@ -68,6 +72,18 @@ export async function POST(
   const apiKey = process.env['ANTHROPIC_API_KEY'];
   if (!apiKey) {
     return jsonError(503, 'llm_unavailable', 'Configuration LLM manquante');
+  }
+
+  const countResult = await countPlanningsBySejourId(id);
+  if (!countResult.ok) {
+    return dbErrorToResponse(countResult.error);
+  }
+  if (countResult.count >= GENERATION_CAP) {
+    return jsonError(
+      429,
+      'generation_cap_reached',
+      'Nombre maximal de générations atteint pour ce séjour',
+    );
   }
 
   const constraints = buildPlanningConstraints(sejour);
