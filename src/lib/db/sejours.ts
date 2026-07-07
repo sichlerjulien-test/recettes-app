@@ -146,6 +146,30 @@ export async function updateSejour(
   return { ok: true, sejour: parsed.data };
 }
 
+/**
+ * Supprime un séjour et ses données liées (participants, plannings, feedback)
+ * via ON DELETE CASCADE. Retourne une erreur not_found si le séjour n'existe pas.
+ */
+export async function deleteSejour(id: string): Promise<{ ok: true } | { ok: false; error: DbError }> {
+  const supabase = getSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('sejours')
+    .delete()
+    .eq('id', id)
+    .select('id');
+
+  if (error) {
+    return { ok: false, error: { kind: 'query_failed', cause: error.message } };
+  }
+
+  if (data === null || data.length === 0) {
+    return { ok: false, error: { kind: 'not_found', entity: 'sejour', id } };
+  }
+
+  return { ok: true };
+}
+
 export async function createSejour(
   input: SejourDALInput,
   participants: ParticipantDALInput[],

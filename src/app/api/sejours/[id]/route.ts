@@ -1,4 +1,4 @@
-import { getSejourById, updateSejour, type SejourDALInput } from '@/lib/db/sejours';
+import { getSejourById, updateSejour, deleteSejour, type SejourDALInput } from '@/lib/db/sejours';
 import { CreateSejourBodySchema } from '@/lib/types/schemas';
 import { jsonError, jsonSuccess } from '@/lib/api/responses';
 import { dbErrorToResponse } from '@/lib/api/error-mapping';
@@ -53,4 +53,31 @@ export async function PATCH(
   }
 
   return jsonSuccess(200, result.sejour);
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+): Promise<Response> {
+  const { id } = await params;
+
+  const token = request.headers.get('X-Sejour-Token');
+  if (!token) {
+    return jsonError(401, 'unauthorized', 'Token de séjour requis');
+  }
+
+  const sejourResult = await getSejourById(id);
+  if (!sejourResult.ok) {
+    return dbErrorToResponse(sejourResult.error);
+  }
+  if (sejourResult.sejour.token !== token) {
+    return jsonError(401, 'unauthorized', 'Token invalide');
+  }
+
+  const result = await deleteSejour(id);
+  if (!result.ok) {
+    return dbErrorToResponse(result.error);
+  }
+
+  return new Response(null, { status: 204 });
 }

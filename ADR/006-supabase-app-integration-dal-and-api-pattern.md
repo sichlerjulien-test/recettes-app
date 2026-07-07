@@ -136,6 +136,10 @@ message allergène/exclusion.
 - POST /api/sejours/:id/shopping-list : calcule la liste de courses à
   partir du planning courant (vérification token via header
   X-Sejour-Token, 422 si aucun planning généré)
+- DELETE /api/sejours/:id : supprime le séjour et ses données liées
+  (participants, plannings, feedback via ON DELETE CASCADE — TK-56a),
+  vérification token via header X-Sejour-Token, 404 si séjour introuvable,
+  204 en cas de succès
 
 ### 7. Authentification au MVP : token de séjour
 
@@ -146,6 +150,11 @@ par le token UUID v4 généré à la création du séjour.
 - Toute route qui modifie ou consulte un séjour exige le token via
   le header HTTP X-Sejour-Token
 - Si token absent ou invalide : 401 unauthorized
+- Le token est un droit de lecture **et** d'écriture : il autorise aussi
+  bien la consultation (GET) que la modification (PATCH) et la suppression
+  définitive du séjour (DELETE — TK-56a). Il n'existe pas de niveau de
+  droit intermédiaire au MVP ; quiconque détient le token peut supprimer le
+  séjour. (TK-57)
 
 Le token est généré par crypto.randomUUID() (cryptographiquement aléatoire,
 non énumérable).

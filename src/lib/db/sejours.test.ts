@@ -7,7 +7,7 @@ vi.mock('./supabase', () => ({
 }));
 
 import { getSupabaseClient } from './supabase';
-import { createSejour, getSejourById, getSejourByToken, updateSejour, SejourDALInputSchema } from './sejours';
+import { createSejour, getSejourById, getSejourByToken, updateSejour, deleteSejour, SejourDALInputSchema } from './sejours';
 import type { SejourDALInput, ParticipantDALInput } from './sejours';
 import { CreateSejourBodySchema } from '../types/schemas';
 
@@ -23,6 +23,7 @@ function makeChain(result: Promise<MockResult>) {
     select: (_cols?: string) => makeChain(result),
     eq: (_col: string, _val: unknown) => makeChain(result),
     insert: (_rows: unknown) => makeChain(result),
+    delete: () => makeChain(result),
     single: () => result,
     maybeSingle: () => result,
   };
@@ -296,6 +297,53 @@ describe('sejours DAL', () => {
         if (result.error.kind === 'query_failed') {
           expect(result.error.cause).toBe('RPC procedure failed');
         }
+      }
+    });
+  });
+
+  describe('deleteSejour', () => {
+    it('ok:true quand une ligne est supprimée', async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        asMockClient(createMockSupabase({
+          sejours: [{ data: [{ id: 'sejour-uuid-123' }], error: null }],
+        })),
+      );
+
+      const result = await deleteSejour('sejour-uuid-123');
+
+      expect(result.ok).toBe(true);
+    });
+
+    it('not_found quand aucune ligne supprimée (séjour inexistant)', async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        asMockClient(createMockSupabase({
+          sejours: [{ data: [], error: null }],
+        })),
+      );
+
+      const result = await deleteSejour('unknown-id');
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('not_found');
+        if (result.error.kind === 'not_found') {
+          expect(result.error.id).toBe('unknown-id');
+        }
+      }
+    });
+
+    it('query_failed quand la DB retourne une erreur', async () => {
+      vi.mocked(getSupabaseClient).mockReturnValue(
+        asMockClient(createMockSupabase({
+          sejours: [{ data: null, error: { message: 'DB delete failed' } }],
+        })),
+      );
+
+      const result = await deleteSejour('sejour-uuid-123');
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('query_failed');
       }
     });
   });

@@ -4,10 +4,11 @@ vi.mock('server-only', () => ({}));
 vi.mock('@/lib/db/sejours', () => ({
   getSejourById: vi.fn(),
   updateSejour: vi.fn(),
+  deleteSejour: vi.fn(),
 }));
 
-import { getSejourById, updateSejour } from '@/lib/db/sejours';
-import { PATCH } from './route';
+import { getSejourById, updateSejour, deleteSejour } from '@/lib/db/sejours';
+import { PATCH, DELETE } from './route';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -50,6 +51,17 @@ function makePatchRequest(body: unknown, token?: string): Request {
     method: 'PATCH',
     headers,
     body: JSON.stringify(body),
+  });
+}
+
+function makeDeleteRequest(token?: string): Request {
+  const headers = new Headers();
+  if (token !== undefined) {
+    headers.set('X-Sejour-Token', token);
+  }
+  return new Request('http://localhost/api/sejours/sejour-uuid-123', {
+    method: 'DELETE',
+    headers,
   });
 }
 
@@ -102,6 +114,69 @@ describe('PATCH /api/sejours/[id]', () => {
     });
 
     const response = await PATCH(makePatchRequest(VALID_BODY, VALID_TOKEN), TEST_PARAMS);
+
+    expect(response.status).toBe(500);
+    const body = await response.json();
+    expect(body.error.kind).toBe('db_error');
+  });
+});
+
+describe('DELETE /api/sejours/[id]', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it('returns 401 unauthorized when X-Sejour-Token header is absent', async () => {
+    const response = await DELETE(makeDeleteRequest(), TEST_PARAMS);
+
+    expect(response.status).toBe(401);
+    const body = await response.json();
+    expect(body.error.kind).toBe('unauthorized');
+  });
+
+  it('returns 401 unauthorized when token does not match sejour.token', async () => {
+    vi.mocked(getSejourById).mockResolvedValue({ ok: true, sejour: SEJOUR_FIXTURE });
+
+    const response = await DELETE(makeDeleteRequest('wrong-token'), TEST_PARAMS);
+
+    expect(response.status).toBe(401);
+    const body = await response.json();
+    expect(body.error.kind).toBe('unauthorized');
+  });
+
+  it('returns 404 not_found when sejour does not exist', async () => {
+    vi.mocked(getSejourById).mockResolvedValue({
+      ok: false,
+      error: { kind: 'not_found', entity: 'sejour', id: 'sejour-uuid-123' },
+    });
+
+    const response = await DELETE(makeDeleteRequest(VALID_TOKEN), TEST_PARAMS);
+
+    expect(response.status).toBe(404);
+    const body = await response.json();
+    expect(body.error.kind).toBe('not_found');
+  });
+
+  it('returns 204 with empty body when token is valid and delete succeeds', async () => {
+    vi.mocked(getSejourById).mockResolvedValue({ ok: true, sejour: SEJOUR_FIXTURE });
+    vi.mocked(deleteSejour).mockResolvedValue({ ok: true });
+
+    const response = await DELETE(makeDeleteRequest(VALID_TOKEN), TEST_PARAMS);
+
+    expect(response.status).toBe(204);
+    const text = await response.text();
+    expect(text).toBe('');
+    expect(deleteSejour).toHaveBeenCalledWith('sejour-uuid-123');
+  });
+
+  it('returns db_error when deleteSejour returns an error', async () => {
+    vi.mocked(getSejourById).mockResolvedValue({ ok: true, sejour: SEJOUR_FIXTURE });
+    vi.mocked(deleteSejour).mockResolvedValue({
+      ok: false,
+      error: { kind: 'query_failed', cause: 'DB delete failed' },
+    });
+
+    const response = await DELETE(makeDeleteRequest(VALID_TOKEN), TEST_PARAMS);
 
     expect(response.status).toBe(500);
     const body = await response.json();
