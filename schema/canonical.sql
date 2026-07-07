@@ -462,23 +462,6 @@ ALTER TABLE ONLY public.recette_ingredients
 ALTER TABLE ONLY public.recette_ingredients
     ADD CONSTRAINT recette_ingredients_recette_id_fkey FOREIGN KEY (recette_id) REFERENCES public.recettes(id) ON DELETE CASCADE;
 
---
--- Name: participants allow_all_mvp; Type: POLICY; Schema: public; Owner: postgres
---
-
-CREATE POLICY allow_all_mvp ON public.participants USING (true) WITH CHECK (true);
-
---
--- Name: plannings allow_all_mvp; Type: POLICY; Schema: public; Owner: postgres
---
-
-CREATE POLICY allow_all_mvp ON public.plannings USING (true) WITH CHECK (true);
-
---
--- Name: sejours allow_all_mvp; Type: POLICY; Schema: public; Owner: postgres
---
-
-CREATE POLICY allow_all_mvp ON public.sejours USING (true) WITH CHECK (true);
 
 --
 -- Name: feedback; Type: ROW SECURITY; Schema: public; Owner: postgres
