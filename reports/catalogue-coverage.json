@@ -12,7 +12,7 @@
       "counts": {
         "petit-dejeuner": 17,
         "midi": 49,
-        "soir": 53
+        "soir": 63
       },
       "verdict": "tient",
       "mains": {
@@ -32,7 +32,7 @@
           ]
         },
         "soir": {
-          "mains_distincts": 11,
+          "mains_distincts": 12,
           "mains_list": [
             "agneau",
             "boeuf",
@@ -44,11 +44,12 @@
             "oeufs",
             "poisson",
             "porc",
-            "poulet"
+            "poulet",
+            "tofu"
           ]
         },
         "midi_soir_union": {
-          "mains_distincts": 11,
+          "mains_distincts": 12,
           "mains_list": [
             "agneau",
             "boeuf",
@@ -60,7 +61,8 @@
             "oeufs",
             "poisson",
             "porc",
-            "poulet"
+            "poulet",
+            "tofu"
           ]
         }
       },

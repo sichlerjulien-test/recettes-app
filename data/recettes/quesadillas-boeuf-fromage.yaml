@@ -1,0 +1,49 @@
+id: quesadillas-boeuf-fromage
+nom: Quesadillas au bœuf et fromage
+description: "Tortillas de blé garnies de bœuf haché épicé, oignon, poivron et emmental fondant, dorées à la poêle."
+portions_base: 4
+duree_minutes: 30
+duree_active: 30
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: mexicaine
+saison:
+  - toutes
+ingredient_principal: boeuf
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: boeuf-hache
+    quantite_base: 400
+    unite: g
+  - ingredient_id: wrap-tortilla
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: emmental-rape
+    quantite_base: 200
+    unite: g
+  - ingredient_id: oignon
+    quantite_base: 100
+    unite: g
+  - ingredient_id: poivron-rouge
+    quantite_base: 150
+    unite: g
+  - ingredient_id: cumin-moulu
+    quantite_base: 6
+    unite: g
+  - ingredient_id: paprika
+    quantite_base: 6
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 15
+    unite: ml
+etapes:
+  - "Faire revenir le bœuf haché avec l'oignon et le poivron émincés, assaisonner de cumin et paprika."
+  - "Répartir la garniture de viande et l'emmental râpé sur une moitié de chaque tortilla, replier en deux."
+  - "Faire dorer les quesadillas à sec à la poêle 2-3 minutes de chaque côté jusqu'à ce que le fromage soit fondu."
+  - "Couper en parts et servir chaud."
+tags_libres:
+  - convivial
+  - a-partager

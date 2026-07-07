@@ -5,7 +5,8 @@ categorie: epicerie-salee
 unite_base: ml
 unite_achat: piece
 conversion: 400
-allergenes: []
+allergenes:
+  - fruits-coque
 contient_trace: []
 substituts: []
-notes: Boîte standard 400ml. Choisir version sans additifs.
+notes: "Boîte standard 400ml. Choisir version sans additifs. Tag fruits-coque : convention projet pour la noix de coco."

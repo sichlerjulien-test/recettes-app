@@ -1,0 +1,14 @@
+id: nuoc-mam
+nom_singulier: Nuoc-mâm
+nom_pluriel: Nuoc-mâm
+categorie: viandes-poissons
+unite_base: ml
+unite_achat: ml
+conversion: 1
+allergenes:
+  - poissons
+contient_trace: []
+substituts: []
+exclusion_tags:
+  - sans-poisson
+notes: Sauce de poisson fermentée, base de nombreuses cuisines d'Asie du Sud-Est.

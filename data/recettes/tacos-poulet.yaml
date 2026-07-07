@@ -1,0 +1,57 @@
+id: tacos-poulet
+nom: Tacos de poulet effiloché
+description: "Tortillas de maïs garnies de poulet épicé au cumin et paprika, oignon rouge, poivron, crème fraîche, coriandre et citron vert."
+portions_base: 4
+duree_minutes: 30
+duree_active: 25
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: mexicaine
+saison:
+  - toutes
+ingredient_principal: poulet
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: filet-poulet
+    quantite_base: 400
+    unite: g
+  - ingredient_id: tortilla-mais
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: oignon-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: poivron-rouge
+    quantite_base: 200
+    unite: g
+  - ingredient_id: cumin-moulu
+    quantite_base: 6
+    unite: g
+  - ingredient_id: paprika
+    quantite_base: 6
+    unite: g
+  - ingredient_id: citron-vert
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: coriandre-frais
+    quantite_base: 15
+    unite: g
+  - ingredient_id: creme-fraiche
+    quantite_base: 100
+    unite: ml
+  - ingredient_id: huile-olive
+    quantite_base: 20
+    unite: ml
+etapes:
+  - "Couper le poulet en lanières, le mariner avec cumin, paprika et un filet d'huile d'olive."
+  - "Faire revenir le poulet à la poêle jusqu'à ce qu'il soit bien coloré et cuit à cœur."
+  - "Faire suer l'oignon rouge et le poivron émincés dans la même poêle."
+  - "Réchauffer les tortillas de maïs à la poêle sèche."
+  - "Garnir les tortillas de poulet, d'oignon-poivron, de crème fraîche, de coriandre et d'un filet de citron vert."
+tags_libres:
+  - sans-gluten
+  - convivial
+  - a-partager

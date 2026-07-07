@@ -1,0 +1,55 @@
+id: chili-sin-carne
+nom: Chili sin carne
+description: "Chili végétarien mijoté aux haricots rouges, maïs, tomate et poivron, relevé au cumin et paprika."
+portions_base: 4
+duree_minutes: 40
+duree_active: 15
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: mexicaine
+saison:
+  - automne
+  - hiver
+ingredient_principal: legumineuses
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: haricots-rouges-boite
+    quantite_base: 480
+    unite: g
+  - ingredient_id: mais-boite
+    quantite_base: 200
+    unite: g
+  - ingredient_id: tomate-concassee-boite
+    quantite_base: 400
+    unite: g
+  - ingredient_id: poivron-rouge
+    quantite_base: 200
+    unite: g
+  - ingredient_id: oignon
+    quantite_base: 100
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: cumin-moulu
+    quantite_base: 8
+    unite: g
+  - ingredient_id: paprika
+    quantite_base: 8
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 20
+    unite: ml
+etapes:
+  - "Faire suer l'oignon, l'ail et le poivron émincés dans l'huile d'olive."
+  - "Ajouter la tomate concassée, les haricots rouges égouttés et le maïs égoutté."
+  - "Assaisonner de cumin et paprika, laisser mijoter à couvert 30 minutes en remuant de temps en temps."
+  - "Servir bien chaud."
+tags_libres:
+  - vegan
+  - sans-gluten
+  - mijote
+  - economique

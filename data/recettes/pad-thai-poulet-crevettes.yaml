@@ -1,0 +1,62 @@
+id: pad-thai-poulet-crevettes
+nom: Pad thaï poulet et crevettes
+description: "Nouilles de riz sautées au wok avec poulet, crevettes, œuf brouillé et sauce nuoc-mâm-soja, parsemées de cacahuètes concassées et de coriandre."
+portions_base: 4
+duree_minutes: 35
+duree_active: 35
+difficulte: normale
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: asiatique
+saison:
+  - toutes
+ingredient_principal: poulet
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: nouilles-riz
+    quantite_base: 320
+    unite: g
+  - ingredient_id: filet-poulet
+    quantite_base: 300
+    unite: g
+  - ingredient_id: crevettes-crues-decortiquees
+    quantite_base: 200
+    unite: g
+  - ingredient_id: oeuf
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: cacahuetes
+    quantite_base: 40
+    unite: g
+  - ingredient_id: nuoc-mam
+    quantite_base: 30
+    unite: ml
+  - ingredient_id: sauce-soja
+    quantite_base: 20
+    unite: ml
+  - ingredient_id: citron-vert
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: oignon-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: huile-tournesol
+    quantite_base: 20
+    unite: ml
+  - ingredient_id: coriandre-frais
+    quantite_base: 15
+    unite: g
+etapes:
+  - "Faire tremper les nouilles de riz dans l'eau chaude jusqu'à ce qu'elles soient souples, égoutter."
+  - "Faire sauter au wok l'ail et l'oignon rouge émincés dans l'huile, ajouter le poulet en lanières puis les crevettes jusqu'à cuisson."
+  - "Pousser sur le côté du wok, casser les œufs et les brouiller rapidement."
+  - "Ajouter les nouilles, le nuoc-mâm et la sauce soja, mélanger 2 minutes à feu vif."
+  - "Servir parsemé de cacahuètes concassées, de coriandre fraîche et d'un quartier de citron vert."
+tags_libres:
+  - wok
+  - convivial

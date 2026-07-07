@@ -1,0 +1,12 @@
+id: tortilla-mais
+nom_singulier: Tortilla de maïs
+nom_pluriel: Tortillas de maïs
+categorie: boulangerie
+unite_base: piece
+unite_achat: piece
+conversion: 1
+allergenes: []
+contient_trace: []
+substituts:
+  - wrap-tortilla
+notes: Galette ~15cm, sans gluten contrairement à la tortilla de blé.

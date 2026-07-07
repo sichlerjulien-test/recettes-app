@@ -1,11 +1,19 @@
 id: pate-curry-rouge
 nom_singulier: Pâte de curry rouge
 nom_pluriel: Pâtes de curry rouge
-categorie: condiments-epices
+categorie: viandes-poissons
 unite_base: g
 unite_achat: g
 conversion: 1
-allergenes: []
+allergenes:
+  - crustaces
+  - poissons
 contient_trace: []
 substituts: []
-notes: Vérifier composition - certaines marques contiennent crustacés (pâte de crevettes). Préférer marques étiquetées vegan.
+exclusion_tags:
+  - sans-poisson
+  - sans-fruits-de-mer
+notes: >-
+  La plupart des pâtes de curry rouge du commerce contiennent pâte de crevette
+  et/ou nam pla. Pour une version vegan, choisir une pâte étiquetée "vegan" ou
+  à liste d'ingrédients vérifiée sans crustacés/poissons.

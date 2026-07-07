@@ -1,0 +1,56 @@
+id: burritos-haricots-riz
+nom: Burritos haricots, riz et avocat
+description: "Tortillas de blé garnies de riz, haricots rouges, maïs, avocat, tomate et emmental, roulées en burrito."
+portions_base: 4
+duree_minutes: 30
+duree_active: 20
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: mexicaine
+saison:
+  - toutes
+ingredient_principal: legumineuses
+feculent_dominant: riz
+ingredients:
+  - ingredient_id: wrap-tortilla
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: riz-basmati
+    quantite_base: 200
+    unite: g
+  - ingredient_id: haricots-rouges-boite
+    quantite_base: 320
+    unite: g
+  - ingredient_id: mais-boite
+    quantite_base: 150
+    unite: g
+  - ingredient_id: avocat
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: tomate
+    quantite_base: 240
+    unite: g
+  - ingredient_id: oignon-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: emmental-rape
+    quantite_base: 150
+    unite: g
+  - ingredient_id: coriandre-frais
+    quantite_base: 15
+    unite: g
+  - ingredient_id: citron-vert
+    quantite_base: 1
+    unite: piece
+etapes:
+  - "Cuire le riz basmati selon les instructions."
+  - "Réchauffer les haricots rouges égouttés avec le maïs égoutté."
+  - "Couper l'avocat, la tomate et l'oignon rouge en dés, arroser d'un filet de citron vert."
+  - "Réchauffer les tortillas, garnir de riz, haricots-maïs, garniture avocat-tomate, emmental râpé et coriandre."
+  - "Rouler en burrito en repliant les extrémités."
+tags_libres:
+  - convivial
+  - a-partager
