@@ -345,7 +345,7 @@ sur le fix. `EditSejourClient.tsx` (même bug) reste hors scope, ticketé en TK-
 
 > Origine : audit sécurité 2026-07-03. VS-bloquant = à faire avant tout élargissement d'audience au-delà du cercle de test.
 
-### TK-54 — Drop des policies RLS allow_all_mvp · S · VS-bloquant [READY]
+### TK-54 — Drop des policies RLS allow_all_mvp · S · VS-bloquant ✅
 
 Les policies `allow_all_mvp` (USING true / WITH CHECK true) sur sejours, participants, plannings ne servent à rien aujourd'hui (l'app passe par service_role qui bypasse le RLS) mais rendent les trois tables publiques en lecture/écriture pour quiconque obtient l'anon key — tokens et allergies inclus. Deny-by-default gratuit : RLS reste ENABLE, on supprime les policies.
 
@@ -356,6 +356,8 @@ Les policies `allow_all_mvp` (USING true / WITH CHECK true) sur sejours, partici
 **Effort :** S.
 
 Respecter ADR-008/013 : migration committée, appliquée aux DEUX instances, jamais d'édition d'historique.
+
+**Livré (2026-07-07) : PR #82 — migration 014 (dev + prod) ; canonical.sql et ledger MIGRATIONS.md à jour ; 4 gates CI verts. Preuve anon key sur prod : GET `/sejours`, `/participants`, `/plannings` → 200 `[]` (deny-by-default, zéro ligne exposée) ; POST `/sejours` → 401 `new row violates row-level security policy`.**
 
 ### Tickets une-ligne (à rédiger quand tirés, pas maintenant)
 
@@ -477,7 +479,7 @@ Convives variables par créneau.
 | TK-51 | Flash retour au formulaire entre génération et affichage du planning | V2 | XS | ✅ Livré |
 | TK-52 | Test RTL empty-state picker (chemin mort) | P2 | S | À faire |
 | TK-53 | Micro-cleanup assertion cross-device restoSlots (index nu) | P2 | XS | À faire |
-| TK-54 | Drop policies RLS allow_all_mvp | VS | S | À faire |
+| TK-54 | Drop policies RLS allow_all_mvp | VS | S | Fait |
 | TK-55 | Rate limiting + plafond générations par séjour [ADR] | VS | — | À faire |
 | TK-56 | Suppression de séjour + purge séjours expirés (RGPD) | VS | — | À faire |
 | TK-57 | Amendement ADR-006 : token = lecture + écriture | VS | — | À faire |
