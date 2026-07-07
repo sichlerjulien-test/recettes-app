@@ -1,0 +1,48 @@
+id: bruschettas-tomate-basilic
+nom: Bruschettas tomate basilic
+description: "Tranches de pain de campagne grillées et frottées à l'ail, garnies de tomates cerises marinées à l'huile d'olive, basilic et origan. Apéro dînatoire simple et généreux, à partager."
+portions_base: 4
+duree_minutes: 20
+duree_active: 20
+difficulte: facile
+equipement:
+  - four
+type_repas:
+  - soir
+type_cuisine: italienne
+saison:
+  - ete
+ingredient_principal: pain
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: pain-campagne
+    quantite_base: 12
+    unite: piece
+  - ingredient_id: tomate-cerise
+    quantite_base: 500
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 60
+    unite: ml
+  - ingredient_id: basilic-frais
+    quantite_base: 20
+    unite: g
+  - ingredient_id: origan
+    quantite_base: 5
+    unite: g
+  - ingredient_id: sel
+    quantite_base: 3
+    unite: g
+etapes:
+  - "Couper les tomates cerises en petits dés, mélanger avec deux gousses d'ail émincées, l'huile d'olive, le basilic ciselé, l'origan et le sel. Laisser mariner 10 min."
+  - "Griller les tranches de pain de campagne au four ou au grille-pain jusqu'à ce qu'elles soient dorées."
+  - "Frotter chaque tranche grillée avec la gousse d'ail restante."
+  - "Répartir la garniture tomate-basilic sur les tranches et servir aussitôt."
+tags_libres:
+  - vegetarien
+  - ete
+  - apero
+  - partage

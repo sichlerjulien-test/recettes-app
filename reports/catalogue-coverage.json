@@ -10,9 +10,9 @@
       "id": "vide",
       "description": "Aucune contrainte",
       "counts": {
-        "petit-dejeuner": 17,
+        "petit-dejeuner": 19,
         "midi": 49,
-        "soir": 63
+        "soir": 67
       },
       "verdict": "tient",
       "mains": {
@@ -32,7 +32,7 @@
           ]
         },
         "soir": {
-          "mains_distincts": 12,
+          "mains_distincts": 13,
           "mains_list": [
             "agneau",
             "boeuf",
@@ -42,6 +42,7 @@
             "legumes",
             "legumineuses",
             "oeufs",
+            "pain",
             "poisson",
             "porc",
             "poulet",
@@ -49,7 +50,7 @@
           ]
         },
         "midi_soir_union": {
-          "mains_distincts": 12,
+          "mains_distincts": 13,
           "mains_list": [
             "agneau",
             "boeuf",
@@ -59,6 +60,7 @@
             "legumes",
             "legumineuses",
             "oeufs",
+            "pain",
             "poisson",
             "porc",
             "poulet",
@@ -72,7 +74,7 @@
       "id": "sarah",
       "description": "Cœliaque + végétarien, 6 couverts, 7 jours",
       "counts": {
-        "petit-dejeuner": 2,
+        "petit-dejeuner": 4,
         "midi": 24,
         "soir": 25
       },

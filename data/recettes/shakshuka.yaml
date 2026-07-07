@@ -1,0 +1,55 @@
+id: shakshuka
+nom: Shakshuka
+description: "Œufs pochés dans une sauce tomate épicée au poivron, oignon, ail, cumin et paprika, parsemée de persil plat. Petit-déjeuner généreux qui se mange à plusieurs, à même la poêle."
+portions_base: 4
+duree_minutes: 30
+duree_active: 25
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - petit-dejeuner
+type_cuisine: orientale
+saison:
+  - ete
+ingredient_principal: oeufs
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: tomate-concassee-boite
+    quantite_base: 800
+    unite: g
+  - ingredient_id: oignon
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: poivron-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 30
+    unite: ml
+  - ingredient_id: cumin-moulu
+    quantite_base: 5
+    unite: g
+  - ingredient_id: paprika
+    quantite_base: 5
+    unite: g
+  - ingredient_id: oeuf
+    quantite_base: 6
+    unite: piece
+  - ingredient_id: persil-plat
+    quantite_base: 10
+    unite: g
+etapes:
+  - "Faire revenir l'oignon émincé et le poivron coupé en dés dans l'huile d'olive, 5 min."
+  - "Ajouter l'ail écrasé, le cumin et le paprika, mélanger 1 min."
+  - "Verser les tomates concassées, saler, laisser mijoter 15 min à couvert."
+  - "Creuser des puits dans la sauce et y casser les œufs un à un. Couvrir et cuire 6-8 min jusqu'à ce que les blancs soient pris et les jaunes coulants."
+  - "Parsemer de persil plat ciselé et servir directement à la poêle, à plusieurs cuillères."
+tags_libres:
+  - vegetarien
+  - sans-gluten
+  - ete
+  - partage

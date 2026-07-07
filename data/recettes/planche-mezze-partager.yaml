@@ -1,0 +1,69 @@
+id: planche-mezze-partager
+nom: Planche mezze à partager
+description: "Grande planche composée d'un houmous au tahini et citron, d'un tzatziki au yaourt grec et à la menthe, d'olives noires et vertes, de bâtonnets de crudités et de pain pita chaud à tremper. L'apéro dînatoire qui fait tenir la tablée jusqu'au coucher de soleil."
+portions_base: 4
+duree_minutes: 40
+duree_active: 35
+difficulte: normale
+equipement: []
+type_repas:
+  - soir
+type_cuisine: mediterraneenne
+saison:
+  - ete
+ingredient_principal: legumineuses
+feculent_dominant: pain
+ingredients:
+  - ingredient_id: pois-chiches-conserve
+    quantite_base: 480
+    unite: g
+  - ingredient_id: tahini
+    quantite_base: 80
+    unite: g
+  - ingredient_id: citron
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: ail
+    quantite_base: 3
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 60
+    unite: ml
+  - ingredient_id: cumin-moulu
+    quantite_base: 3
+    unite: g
+  - ingredient_id: yaourt-grec
+    quantite_base: 400
+    unite: g
+  - ingredient_id: menthe-fraiche
+    quantite_base: 10
+    unite: g
+  - ingredient_id: concombre
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: poivron-rouge
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: carotte
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: olives-noires
+    quantite_base: 100
+    unite: g
+  - ingredient_id: olives-vertes
+    quantite_base: 100
+    unite: g
+  - ingredient_id: pain-pita
+    quantite_base: 6
+    unite: piece
+etapes:
+  - "Préparer le houmous : égoutter les pois chiches, mixer avec le tahini, le jus de citron, une gousse d'ail écrasée et le cumin jusqu'à obtenir une pâte lisse. Ajouter un filet d'huile d'olive."
+  - "Préparer le tzatziki : râper un des concombres, saler et presser pour évacuer l'eau, puis mélanger avec le yaourt grec, deux gousses d'ail écrasées, la menthe ciselée et un filet d'huile d'olive."
+  - "Couper le second concombre, le poivron et les carottes en bâtonnets."
+  - "Réchauffer les pains pitas et les découper en pointes."
+  - "Disposer le houmous, le tzatziki, les olives noires et vertes, les bâtonnets de crudités et les pointes de pita sur une grande planche à partager."
+tags_libres:
+  - vegetarien
+  - ete
+  - apero
+  - partage

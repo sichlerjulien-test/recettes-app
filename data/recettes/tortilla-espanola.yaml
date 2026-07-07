@@ -1,0 +1,42 @@
+id: tortilla-espanola
+nom: Tortilla española
+description: "Omelette épaisse aux pommes de terre fondantes confites à l'huile d'olive et à l'oignon, cuite doucement puis retournée. Se mange tiède ou froide, en tranches, à plusieurs."
+portions_base: 4
+duree_minutes: 45
+duree_active: 35
+difficulte: normale
+equipement:
+  - plaque
+type_repas:
+  - petit-dejeuner
+type_cuisine: mediterraneenne
+saison:
+  - toutes
+ingredient_principal: oeufs
+feculent_dominant: pommes-de-terre
+ingredients:
+  - ingredient_id: pomme-de-terre
+    quantite_base: 800
+    unite: g
+  - ingredient_id: oignon
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: oeuf
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: huile-olive
+    quantite_base: 100
+    unite: ml
+  - ingredient_id: sel
+    quantite_base: 5
+    unite: g
+etapes:
+  - "Éplucher et couper les pommes de terre en tranches fines. Émincer l'oignon."
+  - "Faire confire les pommes de terre et l'oignon dans l'huile d'olive à feu doux, 20 min, jusqu'à tendreté sans coloration."
+  - "Égoutter en réservant l'huile. Battre les œufs avec le sel, puis incorporer les pommes de terre et l'oignon."
+  - "Verser dans la poêle avec un peu d'huile réservée et cuire 5 min à feu moyen."
+  - "Retourner la tortilla à l'aide d'une assiette, cuire 5 min de l'autre côté. Servir tiède ou froide, coupée en parts."
+tags_libres:
+  - vegetarien
+  - sans-gluten
+  - partage
