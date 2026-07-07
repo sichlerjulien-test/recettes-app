@@ -1,0 +1,12 @@
+id: cacahuetes
+nom_singulier: Cacahuètes concassées
+nom_pluriel: Cacahuètes concassées
+categorie: epicerie-salee
+unite_base: g
+unite_achat: g
+conversion: 1
+allergenes:
+  - arachides
+contient_trace: []
+substituts: []
+notes: Non salées, torréfiées à sec. Pour garniture (pad thaï, wok).

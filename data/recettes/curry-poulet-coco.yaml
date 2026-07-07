@@ -1,0 +1,63 @@
+id: curry-poulet-coco
+nom: Curry de poulet au lait de coco
+description: "Cuisses de poulet mijotées dans un curry rouge thaï au lait de coco, citronnelle et gingembre, servies avec du riz thaï et un quartier de citron vert."
+portions_base: 4
+duree_minutes: 45
+duree_active: 20
+difficulte: normale
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: asiatique
+saison:
+  - toutes
+ingredient_principal: poulet
+feculent_dominant: riz
+ingredients:
+  - ingredient_id: cuisse-poulet
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: lait-coco-conserve
+    quantite_base: 400
+    unite: ml
+  - ingredient_id: pate-curry-rouge
+    quantite_base: 40
+    unite: g
+  - ingredient_id: nuoc-mam
+    quantite_base: 15
+    unite: ml
+  - ingredient_id: citronnelle
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: gingembre-frais
+    quantite_base: 15
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: echalote
+    quantite_base: 60
+    unite: g
+  - ingredient_id: riz-thai
+    quantite_base: 320
+    unite: g
+  - ingredient_id: citron-vert
+    quantite_base: 1
+    unite: piece
+  - ingredient_id: coriandre-frais
+    quantite_base: 15
+    unite: g
+  - ingredient_id: huile-tournesol
+    quantite_base: 15
+    unite: ml
+etapes:
+  - "Faire revenir l'échalote, l'ail et le gingembre émincés dans l'huile, puis ajouter la pâte de curry rouge et la citronnelle froissée."
+  - "Ajouter les cuisses de poulet et les faire dorer quelques minutes sur toutes les faces."
+  - "Verser le lait de coco et le nuoc-mâm, laisser mijoter à couvert 30 minutes jusqu'à ce que le poulet soit tendre."
+  - "Cuire le riz thaï selon les instructions."
+  - "Retirer la citronnelle, servir le curry sur le riz, parsemé de coriandre fraîche avec un quartier de citron vert."
+tags_libres:
+  - sans-gluten
+  - reconfortant
+  - mijote

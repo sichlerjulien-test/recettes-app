@@ -104,6 +104,7 @@ export const TRIAGE_COVERED = new Set([
   'gambas',
   'sardine',
   'jambon-cru',
+  'nuoc-mam',
 ]);
 
 export function validateIngredientExclusionCompleteness(

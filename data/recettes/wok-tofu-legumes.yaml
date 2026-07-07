@@ -1,0 +1,56 @@
+id: wok-tofu-legumes
+nom: Wok de tofu aux légumes
+description: "Tofu ferme doré au wok avec poivron, courgette et carotte, sauce soja et huile de sésame, servi sur riz basmati."
+portions_base: 4
+duree_minutes: 30
+duree_active: 30
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: asiatique
+saison:
+  - toutes
+ingredient_principal: tofu
+feculent_dominant: riz
+ingredients:
+  - ingredient_id: tofu-ferme
+    quantite_base: 400
+    unite: g
+  - ingredient_id: sauce-soja
+    quantite_base: 40
+    unite: ml
+  - ingredient_id: huile-sesame
+    quantite_base: 10
+    unite: ml
+  - ingredient_id: gingembre-frais
+    quantite_base: 15
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: poivron-rouge
+    quantite_base: 200
+    unite: g
+  - ingredient_id: courgette
+    quantite_base: 250
+    unite: g
+  - ingredient_id: carotte
+    quantite_base: 150
+    unite: g
+  - ingredient_id: riz-basmati
+    quantite_base: 320
+    unite: g
+  - ingredient_id: huile-tournesol
+    quantite_base: 15
+    unite: ml
+etapes:
+  - "Couper le tofu en cubes, le faire dorer au wok dans un peu d'huile de tournesol jusqu'à ce qu'il soit doré sur toutes les faces, réserver."
+  - "Dans le même wok, faire sauter l'ail, le gingembre, le poivron, la courgette et la carotte émincés quelques minutes à feu vif."
+  - "Remettre le tofu dans le wok, arroser de sauce soja et d'huile de sésame, mélanger 2 minutes."
+  - "Cuire le riz basmati selon les instructions et servir le wok dessus."
+tags_libres:
+  - vegan
+  - wok
+  - rapide

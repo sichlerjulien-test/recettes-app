@@ -1,0 +1,59 @@
+id: riz-saute-poulet-legumes
+nom: Riz sauté au poulet et aux légumes
+description: "Riz basmati sauté au wok avec poulet, petits pois, carotte et œuf brouillé, relevé à la sauce soja et à l'huile de sésame."
+portions_base: 4
+duree_minutes: 30
+duree_active: 30
+difficulte: facile
+equipement:
+  - plaque
+type_repas:
+  - soir
+type_cuisine: asiatique
+saison:
+  - toutes
+ingredient_principal: poulet
+feculent_dominant: riz
+ingredients:
+  - ingredient_id: filet-poulet
+    quantite_base: 300
+    unite: g
+  - ingredient_id: riz-basmati
+    quantite_base: 320
+    unite: g
+  - ingredient_id: oeuf
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: petits-pois-surgeles
+    quantite_base: 150
+    unite: g
+  - ingredient_id: carotte
+    quantite_base: 100
+    unite: g
+  - ingredient_id: oignon
+    quantite_base: 100
+    unite: g
+  - ingredient_id: sauce-soja
+    quantite_base: 30
+    unite: ml
+  - ingredient_id: huile-sesame
+    quantite_base: 10
+    unite: ml
+  - ingredient_id: gingembre-frais
+    quantite_base: 10
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: huile-tournesol
+    quantite_base: 15
+    unite: ml
+etapes:
+  - "Cuire le riz basmati, l'étaler sur une plaque et le laisser refroidir complètement (idéalement à l'avance)."
+  - "Faire sauter le poulet coupé en dés dans l'huile jusqu'à cuisson complète, réserver."
+  - "Dans le même wok, faire revenir oignon, ail, gingembre, carotte et petits pois quelques minutes."
+  - "Pousser sur le côté, casser les œufs et les brouiller."
+  - "Ajouter le riz froid et le poulet, arroser de sauce soja et d'huile de sésame, sauter 3-4 minutes à feu vif en mélangeant bien."
+tags_libres:
+  - wok
+  - anti-gaspillage

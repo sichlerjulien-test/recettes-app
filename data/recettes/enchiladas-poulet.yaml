@@ -1,0 +1,54 @@
+id: enchiladas-poulet
+nom: Enchiladas au poulet
+description: "Tortillas de maïs garnies de poulet effiloché, roulées et gratinées sous une sauce tomate épicée et de l'emmental fondu."
+portions_base: 4
+duree_minutes: 45
+duree_active: 20
+difficulte: normale
+equipement:
+  - four
+type_repas:
+  - soir
+type_cuisine: mexicaine
+saison:
+  - toutes
+ingredient_principal: poulet
+feculent_dominant: aucun
+ingredients:
+  - ingredient_id: cuisse-poulet
+    quantite_base: 4
+    unite: piece
+  - ingredient_id: tortilla-mais
+    quantite_base: 8
+    unite: piece
+  - ingredient_id: sauce-tomate
+    quantite_base: 400
+    unite: g
+  - ingredient_id: emmental-rape
+    quantite_base: 200
+    unite: g
+  - ingredient_id: oignon
+    quantite_base: 100
+    unite: g
+  - ingredient_id: ail
+    quantite_base: 2
+    unite: piece
+  - ingredient_id: cumin-moulu
+    quantite_base: 6
+    unite: g
+  - ingredient_id: paprika
+    quantite_base: 6
+    unite: g
+  - ingredient_id: huile-olive
+    quantite_base: 15
+    unite: ml
+etapes:
+  - "Pocher les cuisses de poulet à l'eau frémissante jusqu'à cuisson complète, effilocher la chair."
+  - "Faire revenir l'oignon et l'ail dans l'huile d'olive, ajouter la sauce tomate, cumin et paprika, laisser réduire 10 minutes."
+  - "Mélanger le poulet effiloché avec la moitié de la sauce tomate épicée."
+  - "Garnir chaque tortilla de maïs de poulet, rouler et disposer serrées dans un plat à gratin."
+  - "Napper du reste de sauce tomate, parsemer d'emmental râpé et enfourner 15 minutes à 200°C jusqu'à gratiné."
+tags_libres:
+  - sans-gluten
+  - gratine
+  - convivial
