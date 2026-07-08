@@ -177,3 +177,16 @@ jobs:
       - run: npm ci
       - name: Anti-interpolation internals dans jsonError arg 3 (ADR-025)
         run: npx tsx scripts/check-jsonerror-message.ts
+
+  backlog-gate:
+    name: backlog-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - name: Structure BACKLOG.md ⊆ statut unique + archive disjointe (ADR-026)
+        run: npx tsx scripts/check-backlog.ts
