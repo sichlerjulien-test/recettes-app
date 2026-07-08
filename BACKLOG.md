@@ -373,6 +373,8 @@ POST /api/sejours/:id/planning est ouvert et déclenche un appel LLM payant sans
 - **TK-60** — Headers de sécurité de base (CSP minimale) dans next.config. Motif : token en URL ⇒ un XSS vaut vol de token. S.
 - **TK-61** — Remplacer l'icône fourchette placeholder par un vrai logo de marque. Cosmétique, réversible, différable.
 - **TK-62** — Hex de marque dupliqué en 3 endroits (globals.css --primary / manifest.json / layout.tsx) sans gate de synchro. Même famille que le Trou A. Dériver de --primary au build ou poser une sentinelle. Inerte tant que la couleur ne bouge pas.
+- **TK-64** — Gate schema-replay aveugle au cron.* : no-op silencieux (image CI sans pg_cron + psql sans -v ON_ERROR_STOP=1), le gate ne peut pas échouer sur du SQL cron — 015 et 016 sont passées vertes sans que leur syntaxe cron soit validée en CI. [ADR probable : installer pg_cron en CI vs faire échouer explicitement sur cron non exécutable]. Réveil : prochaine migration cron.
+- **TK-65** — ADR-020 décrit un push direct sur main via trailer Refs: en réalité impossible : la protection de branche rejette tout push direct, docs-only inclus. « Règle affichée ≠ règle appliquée ». Réconcilier : amender ADR-020 (tout passe par PR) ou assouplir la protection pour les docs. XS, doc.
 
 ---
 
@@ -492,6 +494,8 @@ Convives variables par créneau.
 | TK-61 | Remplacer l'icône fourchette placeholder par un vrai logo | VS | — | À faire |
 | TK-62 | Hex de marque dupliqué (globals.css / manifest.json / layout.tsx) | VS | — | À faire |
 | TK-63 | Même flash overlay/formulaire sur régénération (EditSejourClient) | P2 | XS | À faire |
+| TK-64 | Gate schema-replay aveugle au cron.* | P2 | — | À faire |
+| TK-65 | ADR-020 décrit un push direct impossible | P2 | XS | À faire |
 
 **Ordre conseillé :** **TK-54 en tête absolue** (VS-bloquant, S, sans dépendance — ferme le trou RLS avant tout élargissement d'audience). V2 est clos (tous les tickets Fait ou Dormant — TK-38, TK-39, TK-40a, TK-41, TK-42, TK-43, TK-44, TK-51 faits ; TK-28, TK-40b dormants). TK-55 à TK-62 à rédiger et séquencer après TK-54 (budget cap console Anthropic à poser dès TK-55 ; TK-61/TK-62 cosmétiques, différables sans urgence). Filler si trous : TK-17, TK-52, TK-53, TK-63. TK-40b, TK-20, TK-28 DORMANT (seuils de réveil non atteints). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
 
