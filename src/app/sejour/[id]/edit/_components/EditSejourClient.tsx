@@ -36,6 +36,8 @@ export function EditSejourClient({ sejour, token, hasPlanning }: Props) {
   const [showModal, setShowModal] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [generationError, setGenerationError] = useState<string | null>(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   function extractApiError(json: unknown): { kind: string; message: string } | null {
     if (
@@ -127,6 +129,29 @@ export function EditSejourClient({ sejour, token, hasPlanning }: Props) {
     await generatePlanning()
   }
 
+  async function handleDeleteConfirm() {
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`/api/sejours/${sejour.id}`, {
+        method: "DELETE",
+        headers: { "X-Sejour-Token": token },
+      })
+
+      if (!response.ok) {
+        const json: unknown = await response.json()
+        const apiError = extractApiError(json)
+        toast.error(apiError?.message ?? "Erreur lors de la suppression du séjour")
+        setShowDeleteModal(false)
+        return
+      }
+
+      toast.success("Séjour supprimé")
+      router.push("/")
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <>
       {isGenerating && (
@@ -175,6 +200,43 @@ export function EditSejourClient({ sejour, token, hasPlanning }: Props) {
         </div>
       )}
 
+      {showDeleteModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-modal-title"
+        >
+          <div className="bg-white rounded-xl p-6 max-w-sm mx-4 space-y-4 shadow-xl">
+            <h2 id="delete-modal-title" className="text-lg font-semibold text-gray-900">
+              Supprimer ce séjour ?
+            </h2>
+            <p className="text-sm text-gray-600">
+              Cette action est définitive : le séjour, ses participants, plannings et
+              retours seront supprimés. Impossible à annuler.
+            </p>
+            <div className="flex gap-3 pt-1">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+              >
+                Supprimer
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {generationError && (
         <div
           role="alert"
@@ -193,6 +255,12 @@ export function EditSejourClient({ sejour, token, hasPlanning }: Props) {
         description="Modifiez les informations de votre séjour."
         submitLabel="Enregistrer les modifications"
       />
+
+      <div className="mt-8 border-t border-border pt-6">
+        <Button variant="destructive" onClick={() => setShowDeleteModal(true)}>
+          Supprimer le séjour
+        </Button>
+      </div>
     </>
   )
 }
