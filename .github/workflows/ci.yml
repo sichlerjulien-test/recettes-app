@@ -164,3 +164,16 @@ jobs:
       - run: npm ci
       - name: Enum Zod ⊆⊇ CHECK SQL membership (ADR-015)
         run: npx tsx scripts/check-enum-checks.ts
+
+  jsonerror-message-gate:
+    name: jsonerror-message-gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - name: Anti-interpolation internals dans jsonError arg 3 (ADR-025)
+        run: npx tsx scripts/check-jsonerror-message.ts

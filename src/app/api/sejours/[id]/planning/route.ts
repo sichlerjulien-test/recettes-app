@@ -5,7 +5,7 @@ import { countPlanningsBySejourId, createPlanning, getPlanningBySejourId } from 
 import { createAnthropicClient } from '@/lib/llm/client';
 import { generatePlanning } from '@/lib/llm/generate-planning';
 import { buildPlanningConstraints } from '@/lib/planning/build-constraints';
-import { jsonError, jsonSuccess } from '@/lib/api/responses';
+import { businessMessage, jsonError, jsonSuccess } from '@/lib/api/responses';
 import { dbErrorToResponse } from '@/lib/api/error-mapping';
 
 // Plafond de générations par séjour (TK-55, ADR-023) — protège la disponibilité,
@@ -116,7 +116,7 @@ export async function POST(
         const message = cause === 'allergen'
           ? 'Aucune recette ne correspond aux allergies déclarées. Vérifiez les allergies des participants.'
           : 'Aucune recette ne correspond à ces exclusions alimentaires. Essayez d\'en retirer une.';
-        return jsonError(422, 'pool_empty', message, { cause });
+        return jsonError(422, 'pool_empty', businessMessage(message), { cause });
       }
       case 'validation_failed_after_retries':
         return jsonError(

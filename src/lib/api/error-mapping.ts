@@ -1,10 +1,10 @@
 import type { DbError } from '@/lib/types/domain';
-import { jsonError } from './responses';
+import { businessMessage, jsonError } from './responses';
 
 export function dbErrorToResponse(error: DbError): Response {
   switch (error.kind) {
     case 'not_found':
-      return jsonError(404, 'not_found', `${error.entity} introuvable`);
+      return jsonError(404, 'not_found', businessMessage(`${error.entity} introuvable`));
     case 'connection_failed':
     case 'query_failed':
       return jsonError(500, 'db_error', 'Erreur côté base de données');
@@ -17,6 +17,6 @@ export function dbErrorToResponse(error: DbError): Response {
     }
     case 'constraint_violation':
       // .cause ici = message métier auteur-contrôlé, jamais une chaîne brute.
-      return jsonError(400, 'business_error', error.cause);
+      return jsonError(400, 'business_error', businessMessage(error.cause));
   }
 }
