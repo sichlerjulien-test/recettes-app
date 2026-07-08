@@ -370,7 +370,8 @@ POST /api/sejours/:id/planning est ouvert et déclenche un appel LLM payant sans
 - **[DORMANT] TK-55b** — Rate limiting per-IP. Différé lors de TK-55 (ADR-023) : le plafond par séjour protège la disponibilité, pas le martèlement multi-séjours d'un même visiteur. Seuil de réveil : cap console Anthropic effectivement approché, OU martèlement visible en logs.
 - **TK-58** — Corriger le commentaire mensonger de SejourSchema (« signé HMAC » alors que crypto.randomUUID). XS. Viole « règle affichée = règle appliquée ».
 - ~~**TK-59** — Vérifier que dbErrorToResponse / error-mapping.ts ne renvoie pas les messages Supabase bruts dans les réponses 500 (fuite d'internals). S.~~ **Livré (PR #104)** — voir tableau.
-- **TK-60** — Headers de sécurité de base (CSP minimale) dans next.config. Motif : token en URL ⇒ un XSS vaut vol de token. S.
+- ~~**TK-60** — Headers de sécurité de base (CSP minimale) dans next.config. Motif : token en URL ⇒ un XSS vaut vol de token. S.~~ Découpé : **TK-60a** livré (PR #109), **TK-60b** dormant ci-dessous.
+- **[DORMANT, ADR-gated] TK-60b** — CSP stricte nonce-based (vraie défense anti-XSS). TK-60a n'a posé qu'une CSP `'unsafe-inline'` (durcissement en profondeur, ne bloque pas un `<script>` injecté). Le nonce force du rendu dynamique + interaction avec le service worker PWA — décision structurante, ADR requis (architect) avant cadrage. Réveil : incident XSS réel, ou refonte touchant le rendu statique/PWA.
 - **TK-61** — Remplacer l'icône fourchette placeholder par un vrai logo de marque. Cosmétique, réversible, différable.
 - **TK-62** — Hex de marque dupliqué en 3 endroits (globals.css --primary / manifest.json / layout.tsx) sans gate de synchro. Même famille que le Trou A. Dériver de --primary au build ou poser une sentinelle. Inerte tant que la couleur ne bouge pas.
 - **TK-64** — Gate schema-replay aveugle au cron.* : no-op silencieux (image CI sans pg_cron + psql sans -v ON_ERROR_STOP=1), le gate ne peut pas échouer sur du SQL cron — 015 et 016 sont passées vertes sans que leur syntaxe cron soit validée en CI. [ADR probable : installer pg_cron en CI vs faire échouer explicitement sur cron non exécutable]. Réveil : prochaine migration cron.
@@ -492,7 +493,8 @@ Convives variables par créneau.
 | TK-55b | [DORMANT] Rate limiting per-IP | VS | — | Dormant |
 | TK-58 | Corriger commentaire mensonger SejourSchema (HMAC vs UUID) | VS | XS | Fait (PR #102) |
 | TK-59 | dbErrorToResponse : fuite messages Supabase bruts en 500 | VS | S | Fait (PR #104) |
-| TK-60 | Headers de sécurité de base (CSP minimale) | VS | S | À faire |
+| TK-60a | Headers de sécurité statiques (next.config) | VS | XS | Fait (PR #109) |
+| TK-60b | [DORMANT] CSP stricte nonce-based (ADR requis) | VS | — | Dormant |
 | TK-61 | Remplacer l'icône fourchette placeholder par un vrai logo | VS | — | À faire |
 | TK-62 | Hex de marque dupliqué (globals.css / manifest.json / layout.tsx) | VS | — | À faire |
 | TK-63 | Même flash overlay/formulaire sur régénération (EditSejourClient) | P2 | XS | À faire |
