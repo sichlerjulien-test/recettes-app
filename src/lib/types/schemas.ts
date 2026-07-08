@@ -224,7 +224,7 @@ export const RepartitionRepasSchema = z.object({
 /** Entité Sejour complète (post-création, avec id et token). */
 export const SejourSchema = z.object({
   id: z.string(),
-  /** Token de partage signé HMAC, sert d'auth implicite */
+  /** Token de partage opaque (UUID v4, crypto.randomUUID), sert d'auth implicite (ADR-006 §7). */
   token: z.string(),
   nom: z.string().min(1).max(100),
   date_debut: z.string().optional(),
