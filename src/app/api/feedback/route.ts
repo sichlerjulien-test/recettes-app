@@ -4,7 +4,7 @@ import { getSejourById } from '@/lib/db/sejours';
 import { getPlanningBySejourId } from '@/lib/db/plannings';
 import { insertFeedback } from '@/lib/db/feedback';
 import { FeedbackBodySchema } from '@/lib/types/schemas';
-import { jsonError, jsonSuccess } from '@/lib/api/responses';
+import { jsonError, jsonSuccess, zodValidationResponse } from '@/lib/api/responses';
 import { dbErrorToResponse } from '@/lib/api/error-mapping';
 
 export async function POST(request: NextRequest): Promise<Response> {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
   const parsed = FeedbackBodySchema.safeParse(body);
   if (!parsed.success) {
-    return jsonError(400, 'validation_failed', `Corps invalide : ${parsed.error.message}`);
+    return zodValidationResponse(parsed.error);
   }
 
   const { sejour_id, planning_id, jour, repas, recette_id } = parsed.data;

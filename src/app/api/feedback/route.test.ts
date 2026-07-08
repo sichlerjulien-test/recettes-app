@@ -83,9 +83,13 @@ describe('POST /api/feedback', () => {
     expect(res.status).toBe(401);
   });
 
-  it('retourne 400 si body Zod invalide (sejour_id non-uuid)', async () => {
+  it('retourne 400 si body Zod invalide (sejour_id non-uuid), message générique, détail dans details', async () => {
     const res = await POST(makeRequest({ ...VALID_BODY, sejour_id: 'pas-un-uuid' }, VALID_TOKEN));
+    const body = await res.json();
     expect(res.status).toBe(400);
+    expect(body.error.message).toBe('Données invalides');
+    expect(body.error.message).not.toContain('uuid');
+    expect(body.error.details).toBeDefined();
   });
 
   it('retourne 400 si repas hors enum', async () => {

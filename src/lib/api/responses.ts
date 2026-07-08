@@ -36,3 +36,7 @@ export function jsonError(
 export function jsonSuccess<T>(status: number, data: T): Response {
   return Response.json(data, { status });
 }
+
+export function zodValidationResponse(error: z.ZodError): Response {
+  return jsonError(400, 'validation_failed', 'Données invalides', error.flatten());
+}

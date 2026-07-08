@@ -125,7 +125,8 @@ export async function POST(
           'Impossible de composer un planning conforme après plusieurs tentatives',
         );
       case 'llm_unavailable':
-        return jsonError(503, 'llm_unavailable', planningResult.error.cause);
+        console.error('[POST /planning] llm_unavailable:', planningResult.error.cause);
+        return jsonError(503, 'llm_unavailable', 'Service de génération temporairement indisponible');
     }
   }
 

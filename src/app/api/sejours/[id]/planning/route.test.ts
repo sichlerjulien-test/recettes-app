@@ -135,10 +135,11 @@ describe('POST /api/sejours/[id]/planning', () => {
     expect(body.error.kind).toBe('business_error');
   });
 
-  it('llm_unavailable → 503 llm_unavailable', async () => {
+  it('llm_unavailable → 503 llm_unavailable, message générique sans la cause interne, cause loggée', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(generatePlanning).mockResolvedValue({
       ok: false,
-      error: { kind: 'llm_unavailable', cause: 'timeout' },
+      error: { kind: 'llm_unavailable', cause: 'Connection timeout' },
     });
 
     const response = await POST(makePostRequest(VALID_TOKEN), TEST_PARAMS);
@@ -146,6 +147,10 @@ describe('POST /api/sejours/[id]/planning', () => {
     expect(response.status).toBe(503);
     const body = await response.json();
     expect(body.error.kind).toBe('llm_unavailable');
+    expect(body.error.message).not.toContain('timeout');
+    expect(body.error.message).not.toContain('Connection');
+    expect(spy).toHaveBeenCalledWith(expect.stringContaining('llm_unavailable'), 'Connection timeout');
+    spy.mockRestore();
   });
 
   // TK-55 / ADR-023 : plafond de générations par séjour — protège la disponibilité.
