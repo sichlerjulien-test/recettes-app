@@ -1,10 +1,19 @@
 import type { DbError } from '@/lib/types/domain';
 import { businessMessage, jsonError } from './responses';
 
+type Entity = Extract<DbError, { kind: 'not_found' }>['entity'];
+
+const ENTITY_LABELS: Record<Entity, string> = {
+  sejour: 'Séjour',
+  planning: 'Planning',
+  ingredient: 'Ingrédient',
+  recette: 'Recette',
+};
+
 export function dbErrorToResponse(error: DbError): Response {
   switch (error.kind) {
     case 'not_found':
-      return jsonError(404, 'not_found', businessMessage(`${error.entity} introuvable`));
+      return jsonError(404, 'not_found', businessMessage(`${ENTITY_LABELS[error.entity]} introuvable`));
     case 'connection_failed':
     case 'query_failed':
       return jsonError(500, 'db_error', 'Erreur côté base de données');

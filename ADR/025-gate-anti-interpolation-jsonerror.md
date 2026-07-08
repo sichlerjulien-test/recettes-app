@@ -104,8 +104,30 @@ Rejeté : ESLint n'est pas installé dans ce dépôt (aucun `eslint.config.*`).
 L'introduire pour ce seul gate serait une dépendance et une config nouvelles
 alors qu'un script `tsx` autonome suit la convention déjà en place.
 
+## Amendement (TK-67, 2026-07-08)
+
+`DbError.entity` (variante `not_found`) passe de `z.string()` à
+`z.enum(['sejour', 'planning', 'ingredient', 'recette'])` — miroir exact des
+émetteurs DAL réels (`sejours.ts`, `plannings.ts`, `ingredients.ts`,
+`recettes.ts`). C'est une défense en profondeur orthogonale au gate ci-dessus :
+le gate TK-66 empêche l'interpolation *syntaxique* d'un internal en arg 3 ;
+l'enum empêche qu'`error.entity` lui-même prenne une valeur hors du set connu,
+peu importe le wrapping.
+
+Le libellé humain accentué (`'Séjour'`, `'Recette'`, …) est résolu à la
+frontière — `ENTITY_LABELS: Record<Entity, string>` dans
+`error-mapping.ts`, exhaustif par le type — jamais stocké dans le type
+d'infra `DbError`. `entity` reste un token de code minuscule ; la casse
+française est une préoccupation de présentation. Ce choix corrige au passage
+un bug latent : le DAL émettait déjà `entity` en minuscule
+(ex. `'sejour'`), ce qui produisait `"sejour introuvable"` en prod — le test
+`not_found` était un faux vert car il fabriquait `'Séjour'` à la main sans
+jamais exercer le DAL. Le wrapping `businessMessage(...)` du point 1
+ci-dessus ne change pas : l'interpolation devient un lookup dans
+`ENTITY_LABELS`, toujours passé à `businessMessage()`.
+
 ## Références
 - TK-59 : correction ponctuelle de la fuite (`error-mapping.ts`)
 - TK-33/34, ADR-016 : `check-dal-reads.ts`, pattern AST via `typescript` brut
-- TK-67 (dépendant) : `DbError.entity` en `z.enum` — défense en profondeur
-  hors périmètre de ce ticket
+- TK-67 : `DbError.entity` en `z.enum` — défense en profondeur, voir
+  amendement ci-dessus
