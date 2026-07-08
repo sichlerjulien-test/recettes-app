@@ -1,5 +1,6 @@
 import { vi, describe, it, expect, afterEach } from 'vitest';
 import { dbErrorToResponse } from './error-mapping';
+import { DbErrorSchema } from '@/lib/types/schemas';
 
 describe('dbErrorToResponse', () => {
   afterEach(() => {
@@ -49,10 +50,24 @@ describe('dbErrorToResponse', () => {
   });
 
   it('not_found : conserve le format "{entity} introuvable"', async () => {
-    const res = dbErrorToResponse({ kind: 'not_found', entity: 'Séjour', id: 'abc' });
+    const res = dbErrorToResponse({ kind: 'not_found', entity: 'sejour', id: 'abc' });
     const body = await res.json();
 
     expect(res.status).toBe(404);
     expect(body.error.message).toBe('Séjour introuvable');
+  });
+
+  it('not_found : map le token recette vers son libellé', async () => {
+    const res = dbErrorToResponse({ kind: 'not_found', entity: 'recette', id: 'abc' });
+    const body = await res.json();
+
+    expect(res.status).toBe(404);
+    expect(body.error.message).toBe('Recette introuvable');
+  });
+
+  it('DbErrorSchema : rejette un token entity hors enum', () => {
+    const result = DbErrorSchema.safeParse({ kind: 'not_found', entity: 'bogus', id: 'x' });
+
+    expect(result.success).toBe(false);
   });
 });
