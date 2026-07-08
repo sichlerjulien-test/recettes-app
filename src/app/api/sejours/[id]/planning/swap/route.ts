@@ -7,7 +7,7 @@ import { createPlanning, getPlanningBySejourId } from '@/lib/db/plannings';
 import { buildPlanningConstraints } from '@/lib/planning/build-constraints';
 import { buildSequence } from '@/lib/planning/build-sequence';
 import { getEligibleCandidates, computeSwapResult } from '@/lib/planning/swap-meal';
-import { jsonError, jsonSuccess } from '@/lib/api/responses';
+import { jsonError, jsonSuccess, zodValidationResponse } from '@/lib/api/responses';
 import { dbErrorToResponse } from '@/lib/api/error-mapping';
 import { MealTypeSchema } from '@/lib/types/schemas';
 
@@ -74,7 +74,7 @@ export async function GET(
     repas: searchParams.get('repas'),
   });
   if (!parsed.success) {
-    return jsonError(400, 'validation_failed', `Paramètres invalides : ${parsed.error.message}`);
+    return zodValidationResponse(parsed.error);
   }
 
   const { jour, repas } = parsed.data;
@@ -115,7 +115,7 @@ export async function POST(
 
   const parsed = SwapCommitBodySchema.safeParse(body);
   if (!parsed.success) {
-    return jsonError(400, 'validation_failed', `Corps invalide : ${parsed.error.message}`);
+    return zodValidationResponse(parsed.error);
   }
 
   const { jour, repas, recette_id } = parsed.data;

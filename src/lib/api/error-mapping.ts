@@ -9,12 +9,14 @@ export function dbErrorToResponse(error: DbError): Response {
     case 'query_failed':
       return jsonError(500, 'db_error', 'Erreur côté base de données');
     case 'row_validation_failed':
-      return jsonError(503, 'row_validation_failed', `Validation de ligne échouée : ${error.cause}`);
+      console.error('[dbErrorToResponse] row_validation_failed:', error.cause);
+      return jsonError(503, 'row_validation_failed', 'Erreur de validation des données côté serveur');
     case 'schema_drift': {
-      const cols = error.missing.map((m) => `${m.table}.${m.column}`).join(', ');
-      return jsonError(503, 'schema_drift', `Dérive de schéma DB — colonnes manquantes : ${cols}`);
+      console.error('[dbErrorToResponse] schema_drift — colonnes manquantes :', error.missing);
+      return jsonError(503, 'schema_drift', 'Service temporairement indisponible');
     }
     case 'constraint_violation':
+      // .cause ici = message métier auteur-contrôlé, jamais une chaîne brute.
       return jsonError(400, 'business_error', error.cause);
   }
 }

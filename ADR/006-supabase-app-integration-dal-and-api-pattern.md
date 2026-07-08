@@ -121,6 +121,12 @@ promu kind API de première classe (422, porte details.cause), distinct de
 business_error, car le client doit le discriminer et différencier le
 message allergène/exclusion.
 
+Amendement (TK-59) — deux règles pour le body d'erreur. (A) Échec de
+validation d'input appelant (Zod) : message générique, détail dans
+`details` (flatten). (B) Erreur interne serveur (validation de ligne DB,
+dérive de schéma, indisponibilité LLM) : message générique, aucun détail
+dans le body, cause loggée côté serveur.
+
 ### 6. Routes API au MVP de la Session
 
 5 routes implémentées au MVP :

@@ -119,14 +119,20 @@ describe('GET /planning/swap', () => {
     expect(res.status).toBe(401);
   });
 
-  it('retourne 400 si paramètres manquants', async () => {
+  it('retourne 400 si paramètres manquants, message générique, détail Zod dans details', async () => {
     const res = await GET(makeGetRequest('sejour-1', 'jour=1', VALID_TOKEN), params('sejour-1'));
     expect(res.status).toBe(400);
+    const body = await res.json() as { error: { message: string; details: unknown } };
+    expect(body.error.message).toBe('Données invalides');
+    expect(body.error.details).toBeDefined();
   });
 
-  it('retourne 400 si repas invalide', async () => {
+  it('retourne 400 si repas invalide, message générique sans le détail Zod interne', async () => {
     const res = await GET(makeGetRequest('sejour-1', 'jour=1&repas=brunch', VALID_TOKEN), params('sejour-1'));
     expect(res.status).toBe(400);
+    const body = await res.json() as { error: { message: string } };
+    expect(body.error.message).toBe('Données invalides');
+    expect(body.error.message).not.toMatch(/invalid_enum|expected/i);
   });
 
   it('retourne 200 avec candidates quand des éligibles existent', async () => {
@@ -174,9 +180,12 @@ describe('POST /planning/swap', () => {
     expect(res.status).toBe(400);
   });
 
-  it('retourne 400 si corps manque des champs requis', async () => {
+  it('retourne 400 si corps manque des champs requis, message générique, détail Zod dans details', async () => {
     const res = await POST(makePostRequest('sejour-1', { kind: 'recette' as const, jour: 1 }, VALID_TOKEN), params('sejour-1'));
     expect(res.status).toBe(400);
+    const body = await res.json() as { error: { message: string; details: unknown } };
+    expect(body.error.message).toBe('Données invalides');
+    expect(body.error.details).toBeDefined();
   });
 
   it('retourne 201 et la nouvelle ligne planning en cas de succès', async () => {
