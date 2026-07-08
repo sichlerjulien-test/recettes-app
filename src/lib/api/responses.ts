@@ -21,6 +21,17 @@ export type ApiErrorKind =
   | 'schema_drift'
   | 'row_validation_failed';
 
+// Assertion de confiance, pas un assainisseur (ADR-025). Accepte n'importe
+// quelle chaîne sans validation runtime : la garantie est que le gate CI
+// (scripts/check-jsonerror-message.ts) force tout non-littéral en arg 3 de
+// jsonError à passer par ce wrap explicite, greppable et revu.
+declare const safeMessageBrand: unique symbol;
+export type SafeMessage = string & { readonly [safeMessageBrand]: 'SafeMessage' };
+
+export function businessMessage(s: string): SafeMessage {
+  return s as SafeMessage;
+}
+
 export function jsonError(
   status: number,
   kind: ApiErrorKind,
