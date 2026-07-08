@@ -368,8 +368,6 @@ POST /api/sejours/:id/planning est ouvert et déclenche un appel LLM payant sans
 ### Tickets une-ligne (à rédiger quand tirés, pas maintenant)
 
 - **[DORMANT] TK-55b** — Rate limiting per-IP. Différé lors de TK-55 (ADR-023) : le plafond par séjour protège la disponibilité, pas le martèlement multi-séjours d'un même visiteur. Seuil de réveil : cap console Anthropic effectivement approché, OU martèlement visible en logs.
-- **TK-56** — Suppression de séjour (DELETE + token) et/ou purge des séjours expirés. Motif : allergies = donnée de santé RGPD, aucune rétention définie. Le ON DELETE CASCADE existant fait le travail côté DB.
-- **TK-57** — Amendement ADR-006 (une ligne) : expliciter que le token unique est un droit de LECTURE ET D'ÉCRITURE ; la séparation lecteur/organisateur se tranchera dans TK-45 (auth). Doc seulement.
 - **TK-58** — Corriger le commentaire mensonger de SejourSchema (« signé HMAC » alors que crypto.randomUUID). XS. Viole « règle affichée = règle appliquée ».
 - **TK-59** — Vérifier que dbErrorToResponse / error-mapping.ts ne renvoie pas les messages Supabase bruts dans les réponses 500 (fuite d'internals). S.
 - **TK-60** — Headers de sécurité de base (CSP minimale) dans next.config. Motif : token en URL ⇒ un XSS vaut vol de token. S.
@@ -488,8 +486,6 @@ Convives variables par créneau.
 | TK-54 | Drop policies RLS allow_all_mvp | VS | S | Fait |
 | TK-55 | Plafond de générations par séjour [ADR-023] | VS | S | Fait |
 | TK-55b | [DORMANT] Rate limiting per-IP | VS | — | Dormant |
-| TK-56 | Suppression de séjour + purge séjours expirés (RGPD) | VS | — | À faire |
-| TK-57 | Amendement ADR-006 : token = lecture + écriture | VS | — | À faire |
 | TK-58 | Corriger commentaire mensonger SejourSchema (HMAC vs UUID) | VS | XS | À faire |
 | TK-59 | dbErrorToResponse : fuite messages Supabase bruts en 500 | VS | S | À faire |
 | TK-60 | Headers de sécurité de base (CSP minimale) | VS | S | À faire |
