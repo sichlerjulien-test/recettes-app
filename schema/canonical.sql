@@ -88,6 +88,22 @@ $$;
 ALTER FUNCTION public.create_sejour_with_participants(p_token text, p_nom text, p_date_debut date, p_nb_jours integer, p_repartition_repas jsonb, p_parametres jsonb, p_participants jsonb) OWNER TO postgres;
 
 --
+-- Name: purge_expired_sejours(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.purge_expired_sejours() RETURNS void
+    LANGUAGE plpgsql SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+BEGIN
+  DELETE FROM sejours WHERE cree_le < now() - interval '60 days';
+END;
+$$;
+
+
+ALTER FUNCTION public.purge_expired_sejours() OWNER TO postgres;
+
+--
 -- Name: set_updated_at(); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
