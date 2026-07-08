@@ -2,6 +2,10 @@
 
 **Statut** : Accepté
 **Date** : 2026-07-01
+**Amendé** : 2026-07-08 (TK-65) — la clause « résidu push direct » est retirée : le
+             ruleset `ci-gate` (actif depuis 2026-06-05, `pull_request` required,
+             `current_user_can_bypass: never`) rejette tout push direct sur main,
+             docs-only inclus. Le résidu qu'elle visait à couvrir n'existe pas.
 **Lié à** : préalable au gate backlog v2 · DoR (CLAUDE_PROJECT.md §Gate de cadrage) ·
             découple explicitement la politique de merge (hors scope — voir BACKLOG.md)
 
@@ -15,32 +19,30 @@ oracle fiable — le `TK-XX` n'est pas garanti d'atterrir sur le sujet du commit
 
 ## Décision
 
-1. **Surface primaire = label de PR.** Toute PR mergée porte exactement un label
+1. **Surface unique = label de PR.** Toute PR mergée porte exactement un label
    `TK-XX` (ou `no-ticket`). Le gate v2 lit PR→label via l'API GitHub — agnostique
    à la stratégie de merge.
-2. **Résidu = pushs directs sur main.** Pour eux seuls, trailer `Refs: TK-XX`
-   obligatoire. Le gate réconcilie : {TK-XX côté PR} ∪ {Refs des commits sans PR}.
-3. **Exemption explicite obligatoire** : `no-ticket` (label ou trailer), jeton unique.
-   Sans déclaration positive, "sans ticket" est indiscernable de "oublié" → couverture
-   invérifiable. Motif "fausse confiance" (ADR-014/015/016) proscrit.
-4. **Obligatoire, pas optionnel.** Une convention optionnelle est invérifiable — ça
+2. **Exemption explicite obligatoire** : `no-ticket`, jeton unique. Sans déclaration
+   positive, "sans ticket" est indiscernable de "oublié" → couverture invérifiable.
+   Motif "fausse confiance" (ADR-014/015/016) proscrit.
+3. **Obligatoire, pas optionnel.** Une convention optionnelle est invérifiable — ça
    vide le ticket de sa raison d'être.
-5. **Ne jamais fonder la convention sur le titre.** `COMMIT_OR_PR_TITLE` ne garantit
+4. **Ne jamais fonder la convention sur le titre.** `COMMIT_OR_PR_TITLE` ne garantit
    rien sur main. Le label est la seule surface fiable.
 
 ## Hors scope (explicite)
 
-Normaliser l'historique (squash-only + branch protection + interdiction des pushs
-directs) est une conséquence structurante distincte → ADR séparé si poursuivi. La
-présente convention est merge-agnostique : inchangée si la politique de merge est
-durcie plus tard.
+Cette convention ne visait à l'origine que le référencement, pas la politique de
+merge — voir TK-37 (différé). Le durcissement de l'historique (PR obligatoire) est
+depuis arrivé par un autre chemin, le ruleset `ci-gate` (2026-06-05), indépendamment
+de cet ADR. La présente convention reste inchangée par ce fait : elle décrivait déjà
+le label PR comme seule surface fiable.
 
 ## Conséquences
 
 Gate v2 robuste quelle que soit la stratégie de merge ; retrofit cheap (baseline
-77 % → les 23 % restants reclassés `no-ticket`). Coût assumé : double oracle (API PR
-+ trailers des commits directs), plus lourd qu'un grep `git log` — prix de
-l'agnosticité. CLAUDE.md intègre la règle de label à l'ouverture de PR.
+77 % → les 23 % restants reclassés `no-ticket`). CLAUDE.md intègre la règle de label
+à l'ouverture de PR.
 
 ## Références
 

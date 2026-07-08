@@ -26,7 +26,7 @@ Avant d'écrire la moindre ligne sur un ticket :
 
 # Convention de référencement ticket ↔ PR (ADR-020)
 
-À l'ouverture d'une PR, poser exactement un label `TK-XX` (ou `no-ticket` si hors ticket). Commit poussé directement sur main hors PR : trailer `Refs: TK-XX` obligatoire.
+À l'ouverture d'une PR, poser exactement un label `TK-XX` (ou `no-ticket` si hors ticket). Surface unique : le ruleset `ci-gate` interdit tout push direct sur main, docs-only inclus — pas de résidu à couvrir par un trailer de commit.
 
 # Gate de clôture de session
 
