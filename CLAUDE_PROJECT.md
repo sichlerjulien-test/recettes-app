@@ -137,7 +137,9 @@ Résidu à vérifier : labels d'unités en français dans `src/lib/ui/labels.ts`
 - Le feedback des testeurs n'est pas une feuille de route. On trie ce qui sert le produit, pas ce qui flatte. On ne plie pas une décision d'archi assumée sans raison forte.
 - `git status` avant ET après commit, systématiquement.
 - `npm run build` ne se skip jamais sur une intuition. La preuve > l'intuition.
-- Les dettes traitées se suppriment du backlog (pas un cimetière d'historique).
+- Les dettes traitées se suppriment du backlog vivant (BACKLOG.md), pas un
+  cimetière d'historique — elles vont dans `BACKLOG_ARCHIVE.md` (append-only,
+  une ligne, jamais réédité), voir ADR-026.
 - Les sub-agents Claude Code font des observations utiles mais ne sont pas omniscients. Lecture critique.
 
 ## Gate de cadrage avant Claude Code (Definition of Ready)

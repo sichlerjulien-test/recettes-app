@@ -1,27 +1,36 @@
 # Meal Planner — Backlog
 
-> Backlog unifié après le 1er test terrain. Combine les dettes résiduelles de Sprint 1
-> et les feedbacks des amis testeurs. Ordonné par priorité de delivery.
+> Backlog vivant : À faire + Dormant uniquement. Tout ticket clos (Fait/Annulé)
+> est archivé de façon append-only dans `BACKLOG_ARCHIVE.md`, jamais réédité —
+> mapping TK→PR déjà mécanisé par ADR-020 (label PR) + git, donc la seule
+> source de vérité du **statut** est le tableau « Vue d'ensemble » ci-dessous ;
+> la prose ne porte plus aucun marqueur de statut. Convention actée par
+> ADR-026 (supersede la convention du 2026-07-01 qui gardait les lignes Fait).
 > Convention effort : S (<1h) / M (~demi-journée) / L (~1 journée) / XL (plusieurs jours).
 
 ---
 
-## P2 — Dette interne (invisible utilisateur)
+## Ordre conseillé
 
+VS quasi-close — reliquat TK-61 / TK-62 (cosmétiques, différables). Prochain
+vrai fork : V3 = décision auth (TK-45) [ADR, session dédiée], qui débloque
+TK-46 / TK-47 / monétisation. Confort V3 orthogonal (TK-08, TK-14, TK-48)
+shippable sans auth. Dormants inchangés (seuils de réveil).
 
-### TK-12 — Tests d'intégration TK-03  ·  M  ✅ Livré
+---
 
-**Origine :** allergen-guard + qa (TK-03), lacunes de couverture.
+## Tickets ouverts (détail)
 
-- pool_empty : aucun test ne lie {ok:false, kind:'pool_empty'} au HTTP 422 retourné au client.
-- Flow TK-03 : PATCH séjour → re-génération → POST /planning sans E2E de bout en bout — le cœur
-  de TK-03 n'a pas de test d'intégration.
+### TK-17 — Seed upsert-only : purge des orphelins  ·  S/M
+**Origine :** observé pendant l'incident (sans le causer — total restait à 166).
+
+`build-data` upsert sur `onConflict: 'id'` et ne supprime jamais. Si un id quitte le YAML, l'ancienne ligne reste orpheline en base indéfiniment. Trou structurel, pas un bug actif aujourd'hui.
 
 Sous-tâches :
-- ~~Test route : pool_empty → 422.~~ (TK-12a — #47, #50)
-- ~~E2E Playwright : Sarah ajoute un participant, régénère, planning cohérent et sûr.~~ (TK-12b — #49 + tk-12b-route ; ADR-017 : frontière LLM hors E2E → remplacé par RTL + test route)
+- Option A : seed "YAML = vérité", supprime en base ce qui n'y est plus (attention FK `recette_ingredients`).
+- Option B : job de détection des orphelins (alerte, pas suppression auto).
 
-**Critères :** le flow de re-génération TK-03 couvert end-to-end ; mapping pool_empty→422 testé.
+**Critères :** aucun ingrédient/recette hors-YAML ne subsiste après seed, ou détection explicite. Priorité basse, candidat V2.
 
 ### TK-20 — [DORMANT] Réouverture conditionnelle du garde catégorie porc/viande-rouge/alcool
 **Origine :** ADR-011 §9 (amendé 2026-06-11). Requalifié de tâche en déclencheur de réouverture.
@@ -53,109 +62,6 @@ végétarien sans déclencher l'invariant croisé). Fix candidat documenté : ch
 `nature: animal|vegetal`. Choix structurant → architect + amendement ADR avant tout cadrage.
 Risque de cohérence végé (gâche un repas), pas de sûreté allergène. Faible priorité.
 
-
-### TK-15 — Baseline de schéma DB + source de vérité unique  ·  M
-**Origine :** incident 500 /shopping-list. Cause racine : aucune migration ne reproduit le schéma courant from scratch.
-
-Dev et prod ont dérivé librement parce que les changements de schéma ont été appliqués hors système de migration (dashboard, ALTER manuels). Prod avait une génération de retard ET des colonnes héritées que dev n'a plus. Le repo ne sait pas reconstruire le schéma actuel. Tant que ce socle manque, l'incident se rejoue à la prochaine divergence.
-
-Sous-tâches :
-- Générer une migration baseline capturant le schéma canonique actuel (dump du schéma dev).
-- Mettre en place le suivi des migrations appliquées (si absent), pour que dev/prod/futures instances convergent depuis cette baseline.
-- Règle dure : tout changement de schéma = une migration committée, appliquée à TOUS les environnements. Fin du SQL dashboard hors-migration.
-- Rédiger l'ADR : le schéma DB a une source de vérité unique versionnée.
-- `001-initial-schema.sql` ne contient plus les FK `participants→sejours` et `plannings→sejours` (recréées en live via ALTER TABLE). Les régénérer dans le schéma de référence ou ajouter `002-restore-foreign-keys.sql`.
-
-**Critères :** une instance vierge reconstruit le schéma actuel en appliquant les migrations du repo ; dev et prod sont prouvés identiques à la baseline.
-
-> Le plus haut levier du P2 : c'est le seul ticket qui empêche un nouvel outage prod, pas du cleanup invisible. À séquencer avec TK-06 avant la dette DAL cosmétique (TK-09/10).
-
-### TK-16 — Gate de déploiement : schéma DB cible ↔ attentes du code  ·  M
-**Origine :** incident 500 /shopping-list. Une colonne requise par un schéma Zod n'existait pas en prod, et rien ne l'a signalé avant le 500.
-
-Au déploiement (ou en CI), vérifier que le schéma de la DB cible correspond à ce que le code exige : toute colonne requise par un schéma Zod de lecture doit exister, avec type et nullabilité corrects.
-
-Sous-tâches :
-- Confronter les schémas Zod de lecture au schéma réel de la DB cible.
-- Une colonne Zod-requise absente (ou de type/nullabilité divergente) = déploiement bloqué.
-- Test discriminant : une divergence introduite volontairement doit faire échouer le gate, pas atterrir en 500 prod.
-
-**Critères :** une divergence schéma DB ↔ attentes Zod est bloquée avant la prod. Cousin de TK-06 (gate CI) et TK-13 (sync Zod↔CHECK) — à traiter dans le même chantier.
-
-### TK-17 — Seed upsert-only : purge des orphelins  ·  S/M
-**Origine :** observé pendant l'incident (sans le causer — total restait à 166).
-
-`build-data` upsert sur `onConflict: 'id'` et ne supprime jamais. Si un id quitte le YAML, l'ancienne ligne reste orpheline en base indéfiniment. Trou structurel, pas un bug actif aujourd'hui.
-
-Sous-tâches :
-- Option A : seed "YAML = vérité", supprime en base ce qui n'y est plus (attention FK `recette_ingredients`).
-- Option B : job de détection des orphelins (alerte, pas suppression auto).
-
-**Critères :** aucun ingrédient/recette hors-YAML ne subsiste après seed, ou détection explicite. Priorité basse, candidat V2.
-
-
-### TK-21 — Violations séparées post-retry : allergènes ≠ exclusions  ·  S  ✅ Livré
-**Origine :** revue TK-05 2C (architect/qa-engineer), ADR-011 §7.
-
-`validation_failed_after_retries` agrège toutes les violations dans `lastViolations` au lieu de
-distinguer `last_security_violations` (allergènes EU14, criticité P0) et `last_exclusion_violations`
-(préférences alimentaires, criticité P1). La séparation garantie par ADR-011 §7 est cassée sur le
-chemin rare post-retry : un log de debug indistinguable rend l'analyse d'incident difficile.
-
-**Critères :** `validation_failed_after_retries` expose deux champs séparés ; tests discriminants.
-
-### TK-30 — Cleanup CLAUDE_PROJECT.md · Annulé (2026-07-01)
-Prémisse infirmée : end-session.sh ne mécanise que l'état git final de
-session ; aucune règle de CLAUDE_PROJECT.md §6 n'est en double. La ligne
-« git status avant/après commit » est hors scope du gate (par-commit ≠
-état final) et RESTE. Rien à retirer.
-
-### TK-32 — Garde read-contract.ts ↔ selects DAL réels · S  ✅ Livré
-Vérifier que chaque colonne déclarée dans `read-contract.ts` est effectivement lue par une
-requête du DAL, et que chaque colonne lue par le DAL figure dans `read-contract.ts`. Contrat
-statique seul (TK-16 Modèle A) : si une colonne disparaît du DAL sans être retirée du contrat,
-aucun gate ne le détecte.
-
-**Critères :** un écart `read-contract.ts` ↔ selects DAL réels est détecté en CI.
-
-> Complément naturel de TK-16 Modèle A. Requiert AST ou grep structuré sur les requêtes DAL.
-
-> **Note (2026-06-27) :** Le parser de `check-read-contract.ts` cible `schema/canonical.sql`
-> (DDL, blocs `CREATE TABLE`) — pas la section `COL` produite par `introspect-schema.sql`
-> (introspection live). Si `canonical.sql` présente des variantes de formatage non couvertes
-> par le regex (colonnes en `"guillemets"`, `CONSTRAINT` imbriqué, indentation non standard),
-> le parser peut manquer des colonnes silencieusement. TK-33 couvre le durcissement du parser ;
-> TK-32 peut ensuite s'appuyer dessus pour la garde DAL ↔ contrat.
-
-### TK-33 — Durcir + tester le parser canonical.sql de check-read-contract.ts · S  ✅ Livré
-**Origine :** note de fin de session TK-16 / TK-32.
-
-Le parser de `check-read-contract.ts` extrait les colonnes des blocs `CREATE TABLE` de
-`schema/canonical.sql` via regex. Guillemets (`"colonne"`) et `CONSTRAINT` inline sont déjà
-gérés. Les cas restants non couverts :
-- indentation non standard (tabulations, espaces multiples)
-- `CONSTRAINT` sur ligne séparée (multi-ligne)
-
-Un parser qui rate ces cas manque des colonnes **silencieusement** — aucune erreur, faux-positif
-de conformité.
-
-**Critères :**
-- Au moins un test unitaire par cas manquant (indentation non standard, `CONSTRAINT` multi-ligne)
-- Le parser passe tous les cas sans régression sur les cas existants
-- CI verte (`typecheck` + `test` + `validate`)
-
-> Prérequis de TK-32 : la garde DAL ↔ contrat ne peut être fiable que si le parser
-> en amont est couvert. À faire avant ou en même temps que TK-32.
-
-### TK-31 — Convention TK-XX dans les commits : mini-ADR · S ✅
-**Origine :** clôture session post-TK-29 · préalable au gate backlog v2.
-
-Aucune règle formelle ne définit si/comment le numéro de ticket doit apparaître dans les commits. Le gate backlog v2 ne peut pas vérifier la couverture si la convention est floue.
-
-**Critères :** un mini-ADR tranche la convention (obligatoire/optionnel, format, scope) ; le gate backlog v2 s'y réfère.
-
-**Livré (2026-07-01) :** ADR-020 — surface primaire = label PR (`TK-XX` ou `no-ticket`) ; pushs directs sur main → trailer `Refs: TK-XX`. Convention merge-agnostique. Ligne ajoutée dans CLAUDE.md §Convention de référencement ticket ↔ PR. Ticket différable créé : TK-37 (politique de merge).
-
 ### TK-37 — [DORMANT] Politique de merge unique sur main (squash-only)
 **Origine :** cadrage TK-31 (ADR-020) · constat terrain 2026-07-01.
 
@@ -184,7 +90,6 @@ rebase. Non fait délibérément, pas oublié.
 État actuel : solo, mono-machine, aucun seuil franchi. Tant qu'aucun ne tombe, il
 n'y a rien à exécuter. Si un seuil tombe : ouvrir un ADR dédié (squash-only vs
 statu quo) avec la donnée déclenchante — ne pas pousser ce ticket tel quel.
-
 
 ### TK-35 — [DORMANT] canonical.sql : génération pg_dump déterministe cross-machine
 **Origine :** clôture TK-10. schema-replay rouge sur PR #54, cause non traitée.
@@ -241,6 +146,15 @@ d'usage. Zéro impact sûreté, comme TK-51.
 > qui ne lève jamais l'overlay avant démontage), TK-63 peut se fermer par simple
 > réutilisation — à évaluer au cadrage de TK-63, pas maintenant.
 
+### Tickets une-ligne (à rédiger quand tirés, pas maintenant)
+
+- **[DORMANT] TK-55b** — Rate limiting per-IP. Différé lors de TK-55 (ADR-023) : le plafond par séjour protège la disponibilité, pas le martèlement multi-séjours d'un même visiteur. Seuil de réveil : cap console Anthropic effectivement approché, OU martèlement visible en logs.
+- **[DORMANT, ADR-gated] TK-60b** — CSP stricte nonce-based (vraie défense anti-XSS). TK-60a n'a posé qu'une CSP `'unsafe-inline'` (durcissement en profondeur, ne bloque pas un `<script>` injecté). Le nonce force du rendu dynamique + interaction avec le service worker PWA — décision structurante, ADR requis (architect) avant cadrage. Réveil : incident XSS réel, ou refonte touchant le rendu statique/PWA.
+- **TK-61** — Remplacer l'icône fourchette placeholder par un vrai logo de marque. Cosmétique, réversible, différable.
+- **TK-62** — Hex de marque dupliqué en 3 endroits (globals.css --primary / manifest.json / layout.tsx) sans gate de synchro. Même famille que le Trou A. Dériver de --primary au build ou poser une sentinelle. Inerte tant que la couleur ne bouge pas.
+- **TK-64** — Gate schema-replay aveugle au cron.* : no-op silencieux (image CI sans pg_cron + psql sans -v ON_ERROR_STOP=1), le gate ne peut pas échouer sur du SQL cron — 015 et 016 sont passées vertes sans que leur syntaxe cron soit validée en CI. [ADR probable : installer pg_cron en CI vs faire échouer explicitement sur cron non exécutable]. Réveil : prochaine migration cron.
+- **[DORMANT, à valider] TK-68** — not_found sur ingredient/recette : 404 user-facing ou défaut d'intégrité (→ 500) ? Orthogonal à TK-67 (typage/casse, pas taxonomie). NE PAS CADRER avant d'avoir lu les call sites `ingredients.ts:114` / `recettes.ts:153` : si les deux ne sont atteints que par lookup interne (jamais par une URL que Sarah provoque), alors le 404 est le mauvais statut → ticket ; sinon → poubelle. Réveil : prochaine fois qu'on touche `error-mapping.ts` ou ces deux DAL.
+
 ---
 
 ## V2 — Hors MVP
@@ -257,27 +171,6 @@ En-dessous, sans objet — le catalogue fait quelques dizaines de recettes.
 
 NE PAS CADRER tant que le seuil n'est pas franchi. Au réveil, passe cheap d'abord :
 confirmer que la page charge encore le catalogue complet — le fix peut déjà être caduc.
-
-### TK-38 — Afficher les recettes dans le planning ✅
-Afficher les recettes (étapes + ingrédients) dans le planning. Lecture seule, données déjà présentes (`etapes`, `ingredients`), hors pipeline allergènes. Priorité V2 haute : débloque le jugement des repas, prérequis UX de TK-41.
-
-> **Note couverture E2E :** Aucun E2E ne couvre le rendu de la page séjour (Server Component + Supabase direct, non interceptable par page.route). À rouvrir si la page se complexifie : E2E contre dev DB seedée.
-
-**Livré (2026-07-02) : PR #76**
-
-### TK-39 — Recalibrer la non-répétition pour les séjours longs [ADR] ✅
-Recalibrer la non-répétition pour les séjours longs (petit-déj répétables et/ou non-répétition glissante sur N jours). [ADR — touche une règle dure §4 + src/lib/coherence/] Motif : 7 jours = 21 créneaux dont 7 petit-déj, la règle est calibrée pour un week-end. Orthogonal aux allergènes.
-
-**Livré (2026-07-02) : PR #77 + amendement ADR-009 (scoping `recette_dupliquee` par créneau, fenêtre glissante N=3)**
-
-### TK-40a — Diagnostic de couverture du catalogue · M  ✅ Livré
-Mesurer, par créneau, si le catalogue tient une semaine, en appelant les vrais
-validateurs post-TK-39 (zéro réimplémentation de la cohérence). Sortie = rapport +
-verdict "tient / profondeur insuffisante: <créneau>". Ready — brief cadré côté Project.
-Son résultat décide si la curation lourde (V3, cf. TK-48) est nécessaire, et si TK-40b
-vaut la peine.
-
-**Livré (2026-07-02) :** profil Sarah (cœliaque + végétarien, 7j) → catalogue tient.
 
 ### TK-40b — [DORMANT] Distinguer « profondeur insuffisante » de l'échec de cohérence [ADR]
 **Origine :** cadrage post-TK-40a (2026-07-02).
@@ -304,80 +197,11 @@ pré-LLM vs classifieur post-retry). Vraie question : la sonde de faisabilité
 peut-elle réutiliser `src/lib/coherence/` sans forker sa logique (2e source de
 vérité) ? Si non, arbitrer heuristique post-retry vs renoncement.
 
-### TK-41 — Régénération partielle d'un repas ✅
-Remplacer un créneau sans régénérer le planning. Swap déterministe depuis le pool
-filtré, éligibilité via validateCoherence hypothétique (zéro réimplémentation),
-confiance zéro client (re-compute serveur), snapshot immuable (nouvelle ligne).
-Picker : Sarah choisit parmi les éligibles. La liste de courses se recalcule sur
-le swap (callback swapVersion, pas router.refresh).
-
-**Livré (2026-07-02) : PR #79 + ADR-021**
-
-### TK-43 — (optionnel) Feedback in-app loggé Supabase ✅
-Pouce bas sur un repas loggé en Supabase pour instrumenter le test d'août.
-
-**Livré (2026-07-04) : PR #83 + #84 — table `feedback` (migration 013, RLS deny-by-default), signal négatif append-only.**
-
-### TK-44 — Polish install PWA ✅
-Manifest lié au `<head>` (metadata Next), name/description/theme_color corrigés (theme_color = #BB4D00 = --primary ambre), icônes générées par script déterministe (scripts/generate-icons.mjs → 192/512 any maskable + apple-touch 180), 5 assertions E2E. Rend l'install correcte, pas utile : start_url reste `/`, l'icône ouvre le formulaire vide, pas le séjour — c'est TK-46, hors-scope assumé.
-
-Vérif : installabilité validée desktop (DevTools) + icône de marque validée sur device iOS. Rendu icône sur launcher Android physique non vérifié (pas d'appareil) → reporté en 1er step de TK-47.
-
-**Livré : PR #86**
-
-### TK-51 — Flash retour au formulaire entre génération et affichage du planning · XS  ✅ Livré
-L'overlay d'attente se lève avant que la nav vers /sejour/:id aboutisse : le formulaire de création réapparaît ~qq s avant le planning, perçu comme un bug alors que le résultat est correct. Perceived-quality, tombe pile sur le moment-clé (le payoff de la génération). Zéro impact sûreté. Hypothèse à confirmer au cadrage : séquencement overlay ↔ router.push côté nouveau-sejour ; latence destination amplifiée par le chargement catalogue complet (cf TK-28).
-
-**Livré (2026-07-06) :** suppression du `setIsGenerating(false)` dans le `finally` de
-`handleSubmit` (`src/app/nouveau-sejour/page.tsx`) — le composant est démonté par la
-navigation, rien n'oblige à relever l'overlay avant. Test E2E
-`e2e/flash-overlay.spec.ts` : vérifié rouge sur l'ancien code (flash détecté), vert
-sur le fix. `EditSejourClient.tsx` (même bug) reste hors scope, ticketé en TK-63.
-
-> Résidu perf lié : le swap (TK-41) déclenche router.refresh() qui recharge le
-> catalogue complet (cf TK-28 dormant) — même famille de latence perçue que le
-> flash ci-dessus. Différable ; à traiter avec TK-51/TK-28 si ressenti à l'usage,
-> pas de ticket séparé.
-
 ---
 
 ## VS — Sécurité
 
 > Origine : audit sécurité 2026-07-03. VS-bloquant = à faire avant tout élargissement d'audience au-delà du cercle de test.
-
-### TK-54 — Drop des policies RLS allow_all_mvp · S · VS-bloquant ✅
-
-Les policies `allow_all_mvp` (USING true / WITH CHECK true) sur sejours, participants, plannings ne servent à rien aujourd'hui (l'app passe par service_role qui bypasse le RLS) mais rendent les trois tables publiques en lecture/écriture pour quiconque obtient l'anon key — tokens et allergies inclus. Deny-by-default gratuit : RLS reste ENABLE, on supprime les policies.
-
-**Critères d'acceptation :** migration `014-drop-allow-all-policies.sql` (3 × DROP POLICY, idempotente) appliquée dev + prod ; `canonical.sql` régénéré sans les policies ; gate schema-replay CI vert ; suite E2E inchangée et verte contre dev post-migration (preuve que l'app n'en dépendait pas) ; vérif anon key sur prod : `curl REST /sejours` avec l'anon key renvoie `[]` ou 401/403 et un POST équivalent échoue — commande et résultat consignés dans la PR avant merge (seule preuve que le trou est effectivement fermé).
-
-**Localisation (pari à confirmer) :** `scripts/migrations/014-*.sql`, `schema/canonical.sql`. Aucun fichier TypeScript.
-
-**Effort :** S.
-
-Respecter ADR-008/013 : migration committée, appliquée aux DEUX instances, jamais d'édition d'historique.
-
-**Livré (2026-07-07) : PR #82 — migration 014 (dev + prod) ; canonical.sql et ledger MIGRATIONS.md à jour ; 4 gates CI verts. Preuve anon key sur prod : GET `/sejours`, `/participants`, `/plannings` → 200 `[]` (deny-by-default, zéro ligne exposée) ; POST `/sejours` → 401 `new row violates row-level security policy`.**
-
-### TK-55 — Plafond de générations par séjour · S · VS-bloquant ✅
-
-POST /api/sejours/:id/planning est ouvert et déclenche un appel LLM payant sans borne. Plafond par séjour = compteur DB natif (`COUNT(plannings)`), Upstash rejeté (dépendance/infra injustifiées à cette échelle). Le per-IP est différé (ligne dormante ci-dessous).
-
-**Livré (2026-07-07) :** ADR-023 (amende ADR-006 §5, nouveau kind API `generation_cap_reached` → 429). `countPlanningsBySejourId` (`src/lib/db/plannings.ts`) + garde dans `POST /api/sejours/:id/planning` (`GENERATION_CAP = 20`) : au plafond, 429 sans appel à `generatePlanning` ; sous le plafond, comportement inchangé. Zéro migration (append-only confirmé : génération initiale et swap/TK-41 font tous deux un `insert`, jamais d'upsert). TOCTOU non traité, assumé à cette échelle (cf ADR-023 §5). Budget cap console Anthropic posé manuellement — preuve à joindre à la PR.
-
-### Tickets une-ligne (à rédiger quand tirés, pas maintenant)
-
-- **[DORMANT] TK-55b** — Rate limiting per-IP. Différé lors de TK-55 (ADR-023) : le plafond par séjour protège la disponibilité, pas le martèlement multi-séjours d'un même visiteur. Seuil de réveil : cap console Anthropic effectivement approché, OU martèlement visible en logs.
-- **TK-58** — Corriger le commentaire mensonger de SejourSchema (« signé HMAC » alors que crypto.randomUUID). XS. Viole « règle affichée = règle appliquée ».
-- ~~**TK-59** — Vérifier que dbErrorToResponse / error-mapping.ts ne renvoie pas les messages Supabase bruts dans les réponses 500 (fuite d'internals). S.~~ **Livré (PR #104)** — voir tableau.
-- ~~**TK-60** — Headers de sécurité de base (CSP minimale) dans next.config. Motif : token en URL ⇒ un XSS vaut vol de token. S.~~ Découpé : **TK-60a** livré (PR #109), **TK-60b** dormant ci-dessous.
-- **[DORMANT, ADR-gated] TK-60b** — CSP stricte nonce-based (vraie défense anti-XSS). TK-60a n'a posé qu'une CSP `'unsafe-inline'` (durcissement en profondeur, ne bloque pas un `<script>` injecté). Le nonce force du rendu dynamique + interaction avec le service worker PWA — décision structurante, ADR requis (architect) avant cadrage. Réveil : incident XSS réel, ou refonte touchant le rendu statique/PWA.
-- **TK-61** — Remplacer l'icône fourchette placeholder par un vrai logo de marque. Cosmétique, réversible, différable.
-- **TK-62** — Hex de marque dupliqué en 3 endroits (globals.css --primary / manifest.json / layout.tsx) sans gate de synchro. Même famille que le Trou A. Dériver de --primary au build ou poser une sentinelle. Inerte tant que la couleur ne bouge pas.
-- **TK-64** — Gate schema-replay aveugle au cron.* : no-op silencieux (image CI sans pg_cron + psql sans -v ON_ERROR_STOP=1), le gate ne peut pas échouer sur du SQL cron — 015 et 016 sont passées vertes sans que leur syntaxe cron soit validée en CI. [ADR probable : installer pg_cron en CI vs faire échouer explicitement sur cron non exécutable]. Réveil : prochaine migration cron.
-- **TK-65** — ~~ADR-020 décrit un push direct sur main via trailer Refs: en réalité impossible : la protection de branche rejette tout push direct, docs-only inclus. « Règle affichée ≠ règle appliquée ». Réconcilier : amender ADR-020 (tout passe par PR) ou assouplir la protection pour les docs. XS, doc.~~ **Livré (2026-07-08, PR #105)** — confirmé via `gh api rulesets` : ruleset `ci-gate` actif, PR obligatoire, aucun bypass. Clause « résidu push direct » retirée d'ADR-020 (aucun consommateur du trailer `Refs:` trouvé au grep). CLAUDE.md aligné : surface unique = label PR.
-- ~~**TK-66** — Gate CI interdisant l'interpolation d'internals (`.cause`, `.message`, `parsed.error.message`) dans l'argument `message` d'un `jsonError`. Garde anti-récidive de la classe TK-59 (sinon la 7e instance revient). Prévoir AST plutôt que regex nu (leçon TK-33) ; mini-ADR probable. À cadrer quand tiré. P2.~~ **Livré (ADR-025)** — allowlist arg3 (littéral / template littéral / `businessMessage()`), gate `scripts/check-jsonerror-message.ts` via API compilateur TypeScript brute (même pattern que `check-dal-reads.ts`, ni ts-morph ni ESLint présents dans le repo).
-- **[DORMANT, à valider] TK-68** — not_found sur ingredient/recette : 404 user-facing ou défaut d'intégrité (→ 500) ? Orthogonal à TK-67 (typage/casse, pas taxonomie). NE PAS CADRER avant d'avoir lu les call sites `ingredients.ts:114` / `recettes.ts:153` : si les deux ne sont atteints que par lookup interne (jamais par une URL que Sarah provoque), alors le 404 est le mauvais statut → ticket ; sinon → poubelle. Réveil : prochaine fois qu'on touche `error-mapping.ts` ou ces deux DAL.
 
 ---
 
@@ -451,59 +275,25 @@ Convives variables par créneau.
 | Ticket | Titre | Priorité | Effort | Statut |
 |--------|-------|----------|--------|--------|
 | TK-08 | Réutilisation ingrédients | V3 | — | À faire |
-| TK-12 | Tests d'intégration TK-03 | P2 | M | Fait |
-| TK-13 | Source unique enums SQL + Zod (Trou A) | P2 | S | Fait |
 | TK-14 | Règles de cohérence sémantiques restantes | V3 | — | À faire |
-| TK-15 | Baseline schéma DB + source de vérité | P2 | M | Fait |
-| TK-16 | Gate déploiement : schéma DB ↔ code | P2 | M | Fait |
 | TK-17 | Seed : purge des orphelins | P2 | S/M | À faire |
-| TK-18 | Bug hydratation ShareLink | P2 | S | Fait |
 | TK-20 | [DORMANT] Réouverture conditionnelle garde porc/viande-rouge/alcool | P2 | — | Dormant |
-| TK-21 | Violations séparées post-retry : allergènes ≠ exclusions | P2 | S | Fait |
-| TK-24 | tool input_schema dérivé de Zod | P2 | S | Fait |
-| TK-25 | Sortir buildPlanningConstraints des routes | P2 | S | Fait |
-| TK-27 | Dark mode : trancher | P2 | S | Fait |
 | TK-28 | [DORMANT] Chargement ciblé du catalogue recettes | V2 | — | Dormant |
-| TK-30 | Cleanup CLAUDE_PROJECT.md (règles mécanisées) | P2 | S | Annulé |
-| TK-31 | Convention TK-XX commits (ADR-020) | P2 | S | Fait |
-| TK-37 | [DORMANT] Politique de merge unique sur main (squash-only) | P2 | — | Dormant |
-| TK-32 | Garde read-contract.ts ↔ selects DAL réels | P2 | S | Fait |
-| TK-33 | Gate CI DAL reads ⊆ READ_CONTRACT — AST + file:line | P2 | S | Fait |
-| TK-34 | Unifier checkers DAL AST (TK-32/33) en un seul précis+large — ADR-016 | P2 | S | Fait |
 | TK-35 | [DORMANT] canonical.sql génération pg_dump déterministe | P2 | — | Dormant |
-| TK-38 | Afficher les recettes dans le planning | V2 | — | Fait |
-| TK-39 | Recalibrer la non-répétition pour les séjours longs [ADR] | V2 | — | Fait |
-| TK-40a | Diagnostic de couverture du catalogue | V2 | M | Fait |
+| TK-37 | [DORMANT] Politique de merge unique sur main (squash-only) | P2 | — | Dormant |
 | TK-40b | [DORMANT] Distinguer « profondeur insuffisante » de l'échec de cohérence [ADR] | V2 | — | Dormant |
-| TK-41 | Régénération partielle d'un repas | V2 | L | Fait |
-| TK-42 | Créneau « resto / non cuisiné » | V2 | — | Fait |
-| TK-43 | (optionnel) Feedback in-app loggé Supabase | V2 | — | Fait |
-| TK-44 | Polish install PWA | V2 | — | Fait |
 | TK-45 | Auth / comptes [ADR] | V3 | — | À faire |
 | TK-46 | Historique des séjours (server-side) | V3 | — | À faire |
 | TK-47 | Packaging store iOS/Android (TWA / wrapper) | V3 | — | À faire |
 | TK-48 | Pondération des portions pour enfants | V3 | — | À faire |
 | TK-49 | Plafond de fréquence sur exclusions | V4 | — | À faire |
 | TK-50 | Présence partielle par repas | V4 | — | À faire |
-| TK-51 | Flash retour au formulaire entre génération et affichage du planning | V2 | XS | ✅ Livré |
 | TK-52 | Test RTL empty-state picker (chemin mort) | P2 | S | À faire |
 | TK-53 | Micro-cleanup assertion cross-device restoSlots (index nu) | P2 | XS | À faire |
-| TK-54 | Drop policies RLS allow_all_mvp | VS | S | Fait |
-| TK-55 | Plafond de générations par séjour [ADR-023] | VS | S | Fait |
 | TK-55b | [DORMANT] Rate limiting per-IP | VS | — | Dormant |
-| TK-58 | Corriger commentaire mensonger SejourSchema (HMAC vs UUID) | VS | XS | Fait (PR #102) |
-| TK-59 | dbErrorToResponse : fuite messages Supabase bruts en 500 | VS | S | Fait (PR #104) |
-| TK-60a | Headers de sécurité statiques (next.config) | VS | XS | Fait (PR #109) |
 | TK-60b | [DORMANT] CSP stricte nonce-based (ADR requis) | VS | — | Dormant |
 | TK-61 | Remplacer l'icône fourchette placeholder par un vrai logo | VS | — | À faire |
 | TK-62 | Hex de marque dupliqué (globals.css / manifest.json / layout.tsx) | VS | — | À faire |
 | TK-63 | Même flash overlay/formulaire sur régénération (EditSejourClient) | P2 | XS | À faire |
 | TK-64 | Gate schema-replay aveugle au cron.* | P2 | — | À faire |
-| TK-65 | ADR-020 décrit un push direct impossible | P2 | XS | Fait (PR #105) |
-| TK-66 | Gate CI anti-interpolation internals dans jsonError [ADR-025] | VS/P2 | S | Fait |
-| TK-67 | DbError.entity : z.string() → z.enum. Défense en profondeur : rend sûr par type le membre interpolé dans le message not_found (dépend de TK-66). Surface la dérive casing test ('Séjour') ↔ prod ('sejour'). [ADR léger : touche contrat DbError] | VS/P2 | S | À faire |
 | TK-68 | [DORMANT] not_found ingredient/recette : 404 user-facing ou défaut d'intégrité (→ 500) ? | P2 | — | Dormant |
-
-**Ordre conseillé :** **TK-54 en tête absolue** (VS-bloquant, S, sans dépendance — ferme le trou RLS avant tout élargissement d'audience). V2 est clos (tous les tickets Fait ou Dormant — TK-38, TK-39, TK-40a, TK-41, TK-42, TK-43, TK-44, TK-51 faits ; TK-28, TK-40b dormants). TK-55 à TK-62 à rédiger et séquencer après TK-54 (budget cap console Anthropic à poser dès TK-55 ; TK-61/TK-62 cosmétiques, différables sans urgence). Filler si trous : TK-17, TK-52, TK-53, TK-63. TK-40b, TK-20, TK-28 DORMANT (seuils de réveil non atteints). TK-37 différable (ouvrir si 2e contributeur ou coût double oracle palpable).
-
-> **Convention (acté 2026-07-01) :** Le tableau récap est un index d'état — les lignes "Fait" sont conservées.
