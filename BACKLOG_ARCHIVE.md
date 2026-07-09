@@ -38,3 +38,4 @@
 | TK-66 | Gate CI anti-interpolation internals dans jsonError | Fait | PR #106 — ADR-025 |
 | TK-67 | DbError.entity : z.string() → z.enum | Fait | PR #107 |
 | TK-71 | Exposer marquage resto/non cuisiné au formulaire de séjour | Fait | PR #114 |
+| TK-63 | Flash overlay→formulaire sur régénération depuis l'édition | Fait | PR #116 |

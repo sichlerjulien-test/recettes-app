@@ -128,24 +128,6 @@ no_alternative` n'a aucune assertion RTL. Corriger le mock en 422 quand le picke
 retouché ; au passage, trancher si le guard mort reste ou saute. Test qui verrouille
 une branche morte = fausse confiance, à corriger opportunistement, pas urgent.
 
-### TK-63 — Même flash overlay/formulaire sur le flow de régénération · XS
-
-**Origine :** cadrage TK-51 (2026-07-06) — même pattern repéré en lisant le code.
-
-`EditSejourClient.tsx::generatePlanning()` reproduit exactement le bug de TK-51 :
-`router.push(...)` appelé en corps de `try`, puis `finally { setIsGenerating(false) }`
-qui lève l'overlay avant que la navigation aboutisse. Même cause, autre fichier.
-
-Différable : ce n'est pas le moment-clé décrit par TK-51 (payoff de création), c'est
-le flow de régénération depuis l'édition — moins de visibilité, moins de fréquence
-d'usage. Zéro impact sûreté, comme TK-51.
-
-**Critères :** mêmes que TK-51 côté overlay ↔ navigation, transposés à ce fichier.
-
-> Si le fix de TK-51 se généralise proprement (ex. un hook partagé `useNavigateAfterAction`
-> qui ne lève jamais l'overlay avant démontage), TK-63 peut se fermer par simple
-> réutilisation — à évaluer au cadrage de TK-63, pas maintenant.
-
 ### Tickets une-ligne (à rédiger quand tirés, pas maintenant)
 
 - **[DORMANT] TK-55b** — Rate limiting per-IP. Différé lors de TK-55 (ADR-023) : le plafond par séjour protège la disponibilité, pas le martèlement multi-séjours d'un même visiteur. Seuil de réveil : cap console Anthropic effectivement approché, OU martèlement visible en logs.
@@ -294,6 +276,5 @@ Convives variables par créneau.
 | TK-60b | [DORMANT] CSP stricte nonce-based (ADR requis) | VS | — | Dormant |
 | TK-61 | Remplacer l'icône fourchette placeholder par un vrai logo | VS | — | À faire |
 | TK-62 | Hex de marque dupliqué (globals.css / manifest.json / layout.tsx) | VS | — | À faire |
-| TK-63 | Même flash overlay/formulaire sur régénération (EditSejourClient) | P2 | XS | À faire |
 | TK-64 | Gate schema-replay aveugle au cron.* | P2 | — | À faire |
 | TK-68 | [DORMANT] not_found ingredient/recette : 404 user-facing ou défaut d'intégrité (→ 500) ? | P2 | — | Dormant |
