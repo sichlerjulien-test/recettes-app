@@ -159,62 +159,6 @@ d'usage. Zéro impact sûreté, comme TK-51.
 
 ## V2 — Hors MVP
 
-### TK-71 — Exposer le marquage « resto / non cuisiné » dans le formulaire de séjour · S
-
-**Origine :** trou UI découvert en voulant tester TK-42 (2026-07-09). Le moteur
-`slots_resto` est livré et testé bout en bout (PR #80, ADR-022), mais
-`src/components/sejour-form.tsx` initialise `slots_resto: []` et ne l'expose nulle
-part. Aucun chemin utilisateur ne permet aujourd'hui de marquer un créneau resto —
-contredit ADR-022 §3 (« saisi au formulaire »). Vérifié dans le code : seul rendu
-du concept hors tests = lecture seule dans `PlanningSection.tsx`.
-
-Scope strict — création uniquement. Le marquage resto à l'édition post-génération
-est explicitement hors périmètre : ADR-022 le renvoie au picker de TK-41/ADR-021
-(swap recette→resto), pas à un chemin de mutation parallèle. Ce ticket ne touche
-que la création de séjour.
-
-**Critères d'acceptation testables :**
-- Dans le formulaire, une fois les compteurs midis/soirs/brunchs/premier_repas
-  renseignés, la grille des créneaux datés est affichée et chacun est togglable
-  « resto ». La grille est dérivée par `buildSequence()` (pas de réimplémentation
-  du mapping).
-- Un créneau marqué resto produit une entrée `{jour, repas}` dans
-  `repartition_repas.slots_resto` du payload soumis. Test : soumettre avec le
-  créneau jour 1 soir togglé → `slots_resto` du body POST contient
-  `[{jour:1, repas:'soir'}]`.
-- Purge des orphelins : si l'utilisateur réduit un compteur après avoir coché un
-  resto, tout slot resto qui ne correspond plus à un créneau de la grille
-  recalculée est retiré de `slots_resto`. Test : cocher jour 1 soir en resto, puis
-  passer soirs de 2 à 0 → `slots_resto` ne contient plus ce slot. (Sans ça, on
-  soumet un slot resto fantôme que la génération ignore silencieusement, ou pire,
-  qui décale la validation `slots_mismatch`.)
-- Un séjour tout-resto reste soumettable (aucun blocage nouveau côté formulaire —
-  la validation existante `computeRepasValidation` ne doit pas traiter un créneau
-  resto comme un trou de couverture non intentionnel).
-
-**Hypothèse de localisation** (un pari, à confirmer par une passe cheap avant
-cadrage) :
-- `src/components/sejour-form.tsx` : le gros du travail. Un nouveau bloc dans la
-  Section 2 (Répartition des repas), qui watch les compteurs, appelle
-  `buildSequence()`, et rend un toggle par créneau lié à `slots_resto` via
-  `form.setValue`. La purge (CA-3) vit dans le même watch/effet de recalcul de
-  grille.
-- `src/lib/planning/build-sequence.ts` : import seulement, aucune modif attendue
-  (fonction pure déjà exportée).
-- Vérifier : `computeRepasValidation` (même fichier) ne doit pas fausser CA-4. À
-  lire avant de coder.
-- Point d'attention non tranché à confirmer : `buildSequence` prend
-  `RepartitionRepas` sans `slots_resto` dans son interface locale — vérifier
-  qu'on lui passe bien un objet compatible (les compteurs seuls suffisent, donc a
-  priori OK, mais à confirmer par le typecheck).
-
-Effort : S, conditionnel à l'hypothèse. Composant à câbler, brique de dérivation
-déjà là, zéro migration, zéro contact avec le sanctuaire allergènes/dietary (un
-slot resto = absence de nourriture, ADR-022 §4). Si la passe cheap révèle que le
-formulaire ne peut pas dériver la grille proprement côté client (ex. `buildSequence`
-tire une dépendance serveur cachée — improbable, c'est une fonction pure), STOP,
-retour ici : ça deviendrait un choix de refonte du modèle formulaire, hors S.
-
 ### TK-28 — [DORMANT] Chargement ciblé du catalogue recettes · V2
 Page séjour charge le catalogue complet (prémisse NON revérifiée — à confirmer côté code
 au réveil). Fix : jointure SQL / fetch par `recette_id`. Purement perf, zéro impact
@@ -352,5 +296,4 @@ Convives variables par créneau.
 | TK-62 | Hex de marque dupliqué (globals.css / manifest.json / layout.tsx) | VS | — | À faire |
 | TK-63 | Même flash overlay/formulaire sur régénération (EditSejourClient) | P2 | XS | À faire |
 | TK-64 | Gate schema-replay aveugle au cron.* | P2 | — | À faire |
-| TK-71 | Exposer marquage resto/non cuisiné au formulaire de séjour | V2 | S | À faire |
 | TK-68 | [DORMANT] not_found ingredient/recette : 404 user-facing ou défaut d'intégrité (→ 500) ? | P2 | — | Dormant |
