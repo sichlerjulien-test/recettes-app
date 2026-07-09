@@ -19,7 +19,7 @@ const SEJOUR: Sejour = {
   nom: 'Séjour test',
   nb_jours: 3,
   repartition_repas: { premier_repas: 'matin', midis: 2, soirs: 2, brunchs: 0, slots_resto: [] },
-  participants: [],
+  participants: [{ id: 'participant-1', nom: 'Alex', allergies: [], exclusions: [], aime: [], n_aime_pas: [] }],
   parametres: {
     niveau_cuisine: 'facile',
     equipement_disponible: ['plaque'],
@@ -72,5 +72,70 @@ describe('EditSejourClient — suppression', () => {
 
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('EditSejourClient — régénération (TK-63, flash overlay)', () => {
+  beforeEach(() => {
+    pushMock.mockClear();
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
+
+  function stubFetch(planningResponse: Response) {
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith('/planning')) {
+        return Promise.resolve(planningResponse);
+      }
+      return Promise.resolve(
+        new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } }),
+      );
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    return fetchMock;
+  }
+
+  it('chemin succès : ne repasse pas isGenerating à false (pas de flash avant navigation)', async () => {
+    stubFetch(
+      new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } }),
+    );
+
+    const { container } = render(
+      <EditSejourClient sejour={SEJOUR} token="token-abc" hasPlanning={false} />,
+    );
+
+    fireEvent.submit(container.querySelector('form')!);
+
+    await waitFor(() =>
+      expect(pushMock).toHaveBeenCalledWith(`/sejour/${SEJOUR.id}?t=token-abc`),
+    );
+
+    expect(screen.getByText('Génération du planning en cours...')).toBeTruthy();
+  });
+
+  it("chemin erreur non-navigant (pool_empty) : reset l'overlay et affiche le bandeau", async () => {
+    stubFetch(
+      new Response(
+        JSON.stringify({ error: { kind: 'pool_empty', message: 'Pas assez de recettes disponibles' } }),
+        { status: 422, headers: { 'Content-Type': 'application/json' } },
+      ),
+    );
+
+    const { container } = render(
+      <EditSejourClient sejour={SEJOUR} token="token-abc" hasPlanning={false} />,
+    );
+
+    fireEvent.submit(container.querySelector('form')!);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('pool-empty-banner')).toBeTruthy(),
+    );
+
+    expect(screen.queryByText('Génération du planning en cours...')).toBeNull();
+    expect(pushMock).not.toHaveBeenCalled();
   });
 });
