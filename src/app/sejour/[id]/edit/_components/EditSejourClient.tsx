@@ -56,29 +56,27 @@ export function EditSejourClient({ sejour, token, hasPlanning }: Props) {
   async function generatePlanning() {
     setIsGenerating(true)
     setGenerationError(null)
-    try {
-      const response = await fetch(`/api/sejours/${sejour.id}/planning`, {
-        method: "POST",
-        headers: { "X-Sejour-Token": token },
-      })
+    const response = await fetch(`/api/sejours/${sejour.id}/planning`, {
+      method: "POST",
+      headers: { "X-Sejour-Token": token },
+    })
 
-      if (!response.ok) {
-        const json: unknown = await response.json()
-        const apiError = extractApiError(json)
-        const message = apiError?.message ?? "Erreur lors de la génération du planning"
+    if (!response.ok) {
+      const json: unknown = await response.json()
+      const apiError = extractApiError(json)
+      const message = apiError?.message ?? "Erreur lors de la génération du planning"
 
-        if (apiError?.kind === "pool_empty") {
-          setGenerationError(message)
-        } else {
-          toast.error(message)
-          router.push(`/sejour/${sejour.id}?t=${token}`)
-        }
+      if (apiError?.kind === "pool_empty") {
+        // Ne pas naviguer : le composant reste monté, l'overlay doit être reset ici.
+        setGenerationError(message)
+        setIsGenerating(false)
       } else {
-        toast.success("Planning généré")
+        toast.error(message)
         router.push(`/sejour/${sejour.id}?t=${token}`)
       }
-    } finally {
-      setIsGenerating(false)
+    } else {
+      toast.success("Planning généré")
+      router.push(`/sejour/${sejour.id}?t=${token}`)
     }
   }
 
