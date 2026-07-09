@@ -72,7 +72,7 @@ describe('SejourForm — marquage resto (TK-71)', () => {
   it('CA-4 : un séjour tout-resto reste soumettable (pas de warning de couverture)', () => {
     const { container } = render(<SejourForm onSubmit={vi.fn()} />)
 
-    setCounts(container, '0', '3') // 3 jours * 3 repas max par défaut nb_jours=2 → couvre min
+    setCounts(container, '0', '3') // nb_jours défaut = 2 → min de couverture = 3, atteint pile
 
     // Marquer tous les slots en resto ne doit pas faire apparaître d'alerte liée aux resto
     const soirButtons = screen.getAllByRole('button', { name: 'Soir' })
