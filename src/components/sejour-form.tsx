@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { z } from "zod"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -9,13 +9,14 @@ import { Plus, Trash2 } from "lucide-react"
 
 import { setupZodFr } from "@/lib/zod-config"
 import { CreateSejourBodySchema, EquipmentSchema, AllergenSchema, ExclusionTagSchema } from "@/lib/types/schemas"
+import { buildSequence, type PlanningSlot } from "@/lib/planning/build-sequence"
 import {
   ALLERGEN_LABELS,
   DIETARY_LABELS,
   EU14_ALLERGENS,
 } from "@/lib/ui/labels"
 import type { Allergen, DietaryRestriction } from "@/lib/ui/labels"
-import type { ExclusionTag } from "@/lib/types/domain"
+import type { ExclusionTag, MealType } from "@/lib/types/domain"
 import {
   Form,
   FormControl,
@@ -72,6 +73,16 @@ const PREMIER_REPAS_OPTIONS: { value: 'matin' | 'midi' | 'soir'; label: string }
   { value: "midi", label: "Midi" },
   { value: "soir", label: "Soir" },
 ]
+
+const MEAL_LABELS: Record<MealType, string> = {
+  'petit-dejeuner': "P-déj",
+  midi: "Midi",
+  soir: "Soir",
+}
+
+function slotKey(slot: PlanningSlot): string {
+  return `${slot.jour}-${slot.repas}`
+}
 
 const EMPTY_PARTICIPANT = {
   nom: "",
@@ -167,6 +178,35 @@ export function SejourForm({
   const brunchs = safeNumber(form.watch("repartition_repas.brunchs"))
 
   const repasValidation = computeRepasValidation(nbJours, midis, soirs, brunchs)
+
+  const premierRepas = form.watch("repartition_repas.premier_repas")
+  const plannedSlots = useMemo(
+    () => buildSequence({ premier_repas: premierRepas, midis, soirs, brunchs }),
+    [premierRepas, midis, soirs, brunchs],
+  )
+  const slotsResto = form.watch("repartition_repas.slots_resto") ?? []
+
+  // Purge dérivée des seuls compteurs : ne dépend pas de slots_resto pour éviter
+  // que le setValue ci-dessous ne redéclenche cet effet en boucle.
+  useEffect(() => {
+    const validKeys = new Set(plannedSlots.map(slotKey))
+    const current = form.getValues("repartition_repas.slots_resto") ?? []
+    const filtered = current.filter((slot) => validKeys.has(slotKey(slot)))
+    if (filtered.length !== current.length) {
+      form.setValue("repartition_repas.slots_resto", filtered)
+    }
+  }, [plannedSlots, form])
+
+  function toggleResto(slot: PlanningSlot) {
+    const current = form.getValues("repartition_repas.slots_resto") ?? []
+    const isResto = current.some((s) => s.jour === slot.jour && s.repas === slot.repas)
+    form.setValue(
+      "repartition_repas.slots_resto",
+      isResto
+        ? current.filter((s) => !(s.jour === slot.jour && s.repas === slot.repas))
+        : [...current, slot],
+    )
+  }
 
   function toggleAllergen(index: number, allergen: Allergen) {
     const allParticipants = form.getValues("participants")
@@ -417,6 +457,47 @@ export function SejourForm({
                   >
                     {repasValidation.message}
                   </p>
+                )}
+
+                {plannedSlots.length > 0 && (
+                  <div className="space-y-2 border-t border-gray-100 pt-4">
+                    <p className="text-sm font-medium text-gray-700">
+                      Repas au restaurant <span className="font-normal text-gray-400">(optionnel)</span>
+                    </p>
+                    <div className="space-y-1.5">
+                      {Object.entries(
+                        plannedSlots.reduce<Record<number, PlanningSlot[]>>((acc, slot) => {
+                          (acc[slot.jour] ??= []).push(slot)
+                          return acc
+                        }, {}),
+                      ).map(([jour, slots]) => (
+                        <div key={jour} className="flex items-center gap-2">
+                          <span className="w-14 shrink-0 text-xs text-gray-500">
+                            Jour {jour}
+                          </span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {slots.map((slot) => {
+                              const checked = slotsResto.some(
+                                (s) => s.jour === slot.jour && s.repas === slot.repas,
+                              )
+                              return (
+                                <Button
+                                  key={slotKey(slot)}
+                                  type="button"
+                                  variant={checked ? "default" : "outline"}
+                                  size="sm"
+                                  className="h-7 px-2 text-xs"
+                                  onClick={() => toggleResto(slot)}
+                                >
+                                  {MEAL_LABELS[slot.repas]}
+                                </Button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
             </section>
